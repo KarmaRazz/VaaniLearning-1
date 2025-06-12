@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import logoImage from "@assets/Logo Png_1749717205842.png";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,9 +33,12 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/">
-              <h1 className="text-2xl font-bold text-primary-orange cursor-pointer">
-                Vaani
-              </h1>
+              <div className="flex items-center space-x-2 cursor-pointer">
+                <img src={logoImage} alt="Vaani" className="h-10 w-10" />
+                <h1 className="text-2xl font-bold text-primary-orange">
+                  Vaani
+                </h1>
+              </div>
             </Link>
           </div>
 
@@ -43,15 +47,15 @@ export default function Navbar() {
             <div className="ml-10 flex items-baseline space-x-8">
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
-                  <a
-                    className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                  <span
+                    className={`px-3 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
                       isActiveLink(link.href)
                         ? "text-primary-orange"
                         : "text-gray-600 hover:text-primary-orange"
                     }`}
                   >
                     {link.label}
-                  </a>
+                  </span>
                 </Link>
               ))}
             </div>
@@ -86,8 +90,8 @@ export default function Navbar() {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <a
-                  className={`block px-3 py-2 text-base font-medium ${
+                <span
+                  className={`block px-3 py-2 text-base font-medium cursor-pointer ${
                     isActiveLink(link.href)
                       ? "text-primary-orange"
                       : "text-gray-600 hover:text-primary-orange"
@@ -95,7 +99,7 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
-                </a>
+                </span>
               </Link>
             ))}
             <div className="pt-2">
