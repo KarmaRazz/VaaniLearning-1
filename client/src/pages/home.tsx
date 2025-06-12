@@ -12,21 +12,21 @@ export default function Home() {
       <FeatureCards />
       
       {/* Call to Action Section */}
-      <section className="py-16 bg-gradient-to-r from-primary-orange to-primary-red">
+      <section className="py-16 bg-[#FDF7F3]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#333333] mb-6">
             Ready to Start Your Success Journey?
           </h2>
-          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-[#444444] mb-8 max-w-2xl mx-auto leading-relaxed">
             Join thousands of students who have achieved their dreams with Vaani. Start your preparation today!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-white text-primary-orange px-8 py-4 text-lg font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+            <Button className="bg-[#F26B1D] text-white px-8 py-4 text-lg font-bold hover:bg-[#D72638] transition-colors duration-200 shadow-md hover:shadow-lg">
               Start Free Trial
             </Button>
             <Button
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-primary-orange px-8 py-4 text-lg font-semibold transition-all duration-200"
+              className="border-2 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white px-8 py-4 text-lg font-semibold transition-all duration-200"
             >
               View Pricing
             </Button>
@@ -62,29 +62,29 @@ export default function Home() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-base font-bold text-[#333333] mb-4">Quick Links</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Quick Links</h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">About Us</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Courses</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Pricing</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Contact</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">About Us</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Courses</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Pricing</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Contact</a></li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="text-base font-bold text-[#333333] mb-4">Support</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Support</h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Help Center</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Terms of Service</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Privacy Policy</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Refund Policy</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Help Center</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Terms of Service</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Privacy Policy</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Refund Policy</a></li>
               </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 className="text-base font-bold text-[#333333] mb-4">Contact</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Contact</h4>
               <div className="space-y-3">
                 <p className="flex items-center text-[#333333] text-sm">
                   <Phone className="h-4 w-4 mr-3 text-[#F26B1D]" /> +977 98XXXXXXXX
