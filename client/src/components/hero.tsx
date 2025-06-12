@@ -34,38 +34,38 @@ export default function Hero() {
               <div className="absolute inset-0 w-80 h-80 rounded-full border-4 border-dotted border-white/30 animate-pulse"></div>
               <div className="absolute inset-4 w-72 h-72 rounded-full border-2 border-dotted border-white/20"></div>
               
-              {/* Main instructor image placeholder */}
-              <div className="relative z-10 w-80 h-80 rounded-full overflow-hidden shadow-2xl border-8 border-white bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              {/* Main instructor image placeholder with floating badges */}
+              <div className="relative w-80 h-80 rounded-full overflow-hidden shadow-2xl border-8 border-white bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center z-10">
                 <div className="text-8xl text-gray-400">👨‍🏫</div>
-              </div>
-
-              {/* Floating achievement badges */}
-              <div className="absolute top-16 -left-8 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce">
-                <div className="flex items-center space-x-2">
-                  <span className="text-yellow-500 text-xl">🏆</span>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-800">Top Rated</div>
-                    <div className="text-xs text-gray-600">Platform</div>
+                
+                {/* Floating achievement badges - positioned within circle bounds */}
+                <div className="absolute top-[-20px] left-4 bg-white p-2 px-4 rounded-xl shadow-md text-sm z-20 animate-bounce">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-yellow-500 text-lg">🏆</span>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-800">Top Rated</div>
+                      <div className="text-xs text-gray-600">Platform</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="absolute top-20 right-[-60px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
-                <div className="flex items-center space-x-2">
-                  <span className="text-green-500 text-xl">📚</span>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-800">10K+</div>
-                    <div className="text-xs text-gray-600">Notes</div>
+                <div className="absolute bottom-10 left-[-10px] bg-white p-2 px-4 rounded-xl shadow-md text-sm z-20 animate-bounce" style={{ animationDelay: "1s" }}>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-green-500 text-lg">📚</span>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-800">10K+</div>
+                      <div className="text-xs text-gray-600">Notes</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="absolute bottom-20 right-[-60px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
-                <div className="flex items-center space-x-2">
-                  <span className="text-[#F26B1D] text-xl">👥</span>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-800">5K+</div>
-                    <div className="text-xs text-gray-600">Students</div>
+                <div className="absolute bottom-0 right-4 bg-white p-2 px-4 rounded-xl shadow-md text-sm z-20 animate-bounce" style={{ animationDelay: "2s" }}>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[#F26B1D] text-lg">👥</span>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-800">5K+</div>
+                      <div className="text-xs text-gray-600">Students</div>
+                    </div>
                   </div>
                 </div>
               </div>
