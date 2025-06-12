@@ -50,7 +50,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="absolute top-20 right-[-30px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
+              <div className="absolute top-20 right-[-60px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500 text-xl">📚</span>
                   <div>
@@ -60,7 +60,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="absolute bottom-20 right-[-30px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
+              <div className="absolute bottom-20 right-[-60px] bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
                 <div className="flex items-center space-x-2">
                   <span className="text-[#F26B1D] text-xl">👥</span>
                   <div>
