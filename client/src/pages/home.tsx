@@ -35,72 +35,72 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-dark text-white py-12">
+      <footer className="bg-[#F8EDEB] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-primary-orange">Vaani</h3>
-              <p className="text-gray-300">
+              <h3 className="text-lg font-bold text-[#F26B1D]">Vaani</h3>
+              <p className="text-[#333333] text-sm leading-relaxed">
                 Nepal's most trusted platform for Lok Sewa and CEE preparation.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">
-                  <Facebook className="h-6 w-6" />
+                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                  <Facebook className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">
-                  <Twitter className="h-6 w-6" />
+                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                  <Twitter className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">
-                  <Instagram className="h-6 w-6" />
+                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                  <Instagram className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">
-                  <Youtube className="h-6 w-6" />
+                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                  <Youtube className="h-5 w-5" />
                 </a>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">About Us</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Courses</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Contact</a></li>
+              <h4 className="text-base font-bold text-[#333333] mb-4">Quick Links</h4>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">About Us</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Courses</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Pricing</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Contact</a></li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-primary-orange transition-colors">Refund Policy</a></li>
+              <h4 className="text-base font-bold text-[#333333] mb-4">Support</h4>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Help Center</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Terms of Service</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Privacy Policy</a></li>
+                <li><a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors text-sm font-medium">Refund Policy</a></li>
               </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-300">
-                <p className="flex items-center">
-                  <Phone className="h-4 w-4 mr-2" /> +977 98XXXXXXXX
+              <h4 className="text-base font-bold text-[#333333] mb-4">Contact</h4>
+              <div className="space-y-3">
+                <p className="flex items-center text-[#333333] text-sm">
+                  <Phone className="h-4 w-4 mr-3 text-[#F26B1D]" /> +977 98XXXXXXXX
                 </p>
-                <p className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2" /> support@vaani.np
+                <p className="flex items-center text-[#333333] text-sm">
+                  <Mail className="h-4 w-4 mr-3 text-[#F26B1D]" /> support@vaani.np
                 </p>
-                <p className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-2" /> Kathmandu, Nepal
+                <p className="flex items-center text-[#333333] text-sm">
+                  <MapPin className="h-4 w-4 mr-3 text-[#F26B1D]" /> Kathmandu, Nepal
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 Vaani. All rights reserved.</p>
+          <div className="border-t border-[#333333]/20 mt-10 pt-8 text-center">
+            <p className="text-[#333333] text-sm">&copy; 2024 Vaani. All rights reserved.</p>
           </div>
         </div>
       </footer>
