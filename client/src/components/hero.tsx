@@ -29,7 +29,7 @@ export default function Hero() {
 
           {/* Right Content - Instructor Image */}
           <div className="flex-1 flex justify-center md:justify-end">
-            <div className="relative">
+            <div className="relative z-10 w-[80%] max-w-md mx-auto md:ml-auto md:mr-8">
               {/* Dotted circular background */}
               <div className="absolute inset-0 w-80 h-80 rounded-full border-4 border-dotted border-white/30 animate-pulse"></div>
               <div className="absolute inset-4 w-72 h-72 rounded-full border-2 border-dotted border-white/20"></div>
@@ -40,7 +40,7 @@ export default function Hero() {
               </div>
 
               {/* Floating achievement badges */}
-              <div className="absolute top-8 -left-8 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce">
+              <div className="absolute top-8 -left-4 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce">
                 <div className="flex items-center space-x-2">
                   <span className="text-yellow-500 text-xl">🏆</span>
                   <div>
@@ -50,7 +50,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="absolute bottom-8 -right-8 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
+              <div className="absolute bottom-8 -right-4 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center space-x-2">
                   <span className="text-[#F26B1D] text-xl">👥</span>
                   <div>
@@ -60,7 +60,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="absolute top-1/2 -right-12 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
+              <div className="absolute top-1/2 -right-6 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500 text-xl">📚</span>
                   <div>

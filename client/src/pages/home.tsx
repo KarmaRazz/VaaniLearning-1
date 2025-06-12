@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
+import OverlapFeatures from "@/components/overlap-features";
 import FeatureCards from "@/components/feature-cards";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
@@ -9,6 +10,7 @@ export default function Home() {
     <div className="min-h-screen bg-cream">
       <Navbar />
       <Hero />
+      <OverlapFeatures />
       <FeatureCards />
       
       {/* Call to Action Section */}
