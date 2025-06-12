@@ -40,7 +40,7 @@ export default function Hero() {
               </div>
 
               {/* Floating achievement badges */}
-              <div className="absolute top-8 -left-4 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce">
+              <div className="absolute top-12 -left-12 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce">
                 <div className="flex items-center space-x-2">
                   <span className="text-yellow-500 text-xl">🏆</span>
                   <div>
@@ -50,22 +50,22 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="absolute bottom-8 -right-4 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
-                <div className="flex items-center space-x-2">
-                  <span className="text-[#F26B1D] text-xl">👥</span>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-800">15K+</div>
-                    <div className="text-xs text-gray-600">Students</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute top-1/2 -right-6 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
+              <div className="absolute top-1/3 right-4 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "1s" }}>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500 text-xl">📚</span>
                   <div>
                     <div className="text-sm font-semibold text-gray-800">10K+</div>
                     <div className="text-xs text-gray-600">Notes</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute bottom-8 right-2 bg-white rounded-xl shadow-lg p-3 z-20 animate-bounce" style={{ animationDelay: "2s" }}>
+                <div className="flex items-center space-x-2">
+                  <span className="text-[#F26B1D] text-xl">👥</span>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-800">5K+</div>
+                    <div className="text-xs text-gray-600">Students</div>
                   </div>
                 </div>
               </div>
