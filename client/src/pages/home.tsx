@@ -1,6 +1,7 @@
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import OverlapFeatures from "@/components/overlap-features";
+import ExamCategories from "@/components/exam-categories";
 import FeatureCards from "@/components/feature-cards";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
@@ -11,6 +12,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <OverlapFeatures />
+      <ExamCategories />
       <FeatureCards />
       
       {/* Call to Action Section */}
