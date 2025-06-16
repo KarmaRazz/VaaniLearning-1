@@ -61,87 +61,120 @@ export default function FeaturedCourses() {
               key={index}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-[1.02] transition-transform duration-300 border border-gray-100"
             >
-              {/* Top Banner */}
-              <div className="relative bg-gradient-to-r from-[#F26B1D] to-[#D72638] h-32 flex items-center justify-center">
-                {course.isOnline && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-                    Online
+              {/* Online Tag */}
+              {course.isOnline && (
+                <div className="bg-[#F26B1D] text-white px-3 py-1 text-xs font-medium inline-block rounded-br-lg">
+                  ONLINE
+                </div>
+              )}
+
+              {/* Top Banner with Course Info */}
+              <div className="relative bg-gradient-to-r from-[#F26B1D] to-[#D72638] p-4 text-white">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-2 text-white">
+                      {course.title.toUpperCase()}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                      <div className="bg-white/20 p-2 rounded text-center">
+                        <div className="font-semibold">LIVE</div>
+                        <div>LECTURES</div>
+                      </div>
+                      <div className="bg-white/20 p-2 rounded text-center">
+                        <div className="font-semibold">HANDWRITTEN NOTES</div>
+                        <div>& REGULAR TESTS</div>
+                      </div>
+                      <div className="bg-white/20 p-2 rounded text-center">
+                        <div className="font-semibold">DPPS WITH THEIR</div>
+                        <div>VIDEO SOLUTIONS</div>
+                      </div>
+                      <div className="bg-white/20 p-2 rounded text-center">
+                        <div className="font-semibold">24X7 DOUBT</div>
+                        <div>SOLUTIONS & FREE APPS</div>
+                      </div>
+                    </div>
                   </div>
-                )}
-                <div className="text-white text-center">
-                  <div className="text-2xl font-bold mb-1">🎓</div>
+                  <div className="ml-4">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-2xl">🎓</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Price Banner */}
+                <div className="bg-[#D72638] text-white px-3 py-2 rounded mt-3 text-center">
                   {course.isFree ? (
                     <div className="text-lg font-bold">FREE</div>
                   ) : (
                     <div>
-                      <div className="text-sm opacity-90">₹{course.originalPrice}</div>
-                      <div className="text-lg font-bold">₹{course.discountedPrice} for Complete Course</div>
+                      <span className="line-through text-sm opacity-80">₹{course.originalPrice}</span>
+                      <span className="text-xl font-bold ml-2">₹{course.discountedPrice}</span>
+                      <div className="text-xs">FOR COMPLETE COURSE</div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Course Info */}
-              <div className="p-6">
-                {/* Title and Language */}
-                <div className="mb-4">
-                  <h3 className="text-xl font-bold text-[#333333] mb-2">
-                    {course.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full font-medium">
+              {/* Course Details */}
+              <div className="p-4">
+                {/* Title Row with Badges */}
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-bold text-[#333333]">{course.title}</h4>
+                  <div className="flex gap-2">
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs rounded font-medium">
+                      NEW
+                    </span>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded">
                       {course.language}
                     </span>
-                    {course.discount && (
-                      <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full font-medium">
-                        {course.discount}
-                      </span>
+                  </div>
+                </div>
+
+                {/* Target Audience */}
+                <div className="flex items-center gap-2 mb-3 text-sm text-[#666666]">
+                  <span>🎯</span>
+                  <span>{course.tagline}</span>
+                </div>
+
+                {/* Duration */}
+                <div className="flex items-center gap-2 mb-4 text-sm text-[#666666]">
+                  <span>📅</span>
+                  <span>{course.duration}</span>
+                </div>
+
+                {/* Plans */}
+                <div className="mb-4">
+                  <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-medium inline-block">
+                    More plans inside
+                  </div>
+                </div>
+
+                {/* Final Price and Discount */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <span className="text-2xl font-bold text-[#F26B1D]">₹{course.discountedPrice}</span>
+                    {!course.isFree && (
+                      <span className="text-sm text-gray-500 line-through ml-2">₹{course.originalPrice}</span>
                     )}
+                    <div className="text-xs text-gray-500">(FOR FULL BATCH)</div>
                   </div>
-                  <p className="text-sm text-[#666666] mb-3">
-                    {course.tagline}
-                  </p>
-                  <p className="text-xs text-[#888888] mb-2">
-                    by {course.instructor}
-                  </p>
-                </div>
-
-                {/* Duration and Videos */}
-                <div className="mb-4 space-y-2">
-                  <p className="text-sm text-[#666666]">
-                    📅 {course.duration}
-                  </p>
-                  <p className="text-sm text-[#666666]">
-                    🎥 {course.videos}
-                  </p>
-                </div>
-
-                {/* Pricing */}
-                {!course.isFree && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2">
-                      {course.originalPrice !== course.discountedPrice && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{course.originalPrice}
-                        </span>
-                      )}
-                      <span className="text-xl font-bold text-[#333333]">
-                        ₹{course.discountedPrice}
-                      </span>
+                  {course.discount && (
+                    <div className="text-xs text-green-600 font-medium">
+                      ✅ {course.discount}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* CTA Buttons */}
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
-                    className="flex-1 border-2 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors duration-200"
+                    className="flex-1 border-2 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors duration-200 font-semibold"
                   >
-                    Explore
+                    EXPLORE
                   </Button>
-                  <Button className="flex-1 bg-[#F26B1D] text-white hover:bg-[#D72638] transition-colors duration-200">
-                    {course.isFree ? "Enroll Now" : "Buy Now"}
+                  <Button className="flex-1 bg-[#F26B1D] text-white hover:bg-[#D72638] transition-colors duration-200 font-semibold">
+                    {course.isFree ? "ENROLL NOW" : "BUY NOW"}
                   </Button>
                 </div>
               </div>
