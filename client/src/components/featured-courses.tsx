@@ -13,6 +13,7 @@ export default function FeaturedCourses() {
       discount: "13% off applied",
       videos: "45 Days | 60+ Videos",
       isOnline: true,
+      imageUrl: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=100&h=100&fit=crop&crop=center",
     },
     {
       title: "Engineering (IOE) Full Prep",
@@ -25,6 +26,7 @@ export default function FeaturedCourses() {
       discount: null,
       videos: "75 Days | 90+ Videos",
       isOnline: true,
+      imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=center",
     },
     {
       title: "Lok Sewa (Kharidar/Subba)",
@@ -38,6 +40,7 @@ export default function FeaturedCourses() {
       videos: "60 Days | 100+ Videos",
       isOnline: true,
       isFree: true,
+      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=center",
     },
   ];
 
@@ -95,8 +98,12 @@ export default function FeaturedCourses() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                      <span className="text-2xl">🎓</span>
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center p-2">
+                      <img 
+                        src={course.imageUrl} 
+                        alt={course.title} 
+                        className="w-full h-full rounded-full object-cover"
+                      />
                     </div>
                   </div>
                 </div>
