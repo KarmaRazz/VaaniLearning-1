@@ -1,0 +1,50 @@
+Create a “Featured Courses” section for my edtech platform using React + Tailwind CSS, with a bold, modern course card UI similar to the Physics Wallah "Arjuna JEE 2.0" card layout.
+
+📌 IMPORTANT:
+- Do not change or touch any part of the existing UI.
+- Just add this new section below the "Exam Categories".
+
+✅ SECTION LAYOUT:
+- Heading: “Featured Courses”
+- Grid layout: 1 card per row on mobile, 2–3 per row on desktop
+- Each card must be visually rich and inspired by the PW Arjuna card style
+
+🎴 COURSE CARD STRUCTURE:
+- **Top Banner**:
+  - Optional “Online” tag in top-left corner
+  - Course image/banner
+  - Label: e.g. “₹5,300 ₹4,900 for Complete Course” (with discount styling)
+
+- **Middle Info Block**:
+  - Course Title: e.g., “Pre-Medical 2025 Crash Course”
+  - Language Badge (e.g., "Nepali", "Hinglish")
+  - Student tag line (e.g., “For Class 12 & Dropper Students”)
+  - Duration: “Starts on 5 July 2025 – Ends on 30 Sept 2025”
+
+- **Price + Plans**:
+  - Actual Price & Discounted Price
+  - Discount badge: e.g. “8% off applied”
+  - Badges like “Free”, “Pro”, “Standard” if needed
+
+- **CTA Buttons**:
+  - `Explore` → ghost style with border
+  - `Buy Now` → solid style with brand color
+  - Buttons should be full width and side-by-side
+
+🎨 Tailwind Design:
+- Card: `bg-white rounded-xl shadow-lg overflow-hidden`
+- Title: `text-xl font-bold`
+- Tag badges: `bg-yellow-100 text-yellow-800 px-2 py-1 text-xs rounded-full`
+- Button: `hover:scale-[1.02] transition transform`
+- Pricing: show strikethrough on original price and green badge for discount
+
+🧠 Sample Courses (you can include 3 to start):
+1. **Pre-Medical Entrance 2025**
+   - Rs. 1499 → Rs. 1299
+   - Sujata Sah | Class 12 & Dropper | 45 Days
+2. **Engineering (IOE) Full Prep**
+   - Rs. 1999 | David Kumar | 60+ videos
+3. **Lok Sewa (Kharidar/Subba)**
+   - Free | Starts 1 July
+
+Make the cards visually appealing like in the provided screenshot with hover effects and responsive layout.
