@@ -4,6 +4,7 @@ import OverlapFeatures from "@/components/overlap-features";
 import ExamCategories from "@/components/exam-categories";
 import FeaturedCourses from "@/components/featured-courses";
 import FeatureCards from "@/components/feature-cards";
+import StatsSection from "@/components/stats-section";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
 
@@ -15,6 +16,7 @@ export default function Home() {
       <OverlapFeatures />
       <ExamCategories />
       <FeaturedCourses />
+      <StatsSection />
       <FeatureCards />
       
       {/* Call to Action Section */}
