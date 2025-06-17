@@ -9,9 +9,9 @@ interface StatCardProps {
 
 function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
   return (
-    <div className={`group relative ${bgColor} w-full h-[200px] rounded-xl shadow-md text-center overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg flex flex-col items-center justify-center p-6`}>
-      {/* Text Content - Moves Up on Hover */}
-      <div className="group-hover:-translate-y-3 transition-all duration-300">
+    <div className={`group relative ${bgColor} w-full h-[200px] rounded-xl shadow-md text-center overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg`}>
+      {/* Text Content - Centered by default, moves up on hover */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover:-translate-y-8 transition-all duration-300">
         <h3 className="text-2xl md:text-3xl font-bold text-[#333333] mb-2">
           {title}
         </h3>
@@ -20,12 +20,14 @@ function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
         </p>
       </div>
       
-      {/* Animated Image - Fades up from below */}
-      <img
-        src={imageUrl}
-        alt={subtitle}
-        className="w-12 h-12 opacity-0 translate-y-6 group-hover:translate-y-0 group-hover:opacity-100 mx-auto mt-2 transition-all duration-300 object-contain"
-      />
+      {/* Animated Image - Appears below text on hover */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+        <img
+          src={imageUrl}
+          alt={subtitle}
+          className="w-12 h-12 object-contain"
+        />
+      </div>
     </div>
   );
 }
