@@ -207,29 +207,168 @@ const PlaceholderContent = ({ section }: { section: string }) => (
   </div>
 );
 
-const DashboardContent = () => (
-  <div className="space-y-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900">Total Students</h3>
-        <p className="text-3xl font-bold text-[#F26B1D]">5,432</p>
+const DashboardContent = () => {
+  const statsCards = [
+    {
+      title: "Total Courses",
+      value: "34",
+      icon: "📚",
+      bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
+      textColor: "text-blue-700",
+      valueColor: "text-blue-800"
+    },
+    {
+      title: "Total Revenue",
+      value: "Rs. 142,000",
+      icon: "💰",
+      bgColor: "bg-gradient-to-br from-green-50 to-green-100",
+      textColor: "text-green-700",
+      valueColor: "text-green-800",
+      hasDropdown: true,
+      dropdownOptions: ["All Time", "This Month"]
+    },
+    {
+      title: "Total Paid Students",
+      value: "523",
+      icon: "👥",
+      bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
+      textColor: "text-purple-700",
+      valueColor: "text-purple-800"
+    },
+    {
+      title: "Total Signups",
+      value: "1892",
+      icon: "📝",
+      bgColor: "bg-gradient-to-br from-yellow-50 to-yellow-100",
+      textColor: "text-yellow-700",
+      valueColor: "text-yellow-800"
+    },
+    {
+      title: "Active Courses",
+      value: "16",
+      icon: "🎯",
+      bgColor: "bg-gradient-to-br from-indigo-50 to-indigo-100",
+      textColor: "text-indigo-700",
+      valueColor: "text-indigo-800"
+    },
+    {
+      title: "Total Expenses",
+      value: "Rs. 41,200",
+      icon: "💸",
+      bgColor: "bg-gradient-to-br from-red-50 to-red-100",
+      textColor: "text-red-700",
+      valueColor: "text-red-800"
+    },
+    {
+      title: "Profit Till Now",
+      value: "Rs. 100,800",
+      icon: "📈",
+      bgColor: "bg-gradient-to-br from-emerald-50 to-emerald-100",
+      textColor: "text-emerald-700",
+      valueColor: "text-emerald-800",
+      hasDropdown: true,
+      dropdownOptions: ["All Time", "This Month"]
+    },
+    {
+      title: "Instructor Count",
+      value: "12",
+      icon: "👨‍🏫",
+      bgColor: "bg-gradient-to-br from-orange-50 to-orange-100",
+      textColor: "text-orange-700",
+      valueColor: "text-orange-800"
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statsCards.map((card, index) => (
+          <div
+            key={index}
+            className={`${card.bgColor} p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:scale-105`}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="text-2xl">{card.icon}</div>
+              {card.hasDropdown && (
+                <select className="text-xs bg-white border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent">
+                  {card.dropdownOptions?.map((option, optIndex) => (
+                    <option key={optIndex} value={option.toLowerCase().replace(' ', '-')}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            
+            <div>
+              <h3 className={`text-sm font-medium ${card.textColor} mb-2`}>
+                {card.title}
+              </h3>
+              <p className={`text-2xl font-bold ${card.valueColor}`}>
+                {card.value}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900">Active Courses</h3>
-        <p className="text-3xl font-bold text-[#F26B1D]">24</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900">Instructors</h3>
-        <p className="text-3xl font-bold text-[#F26B1D]">12</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900">Revenue</h3>
-        <p className="text-3xl font-bold text-[#F26B1D]">₹2.1M</p>
+
+      {/* Recent Activity Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="p-6 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-sm">👤</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">New student enrolled</p>
+                <p className="text-xs text-gray-500">Rajesh Kumar joined Pre-Medical Entrance course</p>
+              </div>
+              <span className="text-xs text-gray-400">2 min ago</span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-sm">💰</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Payment received</p>
+                <p className="text-xs text-gray-500">Rs. 1,299 payment for IOE Full Prep course</p>
+              </div>
+              <span className="text-xs text-gray-400">15 min ago</span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <span className="text-sm">🎓</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Course completion</p>
+                <p className="text-xs text-gray-500">Priya Sharma completed Lok Sewa preparation</p>
+              </div>
+              <span className="text-xs text-gray-400">1 hour ago</span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-sm">📝</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">New instructor added</p>
+                <p className="text-xs text-gray-500">Dr. Amit Sharma joined as Physics instructor</p>
+              </div>
+              <span className="text-xs text-gray-400">3 hours ago</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <PlaceholderContent section="dashboard details" />
-  </div>
-);
+  );
+};
 
 const CoursesContent = () => <PlaceholderContent section="courses management" />;
 const NotesQuizzesContent = () => <PlaceholderContent section="notes and quizzes" />;
