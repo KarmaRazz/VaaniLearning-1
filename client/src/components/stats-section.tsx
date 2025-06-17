@@ -10,8 +10,8 @@ interface StatCardProps {
 function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
   return (
     <div className={`group relative ${bgColor} w-full h-[200px] rounded-xl shadow-md text-center overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg`}>
-      {/* Text Content - Centered by default, moves up on hover */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover:-translate-y-8 transition-all duration-300">
+      {/* Text Content - Centered by default, moves up significantly on hover */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover:top-8 group-hover:-translate-y-0 transition-all duration-300">
         <h3 className="text-2xl md:text-3xl font-bold text-[#333333] mb-2">
           {title}
         </h3>
@@ -20,12 +20,12 @@ function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
         </p>
       </div>
       
-      {/* Animated Image - Appears below text on hover */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+      {/* Animated Image - Appears in bottom area on hover */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 translate-y-8 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
         <img
           src={imageUrl}
           alt={subtitle}
-          className="w-12 h-12 object-contain"
+          className="w-16 h-16 object-contain"
         />
       </div>
     </div>
