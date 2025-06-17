@@ -62,7 +62,12 @@ export default function Navbar() {
           </div>
 
           {/* Login/Register Button */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="/admin">
+              <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
+                Admin
+              </Button>
+            </Link>
             <Link href="/login">
               <Button className="bg-primary-orange hover:bg-orange-600 text-white">
                 Login / Register
@@ -102,7 +107,16 @@ export default function Navbar() {
                 </span>
               </Link>
             ))}
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-300 text-gray-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin
+                </Button>
+              </Link>
               <Link href="/login">
                 <Button
                   className="w-full bg-primary-orange hover:bg-orange-600 text-white"

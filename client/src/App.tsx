@@ -10,6 +10,7 @@ import About from "@/pages/about";
 import Notes from "@/pages/notes";
 import MockTest from "@/pages/mock-test";
 import Login from "@/pages/login";
+import AdminPanel from "@/pages/admin";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/notes" component={Notes} />
       <Route path="/mock-test" component={MockTest} />
       <Route path="/login" component={Login} />
+      <Route path="/admin" component={AdminPanel} />
       <Route component={NotFound} />
     </Switch>
   );
