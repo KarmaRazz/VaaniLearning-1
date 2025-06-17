@@ -9,9 +9,9 @@ interface StatCardProps {
 
 function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
   return (
-    <div className={`group relative ${bgColor} w-full h-[200px] rounded-xl shadow-md text-center overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg`}>
-      {/* Text Content - Fixed Position */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+    <div className={`group relative ${bgColor} w-full h-[200px] rounded-xl shadow-md text-center overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg flex flex-col items-center justify-center p-6`}>
+      {/* Text Content - Moves Up on Hover */}
+      <div className="group-hover:-translate-y-3 transition-all duration-300">
         <h3 className="text-2xl md:text-3xl font-bold text-[#333333] mb-2">
           {title}
         </h3>
@@ -20,11 +20,11 @@ function StatCard({ title, subtitle, imageUrl, bgColor }: StatCardProps) {
         </p>
       </div>
       
-      {/* Animated Image */}
+      {/* Animated Image - Fades up from below */}
       <img
         src={imageUrl}
         alt={subtitle}
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 w-12 h-12 object-contain"
+        className="w-12 h-12 opacity-0 translate-y-6 group-hover:translate-y-0 group-hover:opacity-100 mx-auto mt-2 transition-all duration-300 object-contain"
       />
     </div>
   );
