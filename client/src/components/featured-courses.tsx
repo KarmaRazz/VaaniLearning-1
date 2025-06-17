@@ -13,7 +13,7 @@ export default function FeaturedCourses() {
       discount: "13% off applied",
       videos: "45 Days | 60+ Videos",
       isOnline: true,
-      imageUrl: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=100&h=100&fit=crop&crop=center",
+      imageUrl: "/attached_assets/ChatGPT Image Jun 17, 2025, 10_23_38 AM_1750135214080.png",
     },
     {
       title: "Engineering (IOE) Full Prep",
