@@ -64,61 +64,32 @@ export default function FeaturedCourses() {
               key={index}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-[1.02] transition-transform duration-300 border border-gray-100"
             >
-              {/* Online Tag */}
-              {course.isOnline && (
-                <div className="bg-[#F26B1D] text-white px-3 py-1 text-xs font-medium inline-block rounded-br-lg">
-                  ONLINE
-                </div>
-              )}
-
-              {/* Top Banner with Course Info */}
-              <div className="relative bg-gradient-to-r from-[#F26B1D] to-[#D72638] p-4 text-white">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold mb-2 text-white">
-                      {course.title.toUpperCase()}
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                      <div className="bg-white/20 p-2 rounded text-center">
-                        <div className="font-semibold">LIVE</div>
-                        <div>LECTURES</div>
-                      </div>
-                      <div className="bg-white/20 p-2 rounded text-center">
-                        <div className="font-semibold">HANDWRITTEN NOTES</div>
-                        <div>& REGULAR TESTS</div>
-                      </div>
-                      <div className="bg-white/20 p-2 rounded text-center">
-                        <div className="font-semibold">DPPS WITH THEIR</div>
-                        <div>VIDEO SOLUTIONS</div>
-                      </div>
-                      <div className="bg-white/20 p-2 rounded text-center">
-                        <div className="font-semibold">24X7 DOUBT</div>
-                        <div>SOLUTIONS & FREE APPS</div>
-                      </div>
-                    </div>
+              {/* Course Thumbnail */}
+              <div className="relative h-48 overflow-hidden">
+                {course.isOnline && (
+                  <div className="absolute top-3 left-3 bg-[#F26B1D] text-white px-3 py-1 text-xs font-medium rounded z-10">
+                    ONLINE
                   </div>
-                  <div className="ml-4">
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center p-2">
-                      <img 
-                        src={course.imageUrl} 
-                        alt={course.title} 
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </div>
+                )}
+                <img 
+                  src={course.imageUrl} 
+                  alt={course.title} 
+                  className="w-full h-full object-cover"
+                />
                 
-                {/* Price Banner */}
-                <div className="bg-[#D72638] text-white px-3 py-2 rounded mt-3 text-center">
-                  {course.isFree ? (
-                    <div className="text-lg font-bold">FREE</div>
-                  ) : (
-                    <div>
-                      <span className="line-through text-sm opacity-80">₹{course.originalPrice}</span>
-                      <span className="text-xl font-bold ml-2">₹{course.discountedPrice}</span>
-                      <div className="text-xs">FOR COMPLETE COURSE</div>
-                    </div>
-                  )}
+                {/* Price Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <div className="text-white text-center">
+                    {course.isFree ? (
+                      <div className="text-xl font-bold">FREE</div>
+                    ) : (
+                      <div>
+                        <span className="line-through text-sm opacity-80">₹{course.originalPrice}</span>
+                        <span className="text-xl font-bold ml-2">₹{course.discountedPrice}</span>
+                        <div className="text-xs">FOR COMPLETE COURSE</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
