@@ -313,6 +313,142 @@ const DashboardContent = () => {
         ))}
       </div>
 
+      {/* Today's Activity - Side by Side Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Today's Signups */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-lg">👥</span>
+              <h3 className="text-lg font-semibold text-gray-900">Today's Signups</h3>
+            </div>
+            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              5 New
+            </span>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  RK
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Rajesh Kumar</p>
+                  <p className="text-xs text-gray-500">rajesh.kumar@email.com</p>
+                </div>
+                <span className="text-xs text-gray-400">10:30 AM</span>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  PS
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Priya Sharma</p>
+                  <p className="text-xs text-gray-500">priya.sharma@email.com</p>
+                </div>
+                <span className="text-xs text-gray-400">9:45 AM</span>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <div className="h-8 w-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  AK
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Anita Khadka</p>
+                  <p className="text-xs text-gray-500">anita.khadka@email.com</p>
+                </div>
+                <span className="text-xs text-gray-400">8:20 AM</span>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <div className="h-8 w-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  ST
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Sunil Thapa</p>
+                  <p className="text-xs text-gray-500">sunil.thapa@email.com</p>
+                </div>
+                <span className="text-xs text-gray-400">7:15 AM</span>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <div className="h-8 w-8 bg-pink-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  MG
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Maya Gurung</p>
+                  <p className="text-xs text-gray-500">maya.gurung@email.com</p>
+                </div>
+                <span className="text-xs text-gray-400">6:30 AM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Today's Course Purchases */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-lg">💰</span>
+              <h3 className="text-lg font-semibold text-gray-900">Today's Course Purchases</h3>
+            </div>
+            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              3 Bought
+            </span>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="border border-gray-100 rounded-lg p-3">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Deepak Singh</p>
+                    <p className="text-xs text-gray-500">Pre-Medical Entrance 2025</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-green-600">Rs. 1,299</p>
+                    <p className="text-xs text-gray-400">11:20 AM</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border border-gray-100 rounded-lg p-3">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Sita Rai</p>
+                    <p className="text-xs text-gray-500">Engineering (IOE) Full Prep</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-green-600">Rs. 1,999</p>
+                    <p className="text-xs text-gray-400">9:30 AM</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border border-gray-100 rounded-lg p-3">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Ram Bahadur</p>
+                    <p className="text-xs text-gray-500">Lok Sewa (Kharidar/Subba)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-blue-600">Free</p>
+                    <p className="text-xs text-gray-400">8:45 AM</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Total Revenue Today:</span>
+                <span className="text-lg font-bold text-[#F26B1D]">Rs. 3,298</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Recent Activity Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-6 border-b border-gray-100">
