@@ -52,14 +52,14 @@ export default function ExamCategories() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#333333] mb-4">
-            Choose Your <span className="text-[#F26B1D]">Exam Category</span>
+            Choose Your <span className="text-[#F26B1D]">Goals</span>
           </h2>
           <p className="text-lg text-[#666666] max-w-2xl mx-auto">
             Find comprehensive preparation materials for your target exam
           </p>
         </div>
 
-        {/* Categories Grid */}
+        {/* Goals Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {categories.map((category, index) => (
             <div
@@ -92,17 +92,17 @@ export default function ExamCategories() {
 
               {/* CTA Button */}
               <button className="text-[#D72638] font-medium hover:underline flex items-center gap-1 transition-colors duration-200">
-                Explore Category
+                Explore Goal
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           ))}
         </div>
 
-        {/* View All Categories */}
+        {/* View All Goals */}
         <div className="text-center">
           <button className="text-[#6C63FF] font-semibold text-lg hover:underline transition-colors duration-200">
-            View All Categories ({categories.length})
+            View All Goals ({categories.length})
           </button>
         </div>
       </div>
