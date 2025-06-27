@@ -106,7 +106,11 @@ const courseData: Course = {
 };
 
 export default function CourseDetails() {
+  const params = useParams();
   const [activeTab, setActiveTab] = useState("curriculum");
+  
+  // Get course ID from URL params
+  const courseId = params.id;
 
   const tabs = [
     { id: "curriculum", label: "Curriculum" },
@@ -249,6 +253,7 @@ export default function CourseDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       {/* Course Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -276,11 +281,13 @@ export default function CourseDetails() {
             {/* Right Hero Image */}
             <div className="lg:pl-8">
               <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
-                <img
-                  src={courseData.heroImage}
-                  alt="Course Preview"
-                  className="w-full h-full object-cover"
-                />
+                <div className="w-full h-full bg-gradient-to-br from-[#F26B1D] to-[#D72638] flex items-center justify-center text-white">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📚</div>
+                    <div className="text-xl font-semibold">Course Preview</div>
+                    <div className="text-sm opacity-80 mt-2">Click to watch intro video</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
