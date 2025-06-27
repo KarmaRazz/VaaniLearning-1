@@ -110,11 +110,11 @@ Vaani is a comprehensive online learning platform designed specifically for Nepa
 - Schema changes managed through `drizzle-kit push`
 - Database URL configuration through environment variables
 
-## Changelog
-```
-Changelog:
-- June 27, 2025. Initial setup
-```
+## Recent Changes
+- June 27, 2025: Initial setup with complete landing page and admin dashboard
+- June 27, 2025: Created Course Landing Page with tabbed content (Curriculum, Description, Instructor, Reviews)
+- June 27, 2025: Updated terminology from "Categories" to "Goals" throughout exam selection section
+- June 27, 2025: Built comprehensive Course Upload Form in Admin Dashboard with 12 fields including pricing preview
 
 ## User Preferences
 ```

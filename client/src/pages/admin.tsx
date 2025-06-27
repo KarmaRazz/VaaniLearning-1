@@ -800,7 +800,7 @@ const CoursesContent = () => {
               type="submit"
               className="px-6 py-3 bg-[#F26B1D] text-white font-semibold rounded-lg hover:bg-[#D72638] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:ring-offset-2"
             >
-              Upload Course (Step 1)
+              Next
             </button>
           </div>
         </form>
