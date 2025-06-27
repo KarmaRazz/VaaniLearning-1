@@ -11,12 +11,14 @@ import Notes from "@/pages/notes";
 import MockTest from "@/pages/mock-test";
 import Login from "@/pages/login";
 import AdminPanel from "@/pages/admin";
+import CourseDetails from "@/pages/course-details";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/courses" component={Courses} />
+      <Route path="/course/:id" component={CourseDetails} />
       <Route path="/about" component={About} />
       <Route path="/notes" component={Notes} />
       <Route path="/mock-test" component={MockTest} />

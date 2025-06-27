@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function FeaturedCourses() {
   const courses = [
     {
+      id: "1",
       title: "Pre-Medical Entrance 2025",
       tagline: "For Class 12 & Dropper Students",
       instructor: "Sujata Sah",
@@ -16,6 +18,7 @@ export default function FeaturedCourses() {
       imageUrl: "/attached_assets/ChatGPT Image Jun 17, 2025, 10_23_38 AM_1750135214080.png",
     },
     {
+      id: "2",
       title: "Engineering (IOE) Full Prep",
       tagline: "Complete IOE entrance preparation",
       instructor: "David Kumar",
@@ -29,6 +32,7 @@ export default function FeaturedCourses() {
       imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=100&h=100&fit=crop&crop=center",
     },
     {
+      id: "3",
       title: "Lok Sewa (Kharidar/Subba)",
       tagline: "Government job preparation course",
       instructor: "Anita Sharma",
@@ -145,12 +149,14 @@ export default function FeaturedCourses() {
 
                 {/* CTA Buttons */}
                 <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-2 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors duration-200 font-semibold"
-                  >
-                    EXPLORE
-                  </Button>
+                  <Link href={`/course/${course.id}`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="w-full border-2 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors duration-200 font-semibold"
+                    >
+                      EXPLORE
+                    </Button>
+                  </Link>
                   <Button className="flex-1 bg-[#F26B1D] text-white hover:bg-[#D72638] transition-colors duration-200 font-semibold">
                     {course.isFree ? "ENROLL NOW" : "BUY NOW"}
                   </Button>
