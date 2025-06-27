@@ -506,7 +506,308 @@ const DashboardContent = () => {
   );
 };
 
-const CoursesContent = () => <PlaceholderContent section="courses management" />;
+const CoursesContent = () => {
+  const [formData, setFormData] = useState({
+    courseTitle: '',
+    modeOfLecture: 'Online',
+    courseThumbnail: null as File | null,
+    isNewCourse: false,
+    language: 'Nepali',
+    shortDescription: '',
+    startDate: '',
+    endDate: '',
+    batchInfo: '',
+    originalPrice: '',
+    discountedPrice: '',
+    goal: 'CEE'
+  });
+
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, courseThumbnail: file }));
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setThumbnailPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Course Data:', formData);
+    // Handle form submission logic here
+    alert('Course uploaded successfully! (This is a demo)');
+  };
+
+  const modeOptions = ['Online', 'Offline'];
+  const languageOptions = ['Nepali', 'English', 'Hinglish'];
+  const goalOptions = ['CEE', 'IOE', 'Lok Sewa', 'Class 12 Board', 'Language', 'License'];
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900">Course Upload Form</h3>
+          <p className="text-sm text-gray-600 mt-1">Step 1: Course Card Information</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Course Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Course Title *
+            </label>
+            <input
+              type="text"
+              name="courseTitle"
+              value={formData.courseTitle}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              placeholder="e.g., Complete Lok Sewa GK Course 2025 Full Preparation"
+              required
+            />
+          </div>
+
+          {/* Mode and Language - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mode of Video Lecture *
+              </label>
+              <select
+                name="modeOfLecture"
+                value={formData.modeOfLecture}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              >
+                {modeOptions.map(mode => (
+                  <option key={mode} value={mode}>{mode}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Language *
+              </label>
+              <select
+                name="language"
+                value={formData.language}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              >
+                {languageOptions.map(lang => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Course Thumbnail */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Course Thumbnail
+            </label>
+            <input
+              type="file"
+              name="courseThumbnail"
+              onChange={handleFileChange}
+              accept="image/*"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+            />
+            {thumbnailPreview && (
+              <div className="mt-3">
+                <img
+                  src={thumbnailPreview}
+                  alt="Thumbnail preview"
+                  className="w-32 h-20 object-cover rounded-lg border border-gray-200"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* New Course Checkbox and Goal */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="isNewCourse"
+                  checked={formData.isNewCourse}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-[#F26B1D] border-gray-300 rounded focus:ring-[#F26B1D]"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Mark as New Course (adds NEW tag)
+                </span>
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Goal Category *
+              </label>
+              <select
+                name="goal"
+                value={formData.goal}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              >
+                {goalOptions.map(goal => (
+                  <option key={goal} value={goal}>{goal}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Short Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Short Description *
+            </label>
+            <textarea
+              name="shortDescription"
+              value={formData.shortDescription}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              placeholder="Brief description that appears on the course card"
+              required
+            />
+          </div>
+
+          {/* Date Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Date *
+              </label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                End Date (Optional)
+              </label>
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Batch Info */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Batch Information
+            </label>
+            <input
+              type="text"
+              name="batchInfo"
+              value={formData.batchInfo}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+              placeholder="e.g., For Full Batch, Class 12 Students"
+            />
+          </div>
+
+          {/* Pricing Section */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Pricing Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Original Price (Rs.) *
+                </label>
+                <input
+                  type="number"
+                  name="originalPrice"
+                  value={formData.originalPrice}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="1999"
+                  min="0"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Discounted Price (Rs.) *
+                </label>
+                <input
+                  type="number"
+                  name="discountedPrice"
+                  value={formData.discountedPrice}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="1299"
+                  min="0"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Price Preview */}
+            {formData.originalPrice && formData.discountedPrice && (
+              <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
+                <p className="text-sm font-medium text-gray-700 mb-2">Price Display Preview:</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-[#F26B1D]">Rs.{formData.discountedPrice}</span>
+                  {parseInt(formData.originalPrice) > parseInt(formData.discountedPrice) && (
+                    <span className="text-sm text-gray-500 line-through">Rs.{formData.originalPrice}</span>
+                  )}
+                </div>
+                {parseInt(formData.originalPrice) > parseInt(formData.discountedPrice) && (
+                  <div className="text-xs text-green-600 font-medium mt-1">
+                    ✅ {Math.round(((parseInt(formData.originalPrice) - parseInt(formData.discountedPrice)) / parseInt(formData.originalPrice)) * 100)}% off applied
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end pt-4">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-[#F26B1D] text-white font-semibold rounded-lg hover:bg-[#D72638] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:ring-offset-2"
+            >
+              Upload Course (Step 1)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 const NotesQuizzesContent = () => <PlaceholderContent section="notes and quizzes" />;
 const UsersContent = () => <PlaceholderContent section="users management" />;
 const InstructorsContent = () => <PlaceholderContent section="instructors management" />;
