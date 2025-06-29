@@ -785,7 +785,7 @@ const CoursesContent = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {currentStep === 1 ? (
+          {currentStep === 1 && (
             <>
               {/* Course Title */}
               <div>
@@ -1012,8 +1012,9 @@ const CoursesContent = () => {
             )}
           </div>
             </>
-          ) : (
-            // Step 2: Description & Instructor Info
+          )}
+
+          {currentStep === 2 && (
             <>
               {/* Read-only Preview Section */}
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
@@ -1103,12 +1104,168 @@ const CoursesContent = () => {
             </>
           )}
 
+          {currentStep === 3 && (
+            <>
+              {/* Course Title Preview */}
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Course: {formData.courseTitle}</h4>
+                <p className="text-sm text-gray-600">Build your course curriculum by adding subjects, chapters, and lessons.</p>
+              </div>
+
+              {/* Curriculum Builder */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-lg font-medium text-gray-900">Curriculum Structure</h4>
+                  <button
+                    type="button"
+                    onClick={addSubject}
+                    className="px-4 py-2 bg-[#F26B1D] text-white rounded-lg hover:bg-[#D72638] transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <span>+</span> Add Subject
+                  </button>
+                </div>
+
+                {formData.curriculum.map((subject, subjectIndex) => (
+                  <div key={subject.id} className="border border-gray-200 rounded-lg p-4 bg-white">
+                    {/* Subject Header */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={subject.subjectName}
+                          onChange={(e) => updateSubjectName(subject.id, e.target.value)}
+                          placeholder="Subject name (e.g., Physics, Chemistry)"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent font-medium"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => addChapter(subject.id)}
+                        className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm"
+                      >
+                        + Add Chapter
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeSubject(subject.id)}
+                        className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    {/* Chapters */}
+                    <div className="ml-6 space-y-4">
+                      {subject.chapters.map((chapter, chapterIndex) => (
+                        <div key={chapter.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
+                          {/* Chapter Header */}
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="flex-1">
+                              <input
+                                type="text"
+                                value={chapter.chapterName}
+                                onChange={(e) => updateChapterName(subject.id, chapter.id, e.target.value)}
+                                placeholder="Chapter name (e.g., Motion, Acids & Bases)"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => addLesson(subject.id, chapter.id)}
+                              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors duration-200"
+                            >
+                              + Add Lesson
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeChapter(subject.id, chapter.id)}
+                              className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors duration-200"
+                            >
+                              Remove
+                            </button>
+                          </div>
+
+                          {/* Lessons */}
+                          <div className="ml-6 space-y-3">
+                            {chapter.lessons.map((lesson, lessonIndex) => (
+                              <div key={lesson.id} className="border border-gray-200 rounded-lg p-3 bg-white">
+                                <div className="grid grid-cols-1 gap-3">
+                                  {/* Lesson Title */}
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="text"
+                                      value={lesson.lessonTitle}
+                                      onChange={(e) => updateLesson(subject.id, chapter.id, lesson.id, 'lessonTitle', e.target.value)}
+                                      placeholder="Lesson title"
+                                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeLesson(subject.id, chapter.id, lesson.id)}
+                                      className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors duration-200"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {/* Vimeo Link */}
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Vimeo Video Link (Optional)
+                                      </label>
+                                      <input
+                                        type="url"
+                                        value={lesson.vimeoLink || ''}
+                                        onChange={(e) => updateLesson(subject.id, chapter.id, lesson.id, 'vimeoLink', e.target.value)}
+                                        placeholder="https://vimeo.com/..."
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent text-sm"
+                                      />
+                                    </div>
+
+                                    {/* Notes/PDF Upload */}
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Notes/PDF (Optional)
+                                      </label>
+                                      <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx,.txt"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            updateLesson(subject.id, chapter.id, lesson.id, 'notesFile', file);
+                                          }
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent text-sm"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                {formData.curriculum.length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <p className="mb-4">No subjects added yet. Click "Add Subject" to start building your curriculum.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex justify-between pt-4">
-            {currentStep === 2 && (
+            {(currentStep === 2 || currentStep === 3) && (
               <button
                 type="button"
-                onClick={() => setCurrentStep(1)}
+                onClick={() => setCurrentStep(currentStep - 1)}
                 className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               >
                 Back
@@ -1118,7 +1275,7 @@ const CoursesContent = () => {
               type="submit"
               className="px-6 py-3 bg-[#F26B1D] text-white font-semibold rounded-lg hover:bg-[#D72638] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:ring-offset-2 ml-auto"
             >
-              {currentStep === 1 ? 'Next' : 'Complete Upload'}
+              {currentStep === 1 ? 'Next' : currentStep === 2 ? 'Next' : 'Save Curriculum'}
             </button>
           </div>
         </form>
