@@ -11,7 +11,7 @@ export default function ExamCategories() {
     },
     {
       title: "IOE",
-      tags: ["Class 11", "Class 12", "Dropper"],
+      tags: ["Class 11", "C lass 12", "Dropper"],
       icon: "🧮",
       bgColor: "bg-green-50",
       iconBg: "bg-green-100",

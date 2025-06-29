@@ -507,6 +507,7 @@ const DashboardContent = () => {
 };
 
 const CoursesContent = () => {
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     courseTitle: '',
     modeOfLecture: 'Online',
@@ -519,7 +520,11 @@ const CoursesContent = () => {
     batchInfo: '',
     originalPrice: '',
     discountedPrice: '',
-    goal: 'CEE'
+    goal: 'CEE',
+    // Step 2 fields
+    instructorName: '',
+    instructorBio: '',
+    courseDescription: ''
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
@@ -551,41 +556,87 @@ const CoursesContent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Course Data:', formData);
-    // Handle form submission logic here
-    alert('Course uploaded successfully! (This is a demo)');
+    if (currentStep === 1) {
+      // Move to step 2
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      // Final submission
+      console.log('Complete Course Data:', formData);
+      alert('Course uploaded successfully! (This is a demo)');
+    }
+  };
+
+  const calculateDuration = () => {
+    if (formData.startDate && formData.endDate) {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const weeks = Math.floor(diffDays / 7);
+      const days = diffDays % 7;
+      return weeks > 0 ? `${weeks} weeks${days > 0 ? ` ${days} days` : ''}` : `${days} days`;
+    } else if (formData.startDate) {
+      return 'Ongoing';
+    }
+    return 'Duration not set';
   };
 
   const modeOptions = ['Online', 'Offline'];
   const languageOptions = ['Nepali', 'English', 'Hinglish'];
   const goalOptions = ['CEE', 'IOE', 'Lok Sewa', 'Class 12 Board', 'Language', 'License'];
 
+  const renderStepIndicator = () => (
+    <div className="flex items-center justify-center mb-6">
+      <div className="flex items-center space-x-4">
+        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+          currentStep >= 1 ? 'bg-[#F26B1D] text-white' : 'bg-gray-200 text-gray-600'
+        } font-semibold text-sm`}>
+          1
+        </div>
+        <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-[#F26B1D]' : 'bg-gray-200'}`}></div>
+        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+          currentStep >= 2 ? 'bg-[#F26B1D] text-white' : 'bg-gray-200 text-gray-600'
+        } font-semibold text-sm`}>
+          2
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-4xl mx-auto">
+      {renderStepIndicator()}
+      
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">Course Upload Form</h3>
-          <p className="text-sm text-gray-600 mt-1">Step 1: Course Card Information</p>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {currentStep === 1 ? 'Course Upload Form' : 'Course Landing Page Details'}
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">
+            {currentStep === 1 ? 'Step 1: Course Card Information' : 'Step 2: Description & Instructor Info'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Course Title */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Course Title *
-            </label>
-            <input
-              type="text"
-              name="courseTitle"
-              value={formData.courseTitle}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
-              placeholder="e.g., Complete Lok Sewa GK Course 2025 Full Preparation"
-              required
-            />
-          </div>
+          {currentStep === 1 ? (
+            <>
+              {/* Course Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Course Title *
+                </label>
+                <input
+                  type="text"
+                  name="courseTitle"
+                  value={formData.courseTitle}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="e.g., Complete Lok Sewa GK Course 2025 Full Preparation"
+                  required
+                />
+              </div>
 
-          {/* Mode and Language - Side by Side */}
+              {/* Mode and Language - Side by Side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -793,14 +844,114 @@ const CoursesContent = () => {
               </div>
             )}
           </div>
+            </>
+          ) : (
+            // Step 2: Description & Instructor Info
+            <>
+              {/* Read-only Preview Section */}
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Course Overview (from Step 1)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Course Title:</p>
+                    <p className="text-gray-900">{formData.courseTitle}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Language:</p>
+                    <p className="text-gray-900">{formData.language}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Duration:</p>
+                    <p className="text-gray-900">{calculateDuration()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Price:</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-[#F26B1D]">Rs.{formData.discountedPrice}</span>
+                      {parseInt(formData.originalPrice) > parseInt(formData.discountedPrice) && (
+                        <span className="text-sm text-gray-500 line-through">Rs.{formData.originalPrice}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {thumbnailPreview && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Course Thumbnail:</p>
+                    <img
+                      src={thumbnailPreview}
+                      alt="Course thumbnail"
+                      className="w-32 h-20 object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
+              </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end pt-4">
+              {/* Instructor Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Instructor Name *
+                </label>
+                <input
+                  type="text"
+                  name="instructorName"
+                  value={formData.instructorName}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="e.g., Dev Raj Mandal"
+                  required
+                />
+              </div>
+
+              {/* Instructor Bio */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Instructor Bio *
+                </label>
+                <textarea
+                  name="instructorBio"
+                  value={formData.instructorBio}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="Brief biography of the instructor including experience, qualifications, and teaching methodology..."
+                  required
+                />
+              </div>
+
+              {/* Course Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Course Description *
+                </label>
+                <textarea
+                  name="courseDescription"
+                  value={formData.courseDescription}
+                  onChange={handleInputChange}
+                  rows={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:border-transparent"
+                  placeholder="Detailed course description including what students will learn, course objectives, prerequisites, and benefits..."
+                  required
+                />
+              </div>
+            </>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between pt-4">
+            {currentStep === 2 && (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                Back
+              </button>
+            )}
             <button
               type="submit"
-              className="px-6 py-3 bg-[#F26B1D] text-white font-semibold rounded-lg hover:bg-[#D72638] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:ring-offset-2"
+              className="px-6 py-3 bg-[#F26B1D] text-white font-semibold rounded-lg hover:bg-[#D72638] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#F26B1D] focus:ring-offset-2 ml-auto"
             >
-              Next
+              {currentStep === 1 ? 'Next' : 'Complete Upload'}
             </button>
           </div>
         </form>
