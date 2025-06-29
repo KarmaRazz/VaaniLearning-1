@@ -524,7 +524,22 @@ const CoursesContent = () => {
     // Step 2 fields
     instructorName: '',
     instructorBio: '',
-    courseDescription: ''
+    courseDescription: '',
+    // Step 3 fields
+    curriculum: [] as Array<{
+      id: string;
+      subjectName: string;
+      chapters: Array<{
+        id: string;
+        chapterName: string;
+        lessons: Array<{
+          id: string;
+          lessonTitle: string;
+          vimeoLink?: string;
+          notesFile?: File;
+        }>;
+      }>;
+    }>
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
@@ -560,6 +575,9 @@ const CoursesContent = () => {
       // Move to step 2
       setCurrentStep(2);
     } else if (currentStep === 2) {
+      // Move to step 3
+      setCurrentStep(3);
+    } else if (currentStep === 3) {
       // Final submission
       console.log('Complete Course Data:', formData);
       alert('Course uploaded successfully! (This is a demo)');
@@ -581,6 +599,145 @@ const CoursesContent = () => {
     return 'Duration not set';
   };
 
+  // Curriculum management functions
+  const generateId = () => Math.random().toString(36).substr(2, 9);
+
+  const addSubject = () => {
+    const newSubject = {
+      id: generateId(),
+      subjectName: '',
+      chapters: []
+    };
+    setFormData(prev => ({
+      ...prev,
+      curriculum: [...prev.curriculum, newSubject]
+    }));
+  };
+
+  const removeSubject = (subjectId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.filter(subject => subject.id !== subjectId)
+    }));
+  };
+
+  const updateSubjectName = (subjectId: string, name: string) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId ? { ...subject, subjectName: name } : subject
+      )
+    }));
+  };
+
+  const addChapter = (subjectId: string) => {
+    const newChapter = {
+      id: generateId(),
+      chapterName: '',
+      lessons: []
+    };
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? { ...subject, chapters: [...subject.chapters, newChapter] }
+          : subject
+      )
+    }));
+  };
+
+  const removeChapter = (subjectId: string, chapterId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? { ...subject, chapters: subject.chapters.filter(chapter => chapter.id !== chapterId) }
+          : subject
+      )
+    }));
+  };
+
+  const updateChapterName = (subjectId: string, chapterId: string, name: string) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? {
+              ...subject,
+              chapters: subject.chapters.map(chapter =>
+                chapter.id === chapterId ? { ...chapter, chapterName: name } : chapter
+              )
+            }
+          : subject
+      )
+    }));
+  };
+
+  const addLesson = (subjectId: string, chapterId: string) => {
+    const newLesson = {
+      id: generateId(),
+      lessonTitle: '',
+      vimeoLink: '',
+      notesFile: undefined
+    };
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? {
+              ...subject,
+              chapters: subject.chapters.map(chapter =>
+                chapter.id === chapterId
+                  ? { ...chapter, lessons: [...chapter.lessons, newLesson] }
+                  : chapter
+              )
+            }
+          : subject
+      )
+    }));
+  };
+
+  const removeLesson = (subjectId: string, chapterId: string, lessonId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? {
+              ...subject,
+              chapters: subject.chapters.map(chapter =>
+                chapter.id === chapterId
+                  ? { ...chapter, lessons: chapter.lessons.filter(lesson => lesson.id !== lessonId) }
+                  : chapter
+              )
+            }
+          : subject
+      )
+    }));
+  };
+
+  const updateLesson = (subjectId: string, chapterId: string, lessonId: string, field: string, value: string | File) => {
+    setFormData(prev => ({
+      ...prev,
+      curriculum: prev.curriculum.map(subject =>
+        subject.id === subjectId
+          ? {
+              ...subject,
+              chapters: subject.chapters.map(chapter =>
+                chapter.id === chapterId
+                  ? {
+                      ...chapter,
+                      lessons: chapter.lessons.map(lesson =>
+                        lesson.id === lessonId ? { ...lesson, [field]: value } : lesson
+                      )
+                    }
+                  : chapter
+              )
+            }
+          : subject
+      )
+    }));
+  };
+
   const modeOptions = ['Online', 'Offline'];
   const languageOptions = ['Nepali', 'English', 'Hinglish'];
   const goalOptions = ['CEE', 'IOE', 'Lok Sewa', 'Class 12 Board', 'Language', 'License'];
@@ -599,6 +756,12 @@ const CoursesContent = () => {
         } font-semibold text-sm`}>
           2
         </div>
+        <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-[#F26B1D]' : 'bg-gray-200'}`}></div>
+        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+          currentStep >= 3 ? 'bg-[#F26B1D] text-white' : 'bg-gray-200 text-gray-600'
+        } font-semibold text-sm`}>
+          3
+        </div>
       </div>
     </div>
   );
@@ -610,10 +773,14 @@ const CoursesContent = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">
-            {currentStep === 1 ? 'Course Upload Form' : 'Course Landing Page Details'}
+            {currentStep === 1 ? 'Course Upload Form' : 
+             currentStep === 2 ? 'Course Landing Page Details' : 
+             'Curriculum Builder'}
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            {currentStep === 1 ? 'Step 1: Course Card Information' : 'Step 2: Description & Instructor Info'}
+            {currentStep === 1 ? 'Step 1: Course Card Information' : 
+             currentStep === 2 ? 'Step 2: Description & Instructor Info' : 
+             'Step 3: Curriculum'}
           </p>
         </div>
 
