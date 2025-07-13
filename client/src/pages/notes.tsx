@@ -3,7 +3,7 @@ import Navbar from "@/components/navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Eye, Download, ChevronDown, ChevronUp } from "lucide-react";
 
 interface SubjectMap {
   [key: string]: string[];
@@ -21,7 +21,7 @@ interface NoteCard {
   id: number;
   title: string;
   description: string;
-  downloadUrl: string;
+  type: 'chapters' | 'formulas' | 'previousYears';
 }
 
 const sampleNotes: NoteCard[] = [
@@ -29,32 +29,75 @@ const sampleNotes: NoteCard[] = [
     id: 1,
     title: "Complete Chapter Notes",
     description: "Comprehensive notes covering all important concepts with examples and practice questions.",
-    downloadUrl: "#"
+    type: 'chapters'
   },
   {
     id: 2,
     title: "Formula & Derivation Guide",
     description: "Essential formulas and step-by-step derivations for quick revision and exam preparation.",
-    downloadUrl: "#"
+    type: 'formulas'
   },
   {
     id: 3,
     title: "Previous Year Questions",
     description: "Collection of previous year exam questions with detailed solutions and explanations.",
-    downloadUrl: "#"
+    type: 'previousYears'
   }
 ];
+
+const notesData = {
+  chapterNotes: [
+    { title: "Motion", url: "/notes/motion.pdf" },
+    { title: "Force and Newton's Laws", url: "/notes/force.pdf" },
+    { title: "Work, Energy and Power", url: "/notes/energy.pdf" },
+    { title: "Circular Motion", url: "/notes/circular.pdf" },
+    { title: "Gravitation", url: "/notes/gravitation.pdf" }
+  ],
+  formulas: [
+    { title: "Kinematics Formulas", url: "/notes/kinematics-formulas.pdf" },
+    { title: "Dynamics Formulas", url: "/notes/dynamics-formulas.pdf" },
+    { title: "Energy and Work Formulas", url: "/notes/energy-formulas.pdf" },
+    { title: "Circular Motion Formulas", url: "/notes/circular-formulas.pdf" },
+    { title: "Gravitation Formulas", url: "/notes/gravitation-formulas.pdf" }
+  ],
+  previousYears: [
+    { year: "2023", url: "/notes/pyqs-2023.pdf" },
+    { year: "2022", url: "/notes/pyqs-2022.pdf" },
+    { year: "2021", url: "/notes/pyqs-2021.pdf" },
+    { year: "2020", url: "/notes/pyqs-2020.pdf" },
+    { year: "2019", url: "/notes/pyqs-2019.pdf" }
+  ]
+};
 
 export default function Notes() {
   const [selectedGoal, setSelectedGoal] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   const handleGoalChange = (value: string) => {
     setSelectedGoal(value);
     setSelectedSubject(""); // Reset subject when goal changes
+    setExpandedCard(null); // Close any expanded cards
+  };
+
+  const handleCardToggle = (cardId: number) => {
+    setExpandedCard(expandedCard === cardId ? null : cardId);
   };
 
   const availableSubjects = selectedGoal ? subjectsByGoal[selectedGoal] || [] : [];
+
+  const getCardData = (type: string) => {
+    switch (type) {
+      case 'chapters':
+        return notesData.chapterNotes;
+      case 'formulas':
+        return notesData.formulas;
+      case 'previousYears':
+        return notesData.previousYears;
+      default:
+        return [];
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FDF7F3' }}>
@@ -130,34 +173,87 @@ export default function Notes() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-6">
               {sampleNotes.map((note) => (
-                <Card key={note.id} className="bg-white border border-gray-200 hover:shadow-md transition-shadow duration-200">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2">
-                      {note.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-gray-600 text-sm line-clamp-3">
-                      {note.description}
-                    </p>
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        {selectedSubject}
-                      </span>
-                      <Button 
-                        size="sm" 
-                        className="flex items-center gap-2 hover:bg-[#D72638] transition-colors duration-200"
-                        style={{ backgroundColor: '#F26B1D' }}
-                        onClick={() => window.open(note.downloadUrl, '_blank')}
-                      >
-                        <Download className="h-4 w-4" />
-                        Download
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div key={note.id} className="space-y-4">
+                  <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2">
+                        {note.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-gray-600 text-sm line-clamp-3">
+                        {note.description}
+                      </p>
+                      <div className="flex items-center justify-between pt-2">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          {selectedSubject}
+                        </span>
+                        <Button 
+                          size="sm" 
+                          className="flex items-center gap-2 hover:bg-[#D72638] transition-colors duration-200"
+                          style={{ backgroundColor: '#F26B1D' }}
+                          onClick={() => handleCardToggle(note.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                          {expandedCard === note.id ? 
+                            <ChevronUp className="h-4 w-4 ml-1" /> : 
+                            <ChevronDown className="h-4 w-4 ml-1" />
+                          }
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Collapsible Section */}
+                  {expandedCard === note.id && (
+                    <Card className="bg-gray-50 border border-gray-200">
+                      <CardContent className="p-6">
+                        <div className="space-y-3">
+                          {note.type === 'previousYears' ? (
+                            // Previous Years format
+                            getCardData(note.type).map((item: any, index: number) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                <span className="font-medium text-gray-900">
+                                  {item.year}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-[#F26B1D] hover:text-[#D72638] hover:bg-orange-50"
+                                  onClick={() => window.open(item.url, '_blank')}
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download
+                                </Button>
+                              </div>
+                            ))
+                          ) : (
+                            // Chapters and Formulas format
+                            getCardData(note.type).map((item: any, index: number) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                                <span className="font-medium text-gray-900">
+                                  {item.title}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-[#F26B1D] hover:text-[#D72638] hover:bg-orange-50"
+                                  onClick={() => window.open(item.url, '_blank')}
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download
+                                </Button>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               ))}
             </div>
           </div>

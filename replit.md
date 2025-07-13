@@ -117,6 +117,7 @@ Vaani is a comprehensive online learning platform designed specifically for Nepa
 - June 27, 2025: Built comprehensive Course Upload Form in Admin Dashboard with 12 fields including pricing preview
 - January 10, 2025: Added third step to course upload form with dynamic curriculum builder (Subject → Chapter → Lesson hierarchy)
 - January 10, 2025: Implemented complete /notes page with goal/subject dropdowns and note card grid layout
+- January 10, 2025: Enhanced Notes page with collapsible sections - replaced Download with View buttons, added expandable content for chapters, formulas, and previous year questions with mock data
 
 ## User Preferences
 ```
