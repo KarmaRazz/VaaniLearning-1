@@ -14,9 +14,9 @@ export default function Home() {
     <div className="min-h-screen bg-cream">
       <Navbar />
       <Hero />
-      <NotesFormulasSection />
       <OverlapFeatures />
       <ExamCategories />
+      <NotesFormulasSection />
       <FeaturedCourses />
       <StatsSection />
       <FeatureCards />
