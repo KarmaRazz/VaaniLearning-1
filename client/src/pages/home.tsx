@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
+import NotesFormulasSection from "@/components/notes-formulas-section";
 import OverlapFeatures from "@/components/overlap-features";
 import ExamCategories from "@/components/exam-categories";
 import FeaturedCourses from "@/components/featured-courses";
@@ -13,6 +14,7 @@ export default function Home() {
     <div className="min-h-screen bg-cream">
       <Navbar />
       <Hero />
+      <NotesFormulasSection />
       <OverlapFeatures />
       <ExamCategories />
       <FeaturedCourses />
