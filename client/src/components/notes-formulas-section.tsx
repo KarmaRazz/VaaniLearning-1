@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import NotesPageCard from "@/components/NotesPageCard";
 import { getNotesForHomepage, getFormulasForHomepage } from "@/data/notesData";
+import { Link } from "wouter";
 
 export default function NotesFormulasSection() {
   // Get data from centralized source
-  const notesData = getNotesForHomepage(15); // Show 15 notes
-  const formulasData = getFormulasForHomepage(15); // Show 15 formulas
+  const notesData = getNotesForHomepage(12); // Show 12 notes
+  const formulasData = getFormulasForHomepage(12); // Show 12 formulas
 
   // Handler functions
   const handleView = (id: number) => {
@@ -33,27 +34,33 @@ export default function NotesFormulasSection() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
-            {notesData.map((note) => (
-              <NotesPageCard
-                key={note.id}
-                label={note.label}
-                chapterName={note.chapterName}
-                subjectName={note.subjectName}
-                goals={note.goals}
-                cost={note.cost}
-                onView={() => handleView(note.id)}
-                onGetAdd={() => handleGetAdd(note.id)}
-              />
-            ))}
+          {/* Horizontal scrollable container for notes */}
+          <div className="overflow-x-auto pb-4 mb-8">
+            <div className="flex gap-6 min-w-max">
+              {notesData.map((note) => (
+                <div key={note.id} className="flex-shrink-0 w-64">
+                  <NotesPageCard
+                    label={note.label}
+                    chapterName={note.chapterName}
+                    subjectName={note.subjectName}
+                    goals={note.goals}
+                    cost={note.cost}
+                    onView={() => handleView(note.id)}
+                    onGetAdd={() => handleGetAdd(note.id)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className="text-center">
-            <Button 
-              className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-8 py-3 text-lg font-semibold transition-colors duration-200"
-            >
-              Explore All Notes
-            </Button>
+            <Link href="/notes">
+              <Button 
+                className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-8 py-3 text-lg font-semibold transition-colors duration-200"
+              >
+                Explore All Notes
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -68,27 +75,33 @@ export default function NotesFormulasSection() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
-            {formulasData.map((formula) => (
-              <NotesPageCard
-                key={formula.id}
-                label={formula.label}
-                chapterName={formula.chapterName}
-                subjectName={formula.subjectName}
-                goals={formula.goals}
-                cost={formula.cost}
-                onView={() => handleView(formula.id)}
-                onGetAdd={() => handleGetAdd(formula.id)}
-              />
-            ))}
+          {/* Horizontal scrollable container for formulas */}
+          <div className="overflow-x-auto pb-4 mb-8">
+            <div className="flex gap-6 min-w-max">
+              {formulasData.map((formula) => (
+                <div key={formula.id} className="flex-shrink-0 w-64">
+                  <NotesPageCard
+                    label={formula.label}
+                    chapterName={formula.chapterName}
+                    subjectName={formula.subjectName}
+                    goals={formula.goals}
+                    cost={formula.cost}
+                    onView={() => handleView(formula.id)}
+                    onGetAdd={() => handleGetAdd(formula.id)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className="text-center">
-            <Button 
-              className="bg-[#D72638] hover:bg-[#F26B1D] text-white px-8 py-3 text-lg font-semibold transition-colors duration-200"
-            >
-              Explore All Formulas
-            </Button>
+            <Link href="/notes?filter=formulas">
+              <Button 
+                className="bg-[#D72638] hover:bg-[#F26B1D] text-white px-8 py-3 text-lg font-semibold transition-colors duration-200"
+              >
+                Explore All Formulas
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

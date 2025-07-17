@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NotesPageCard from "@/components/NotesPageCard";
 import { Search } from "lucide-react";
 import { getAllNotes, getAllFormulas } from "@/data/notesData";
+import { useLocation } from "wouter";
 
 // Placeholder data for goals
 const goals = ["CEE", "IOE", "Lok Sewa", "ACCA", "Language"];
@@ -23,10 +24,19 @@ const notesData = getAllNotes();
 const formulasData = getAllFormulas();
 
 export default function Notes() {
+  const [location] = useLocation();
   const [selectedGoal, setSelectedGoal] = useState<string>("CEE");
   const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [contentType, setContentType] = useState<"notes" | "formulas">("notes");
+
+  // Check URL parameter to set initial tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('filter') === 'formulas') {
+      setContentType('formulas');
+    }
+  }, [location]);
 
   const handleGoalClick = (goal: string) => {
     setSelectedGoal(goal);
