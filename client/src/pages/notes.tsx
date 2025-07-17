@@ -59,17 +59,6 @@ export default function Notes() {
   };
 
   const handleView = (id: number) => {
-    // Check if user is logged in (simple check for now - in real app this would be proper auth)
-    const isLoggedIn = localStorage.getItem('user_logged_in') === 'true';
-    
-    if (!isLoggedIn) {
-      // Redirect to login/signup
-      alert('Please log in to view the content. Redirecting to login...');
-      // In a real app, this would redirect to login page
-      window.location.href = '/login';
-      return;
-    }
-
     // Find the note/formula with the given id
     const allData = [...notesData, ...formulasData];
     const item = allData.find(note => note.id === id);

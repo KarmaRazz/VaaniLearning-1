@@ -1654,8 +1654,8 @@ const NotesContent = () => {
                   required
                 >
                   <option value="">Select Subject</option>
-                  {getAvailableSubjects().map(subject => (
-                    <option key={subject} value={subject}>{subject}</option>
+                  {getAvailableSubjects().map((subject, index) => (
+                    <option key={`${subject}-${index}`} value={subject}>{subject}</option>
                   ))}
                 </select>
               </div>
