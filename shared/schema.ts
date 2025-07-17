@@ -16,6 +16,8 @@ export const notes = pgTable("notes", {
   subjectName: text("subject_name").notNull(),
   goals: text("goals").array().notNull(),
   cost: varchar("cost", { length: 20 }).notNull(),
+  driveLink: text("drive_link"),
+  isPublished: boolean("is_published").default(false).notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

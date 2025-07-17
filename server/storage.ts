@@ -10,8 +10,11 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getNotes(): Promise<Note[]>;
+  getPublishedNotes(): Promise<Note[]>;
   createNote(note: InsertNote): Promise<Note>;
   getNote(id: number): Promise<Note | undefined>;
+  updateNote(id: number, note: Partial<InsertNote>): Promise<Note | undefined>;
+  deleteNote(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -48,6 +51,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.notes.values());
   }
 
+  async getPublishedNotes(): Promise<Note[]> {
+    return Array.from(this.notes.values()).filter(note => note.isPublished);
+  }
+
   async createNote(insertNote: InsertNote): Promise<Note> {
     const id = this.currentNoteId++;
     const note: Note = { ...insertNote, id };
@@ -57,6 +64,19 @@ export class MemStorage implements IStorage {
 
   async getNote(id: number): Promise<Note | undefined> {
     return this.notes.get(id);
+  }
+
+  async updateNote(id: number, updateData: Partial<InsertNote>): Promise<Note | undefined> {
+    const existingNote = this.notes.get(id);
+    if (!existingNote) return undefined;
+    
+    const updatedNote: Note = { ...existingNote, ...updateData };
+    this.notes.set(id, updatedNote);
+    return updatedNote;
+  }
+
+  async deleteNote(id: number): Promise<boolean> {
+    return this.notes.delete(id);
   }
 }
 
@@ -83,6 +103,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(notes);
   }
 
+  async getPublishedNotes(): Promise<Note[]> {
+    return await db.select().from(notes).where(eq(notes.isPublished, true));
+  }
+
   async createNote(insertNote: InsertNote): Promise<Note> {
     const [note] = await db
       .insert(notes)
@@ -94,6 +118,20 @@ export class DatabaseStorage implements IStorage {
   async getNote(id: number): Promise<Note | undefined> {
     const [note] = await db.select().from(notes).where(eq(notes.id, id));
     return note || undefined;
+  }
+
+  async updateNote(id: number, updateData: Partial<InsertNote>): Promise<Note | undefined> {
+    const [note] = await db
+      .update(notes)
+      .set(updateData)
+      .where(eq(notes.id, id))
+      .returning();
+    return note || undefined;
+  }
+
+  async deleteNote(id: number): Promise<boolean> {
+    const result = await db.delete(notes).where(eq(notes.id, id));
+    return result.rowCount !== undefined && result.rowCount > 0;
   }
 }
 

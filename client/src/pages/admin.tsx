@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -26,7 +27,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'courses', label: 'Courses', icon: BookOpen },
-    { id: 'notes-quizzes', label: 'Notes & Quizzes', icon: FileText },
+    { id: 'notes', label: 'Notes', icon: FileText },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'instructors', label: 'Instructors', icon: GraduationCap },
     { 
@@ -61,8 +62,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         return <DashboardContent />;
       case 'courses':
         return <CoursesContent />;
-      case 'notes-quizzes':
-        return <NotesQuizzesContent />;
+      case 'notes':
+        return <NotesContent />;
       case 'users':
         return <UsersContent />;
       case 'instructors':
@@ -1283,7 +1284,306 @@ const CoursesContent = () => {
     </div>
   );
 };
-const NotesQuizzesContent = () => <PlaceholderContent section="notes and quizzes" />;
+const NotesContent = () => {
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [formData, setFormData] = useState({
+    chapterName: '',
+    label: 'Note' as 'Note' | 'Formula' | 'Derivation',
+    subjectName: '',
+    goals: [] as string[],
+    cost: '',
+    driveLink: '',
+    isPublished: false
+  });
+
+  // Fetch notes using React Query
+  const { data: notes = [], isLoading, refetch } = useQuery({
+    queryKey: ['/api/admin/notes'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/notes');
+      if (!response.ok) throw new Error('Failed to fetch notes');
+      return response.json();
+    }
+  });
+
+  const createNoteMutation = useMutation({
+    mutationFn: async (noteData: typeof formData) => {
+      const response = await fetch('/api/admin/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(noteData)
+      });
+      if (!response.ok) throw new Error('Failed to create note');
+      return response.json();
+    },
+    onSuccess: () => {
+      refetch();
+      setShowCreateForm(false);
+      resetForm();
+    }
+  });
+
+  const resetForm = () => {
+    setFormData({
+      chapterName: '',
+      label: 'Note',
+      subjectName: '',
+      goals: [],
+      cost: '',
+      driveLink: '',
+      isPublished: false
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createNoteMutation.mutate(formData);
+  };
+
+  const handleGoalToggle = (goal: string) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goal) 
+        ? prev.goals.filter(g => g !== goal)
+        : [...prev.goals, goal]
+    }));
+  };
+
+  const availableGoals = ['CEE', 'IOE', 'Lok Sewa', 'ACCA', 'Language'];
+  const availableSubjects = ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany', 'General Knowledge', 'English Grammar', 'Nepal History', 'Geography', 'Constitution', 'Financial Accounting'];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Notes Management</h1>
+          <p className="text-gray-600">Manage your educational notes, formulas and derivations</p>
+        </div>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Create Note
+        </button>
+      </div>
+
+      {/* Notes List */}
+      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">All Notes ({notes.length})</h2>
+        </div>
+        
+        {isLoading ? (
+          <div className="p-6">
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-16 bg-gray-200 rounded animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Goals</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {notes.map((note: any) => (
+                  <tr key={note.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{note.chapterName}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        note.label === 'Note' ? 'bg-blue-100 text-blue-800' :
+                        note.label === 'Formula' ? 'bg-green-100 text-green-800' :
+                        'bg-purple-100 text-purple-800'
+                      }`}>
+                        {note.label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{note.subjectName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-wrap gap-1">
+                        {note.goals.map((goal: string) => (
+                          <span key={goal} className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            {goal}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{note.cost}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        note.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {note.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button className="text-[#F26B1D] hover:text-[#D72638] mr-3">Edit</button>
+                      <button className="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Create Note Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">Create New Note</h2>
+                <button
+                  onClick={() => setShowCreateForm(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                <input
+                  type="text"
+                  value={formData.chapterName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, chapterName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                  required
+                />
+              </div>
+
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <select
+                  value={formData.label}
+                  onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value as any }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                >
+                  <option value="Note">Note</option>
+                  <option value="Formula">Formula</option>
+                  <option value="Derivation">Derivation</option>
+                </select>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                <select
+                  value={formData.subjectName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subjectName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                  required
+                >
+                  <option value="">Select Subject</option>
+                  {availableSubjects.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Goals */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Goal Tags</label>
+                <div className="flex flex-wrap gap-2">
+                  {availableGoals.map(goal => (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() => handleGoalToggle(goal)}
+                      className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                        formData.goals.includes(goal)
+                          ? 'bg-[#F26B1D] text-white border-[#F26B1D]'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-[#F26B1D]'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                <input
+                  type="text"
+                  value={formData.cost}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cost: e.target.value }))}
+                  placeholder="Free or ₹99"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                  required
+                />
+              </div>
+
+              {/* Google Drive Link */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Google Drive View-Only Link</label>
+                <input
+                  type="url"
+                  value={formData.driveLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, driveLink: e.target.value }))}
+                  placeholder="https://drive.google.com/file/d/..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                />
+              </div>
+
+              {/* Publish Status */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="publish"
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
+                  className="h-4 w-4 text-[#F26B1D] focus:ring-[#F26B1D] border-gray-300 rounded"
+                />
+                <label htmlFor="publish" className="ml-2 block text-sm text-gray-900">
+                  Publish immediately (make visible on website)
+                </label>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateForm(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createNoteMutation.isPending}
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#F26B1D] border border-transparent rounded-md hover:bg-[#D72638] disabled:opacity-50"
+                >
+                  {createNoteMutation.isPending ? 'Creating...' : 'Create Note'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const UsersContent = () => <PlaceholderContent section="users management" />;
 const InstructorsContent = () => <PlaceholderContent section="instructors management" />;
 const HeroSectionContent = () => <PlaceholderContent section="hero section editor" />;

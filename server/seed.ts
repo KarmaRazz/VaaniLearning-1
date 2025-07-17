@@ -15,6 +15,8 @@ export async function seedDatabase() {
         subjectName: item.subjectName,
         goals: item.goals,
         cost: item.cost,
+        driveLink: `https://drive.google.com/file/d/example-${item.chapterName.toLowerCase().replace(/\s+/g, '-')}`,
+        isPublished: true
       });
     }
     
