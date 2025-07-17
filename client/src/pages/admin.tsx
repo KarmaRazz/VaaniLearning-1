@@ -1285,6 +1285,7 @@ const CoursesContent = () => {
   );
 };
 const NotesContent = () => {
+  const [activeTab, setActiveTab] = useState<'notes' | 'formulas'>('notes');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
     chapterName: '',
@@ -1326,13 +1327,43 @@ const NotesContent = () => {
   const resetForm = () => {
     setFormData({
       chapterName: '',
-      label: 'Note',
+      label: activeTab === 'notes' ? 'Note' : 'Formula',
       subjectName: '',
       goals: [],
       cost: '',
       driveLink: '',
       isPublished: false
     });
+  };
+
+  // Filter notes based on active tab
+  const filteredNotes = notes.filter(note => {
+    if (activeTab === 'notes') {
+      return note.label === 'Note';
+    } else {
+      return note.label === 'Formula' || note.label === 'Derivation';
+    }
+  });
+
+  const getCreateButtonText = () => {
+    return activeTab === 'notes' ? 'Create Note' : 'Create Formula/Derivation';
+  };
+
+  const getTabTitle = () => {
+    return activeTab === 'notes' ? 'Notes' : 'Formulas & Derivations';
+  };
+
+  const handleTabChange = (tab: 'notes' | 'formulas') => {
+    setActiveTab(tab);
+    if (showCreateForm) {
+      setShowCreateForm(false);
+      resetForm();
+    }
+  };
+
+  const handleCreateClick = () => {
+    resetForm();
+    setShowCreateForm(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1361,17 +1392,43 @@ const NotesContent = () => {
           <p className="text-gray-600">Manage your educational notes, formulas and derivations</p>
         </div>
         <button
-          onClick={() => setShowCreateForm(true)}
+          onClick={handleCreateClick}
           className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
         >
-          Create Note
+          {getCreateButtonText()}
         </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => handleTabChange('notes')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'notes'
+                ? 'border-[#F26B1D] text-[#F26B1D]'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            📘 Notes
+          </button>
+          <button
+            onClick={() => handleTabChange('formulas')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'formulas'
+                ? 'border-[#F26B1D] text-[#F26B1D]'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            🧪 Formulas & Derivations
+          </button>
+        </nav>
       </div>
 
       {/* Notes List */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">All Notes ({notes.length})</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{getTabTitle()} ({filteredNotes.length})</h2>
         </div>
         
         {isLoading ? (
@@ -1397,7 +1454,7 @@ const NotesContent = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {notes.map((note: any) => (
+                {filteredNotes.map((note: any) => (
                   <tr key={note.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{note.chapterName}</div>
@@ -1447,7 +1504,9 @@ const NotesContent = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">Create New Note</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {activeTab === 'notes' ? 'Create New Note' : 'Create New Formula/Derivation'}
+                </h2>
                 <button
                   onClick={() => setShowCreateForm(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -1473,15 +1532,23 @@ const NotesContent = () => {
               {/* Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                <select
-                  value={formData.label}
-                  onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value as any }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
-                >
-                  <option value="Note">Note</option>
-                  <option value="Formula">Formula</option>
-                  <option value="Derivation">Derivation</option>
-                </select>
+                {activeTab === 'notes' ? (
+                  <input
+                    type="text"
+                    value="Note"
+                    disabled
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
+                  />
+                ) : (
+                  <select
+                    value={formData.label}
+                    onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value as any }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+                  >
+                    <option value="Formula">Formula</option>
+                    <option value="Derivation">Derivation</option>
+                  </select>
+                )}
               </div>
 
               {/* Subject */}
