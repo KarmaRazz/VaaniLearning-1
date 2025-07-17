@@ -1,266 +1,287 @@
 import { useState } from "react";
 import Navbar from "@/components/navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Eye, Download, ChevronDown, ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import NotesPageCard from "@/components/NotesPageCard";
+import { Search } from "lucide-react";
 
-interface SubjectMap {
-  [key: string]: string[];
-}
+// Placeholder data for goals
+const goals = ["CEE", "IOE", "Lok Sewa", "ACCA", "Language"];
 
-const subjectsByGoal: SubjectMap = {
-  'CEE': ['Physics', 'Chemistry', 'Zoology', 'Botany', 'Math'],
-  'IOE': ['Physics', 'Chemistry', 'Math', 'English'],
-  'ACCA': ['Financial Accounting', 'Management Accounting', 'Corporate Law', 'Taxation'],
-  'Lok Sewa': ['General Knowledge', 'Current Affairs', 'Nepal History', 'Geography', 'Constitution'],
-  'Language': ['English Grammar', 'Vocabulary', 'Comprehension', 'Writing Skills']
+// Placeholder data for subjects by goal
+const subjectsByGoal: { [key: string]: string[] } = {
+  "CEE": ["Physics", "Chemistry", "Zoology", "Botany", "Math"],
+  "IOE": ["Physics", "Chemistry", "Math", "English"],
+  "Lok Sewa": ["General Knowledge", "Current Affairs", "Nepal History", "Geography", "Constitution"],
+  "ACCA": ["Financial Accounting", "Management Accounting", "Corporate Law", "Taxation"],
+  "Language": ["English Grammar", "Vocabulary", "Comprehension", "Writing Skills"]
 };
 
-interface NoteCard {
-  id: number;
-  title: string;
-  description: string;
-  type: 'chapters' | 'formulas' | 'previousYears';
-}
-
-const sampleNotes: NoteCard[] = [
+// Placeholder data for notes
+const notesData = [
   {
     id: 1,
-    title: "Complete Chapter Notes",
-    description: "Comprehensive notes covering all important concepts with examples and practice questions.",
-    type: 'chapters'
+    label: "Note" as const,
+    chapterName: "Optics",
+    subjectName: "Physics",
+    goals: ["CEE", "IOE"],
+    cost: "Free"
   },
   {
     id: 2,
-    title: "Formula & Derivation Guide",
-    description: "Essential formulas and step-by-step derivations for quick revision and exam preparation.",
-    type: 'formulas'
+    label: "Note" as const,
+    chapterName: "Organic Chemistry",
+    subjectName: "Chemistry",
+    goals: ["CEE"],
+    cost: "₹199"
   },
   {
     id: 3,
-    title: "Previous Year Questions",
-    description: "Collection of previous year exam questions with detailed solutions and explanations.",
-    type: 'previousYears'
+    label: "Note" as const,
+    chapterName: "Cell Biology",
+    subjectName: "Zoology",
+    goals: ["CEE"],
+    cost: "Free"
+  },
+  {
+    id: 4,
+    label: "Note" as const,
+    chapterName: "Trigonometry",
+    subjectName: "Math",
+    goals: ["CEE", "IOE"],
+    cost: "₹149"
+  },
+  {
+    id: 5,
+    label: "Note" as const,
+    chapterName: "Current Affairs",
+    subjectName: "General Knowledge",
+    goals: ["Lok Sewa"],
+    cost: "Free"
+  },
+  {
+    id: 6,
+    label: "Note" as const,
+    chapterName: "Plant Biology",
+    subjectName: "Botany",
+    goals: ["CEE"],
+    cost: "₹99"
   }
 ];
 
-const notesData = {
-  chapterNotes: [
-    { title: "Motion", url: "/notes/motion.pdf" },
-    { title: "Force and Newton's Laws", url: "/notes/force.pdf" },
-    { title: "Work, Energy and Power", url: "/notes/energy.pdf" },
-    { title: "Circular Motion", url: "/notes/circular.pdf" },
-    { title: "Gravitation", url: "/notes/gravitation.pdf" }
-  ],
-  formulas: [
-    { title: "Kinematics Formulas", url: "/notes/kinematics-formulas.pdf" },
-    { title: "Dynamics Formulas", url: "/notes/dynamics-formulas.pdf" },
-    { title: "Energy and Work Formulas", url: "/notes/energy-formulas.pdf" },
-    { title: "Circular Motion Formulas", url: "/notes/circular-formulas.pdf" },
-    { title: "Gravitation Formulas", url: "/notes/gravitation-formulas.pdf" }
-  ],
-  previousYears: [
-    { year: "2023", url: "/notes/pyqs-2023.pdf" },
-    { year: "2022", url: "/notes/pyqs-2022.pdf" },
-    { year: "2021", url: "/notes/pyqs-2021.pdf" },
-    { year: "2020", url: "/notes/pyqs-2020.pdf" },
-    { year: "2019", url: "/notes/pyqs-2019.pdf" }
-  ]
-};
+// Placeholder data for formulas and derivations
+const formulasData = [
+  {
+    id: 7,
+    label: "Formula" as const,
+    chapterName: "Newton's Laws",
+    subjectName: "Physics",
+    goals: ["CEE", "IOE"],
+    cost: "Free"
+  },
+  {
+    id: 8,
+    label: "Derivation" as const,
+    chapterName: "Thermodynamics",
+    subjectName: "Chemistry",
+    goals: ["CEE"],
+    cost: "₹99"
+  },
+  {
+    id: 9,
+    label: "Formula" as const,
+    chapterName: "Calculus Basics",
+    subjectName: "Math",
+    goals: ["CEE", "IOE"],
+    cost: "₹179"
+  },
+  {
+    id: 10,
+    label: "Derivation" as const,
+    chapterName: "Electromagnetic Theory",
+    subjectName: "Physics",
+    goals: ["IOE"],
+    cost: "Free"
+  },
+  {
+    id: 11,
+    label: "Formula" as const,
+    chapterName: "Probability",
+    subjectName: "Math",
+    goals: ["CEE", "IOE"],
+    cost: "₹129"
+  },
+  {
+    id: 12,
+    label: "Derivation" as const,
+    chapterName: "Acid-Base Equilibrium",
+    subjectName: "Chemistry",
+    goals: ["CEE"],
+    cost: "₹89"
+  }
+];
 
 export default function Notes() {
-  const [selectedGoal, setSelectedGoal] = useState<string>("");
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [selectedGoal, setSelectedGoal] = useState<string>("CEE");
+  const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [contentType, setContentType] = useState<"notes" | "formulas">("notes");
 
-  const handleGoalChange = (value: string) => {
-    setSelectedGoal(value);
-    setSelectedSubject(""); // Reset subject when goal changes
-    setExpandedCard(null); // Close any expanded cards
-  };
-
-  const handleCardToggle = (cardId: number) => {
-    setExpandedCard(expandedCard === cardId ? null : cardId);
-  };
-
-  const availableSubjects = selectedGoal ? subjectsByGoal[selectedGoal] || [] : [];
-
-  const getCardData = (type: string) => {
-    switch (type) {
-      case 'chapters':
-        return notesData.chapterNotes;
-      case 'formulas':
-        return notesData.formulas;
-      case 'previousYears':
-        return notesData.previousYears;
-      default:
-        return [];
+  const handleGoalClick = (goal: string) => {
+    setSelectedGoal(goal);
+    // Reset subject to first subject of the selected goal
+    const subjects = subjectsByGoal[goal];
+    if (subjects && subjects.length > 0) {
+      setSelectedSubject(subjects[0]);
     }
   };
+
+  const handleSubjectClick = (subject: string) => {
+    setSelectedSubject(subject);
+  };
+
+  const handleView = (id: number) => {
+    console.log("View clicked for item:", id);
+    // Add view logic here
+  };
+
+  const handleGetAdd = (id: number) => {
+    console.log("Get/Add clicked for item:", id);
+    // Add get/add logic here
+  };
+
+  // Get available subjects for selected goal
+  const availableSubjects = selectedGoal ? subjectsByGoal[selectedGoal] || [] : [];
+
+  // Filter data based on selected goal, subject, search query, and content type
+  const currentData = contentType === "notes" ? notesData : formulasData;
+  
+  const filteredData = currentData.filter(item => {
+    const matchesGoal = item.goals.includes(selectedGoal);
+    const matchesSubject = item.subjectName === selectedSubject;
+    const matchesSearch = searchQuery === "" || 
+      item.chapterName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.goals.some(goal => goal.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesGoal && matchesSubject && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FDF7F3' }}>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4" style={{ color: '#F26B1D' }}>
             Study Notes
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Access our comprehensive collection of 10,000+ study notes. 
-            Choose your goal and subject to find relevant study materials.
+            Access comprehensive notes and formulas for your exam preparation
           </p>
         </div>
 
-        {/* Filter Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Goal Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Goal
-              </label>
-              <Select value={selectedGoal} onValueChange={handleGoalChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose your exam goal" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CEE">CEE (Medical)</SelectItem>
-                  <SelectItem value="IOE">IOE (Engineering)</SelectItem>
-                  <SelectItem value="ACCA">ACCA</SelectItem>
-                  <SelectItem value="Lok Sewa">Lok Sewa</SelectItem>
-                  <SelectItem value="Language">Language</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Goal Filter Buttons */}
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
+          {goals.map((goal) => (
+            <Button
+              key={goal}
+              variant={selectedGoal === goal ? "default" : "outline"}
+              onClick={() => handleGoalClick(goal)}
+              className={`px-6 py-2 font-medium transition-colors duration-200 ${
+                selectedGoal === goal
+                  ? "bg-[#F26B1D] text-white hover:bg-[#D72638]"
+                  : "border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
+              }`}
+            >
+              {goal}
+            </Button>
+          ))}
+        </div>
 
-            {/* Subject Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Subject
-              </label>
-              <Select 
-                value={selectedSubject} 
-                onValueChange={setSelectedSubject}
-                disabled={!selectedGoal}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={selectedGoal ? "Choose a subject" : "Select goal first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableSubjects.map((subject) => (
-                    <SelectItem key={subject} value={subject}>
-                      {subject}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search chapters, subjects, or goals..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-3 w-full border-gray-300 focus:border-[#F26B1D] focus:ring-[#F26B1D]"
+            />
           </div>
         </div>
 
-        {/* Notes Grid */}
-        {selectedGoal && selectedSubject && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900">
-                {selectedSubject} Notes for {selectedGoal}
-              </h2>
-              <span className="text-sm text-gray-500">
-                {sampleNotes.length} notes available
-              </span>
-            </div>
-
-            <div className="space-y-6">
-              {sampleNotes.map((note) => (
-                <div key={note.id} className="space-y-4">
-                  <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2">
-                        {note.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-gray-600 text-sm line-clamp-3">
-                        {note.description}
-                      </p>
-                      <div className="flex items-center justify-between pt-2">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          {selectedSubject}
-                        </span>
-                        <Button 
-                          size="sm" 
-                          className="flex items-center gap-2 hover:bg-[#D72638] transition-colors duration-200"
-                          style={{ backgroundColor: '#F26B1D' }}
-                          onClick={() => handleCardToggle(note.id)}
-                        >
-                          <Eye className="h-4 w-4" />
-                          View
-                          {expandedCard === note.id ? 
-                            <ChevronUp className="h-4 w-4 ml-1" /> : 
-                            <ChevronDown className="h-4 w-4 ml-1" />
-                          }
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Collapsible Section */}
-                  {expandedCard === note.id && (
-                    <Card className="bg-gray-50 border border-gray-200">
-                      <CardContent className="p-6">
-                        <div className="space-y-3">
-                          {note.type === 'previousYears' ? (
-                            // Previous Years format
-                            getCardData(note.type).map((item: any, index: number) => (
-                              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-                                <span className="font-medium text-gray-900">
-                                  {item.year}
-                                </span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-[#F26B1D] hover:text-[#D72638] hover:bg-orange-50"
-                                  onClick={() => window.open(item.url, '_blank')}
-                                >
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Download
-                                </Button>
-                              </div>
-                            ))
-                          ) : (
-                            // Chapters and Formulas format
-                            getCardData(note.type).map((item: any, index: number) => (
-                              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-                                <span className="font-medium text-gray-900">
-                                  {item.title}
-                                </span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-[#F26B1D] hover:text-[#D72638] hover:bg-orange-50"
-                                  onClick={() => window.open(item.url, '_blank')}
-                                >
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Download
-                                </Button>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
+        {/* Subject Tabs and Content Type Toggle */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+          
+          {/* Subject Tabs - Horizontally Scrollable */}
+          <div className="flex-1 overflow-x-auto">
+            <div className="flex gap-2 min-w-max">
+              {availableSubjects.map((subject) => (
+                <Button
+                  key={subject}
+                  variant={selectedSubject === subject ? "default" : "ghost"}
+                  onClick={() => handleSubjectClick(subject)}
+                  className={`px-4 py-2 font-medium whitespace-nowrap transition-colors duration-200 ${
+                    selectedSubject === subject
+                      ? "bg-[#D72638] text-white hover:bg-[#F26B1D]"
+                      : "text-gray-600 hover:text-[#F26B1D] hover:bg-gray-100"
+                  }`}
+                >
+                  {subject}
+                </Button>
               ))}
             </div>
           </div>
-        )}
+
+          {/* Content Type Toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <Button
+              variant={contentType === "notes" ? "default" : "ghost"}
+              onClick={() => setContentType("notes")}
+              className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                contentType === "notes"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Notes
+            </Button>
+            <Button
+              variant={contentType === "formulas" ? "default" : "ghost"}
+              onClick={() => setContentType("formulas")}
+              className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                contentType === "formulas"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Formulas & Derivations
+            </Button>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          {filteredData.map((item) => (
+            <NotesPageCard
+              key={item.id}
+              label={item.label}
+              chapterName={item.chapterName}
+              subjectName={item.subjectName}
+              goals={item.goals}
+              cost={item.cost}
+              onView={() => handleView(item.id)}
+              onGetAdd={() => handleGetAdd(item.id)}
+            />
+          ))}
+        </div>
 
         {/* Empty State */}
-        {(!selectedGoal || !selectedSubject) && (
+        {filteredData.length === 0 && (
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <div className="mb-4">
@@ -271,10 +292,10 @@ export default function Notes() {
                 </div>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Select Goal and Subject
+                No {contentType} found
               </h3>
               <p className="text-gray-500">
-                Choose your exam goal and subject from the dropdowns above to view available study notes.
+                Try adjusting your filters or search for different content.
               </p>
             </div>
           </div>
