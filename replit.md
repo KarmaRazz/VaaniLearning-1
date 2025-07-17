@@ -120,6 +120,7 @@ Vaani is a comprehensive online learning platform designed specifically for Nepa
 - January 10, 2025: Enhanced Notes page with collapsible sections - replaced Download with View buttons, added expandable content for chapters, formulas, and previous year questions with mock data
 - January 13, 2025: Added Notes and Formulas sections to homepage with reusable NoteCard and FormulaCard components, featuring structured props for easy API integration
 - January 14, 2025: Completely rebuilt Notes Page with new UI structure: goal filter buttons, search bar, horizontally scrollable subject tabs, Notes/Formulas toggle, and modular NotesPageCard component with structured data for database integration
+- January 14, 2025: Created centralized data source with 20 notes and 18 formulas/derivations, updated homepage to fetch from shared data instead of hardcoded content, implemented reusable card system for easy API integration
 
 ## User Preferences
 ```

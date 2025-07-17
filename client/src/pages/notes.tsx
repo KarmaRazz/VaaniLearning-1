@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NotesPageCard from "@/components/NotesPageCard";
 import { Search } from "lucide-react";
+import { getAllNotes, getAllFormulas } from "@/data/notesData";
 
 // Placeholder data for goals
 const goals = ["CEE", "IOE", "Lok Sewa", "ACCA", "Language"];
@@ -17,109 +18,9 @@ const subjectsByGoal: { [key: string]: string[] } = {
   "Language": ["English Grammar", "Vocabulary", "Comprehension", "Writing Skills"]
 };
 
-// Placeholder data for notes
-const notesData = [
-  {
-    id: 1,
-    label: "Note" as const,
-    chapterName: "Optics",
-    subjectName: "Physics",
-    goals: ["CEE", "IOE"],
-    cost: "Free"
-  },
-  {
-    id: 2,
-    label: "Note" as const,
-    chapterName: "Organic Chemistry",
-    subjectName: "Chemistry",
-    goals: ["CEE"],
-    cost: "₹199"
-  },
-  {
-    id: 3,
-    label: "Note" as const,
-    chapterName: "Cell Biology",
-    subjectName: "Zoology",
-    goals: ["CEE"],
-    cost: "Free"
-  },
-  {
-    id: 4,
-    label: "Note" as const,
-    chapterName: "Trigonometry",
-    subjectName: "Math",
-    goals: ["CEE", "IOE"],
-    cost: "₹149"
-  },
-  {
-    id: 5,
-    label: "Note" as const,
-    chapterName: "Current Affairs",
-    subjectName: "General Knowledge",
-    goals: ["Lok Sewa"],
-    cost: "Free"
-  },
-  {
-    id: 6,
-    label: "Note" as const,
-    chapterName: "Plant Biology",
-    subjectName: "Botany",
-    goals: ["CEE"],
-    cost: "₹99"
-  }
-];
-
-// Placeholder data for formulas and derivations
-const formulasData = [
-  {
-    id: 7,
-    label: "Formula" as const,
-    chapterName: "Newton's Laws",
-    subjectName: "Physics",
-    goals: ["CEE", "IOE"],
-    cost: "Free"
-  },
-  {
-    id: 8,
-    label: "Derivation" as const,
-    chapterName: "Thermodynamics",
-    subjectName: "Chemistry",
-    goals: ["CEE"],
-    cost: "₹99"
-  },
-  {
-    id: 9,
-    label: "Formula" as const,
-    chapterName: "Calculus Basics",
-    subjectName: "Math",
-    goals: ["CEE", "IOE"],
-    cost: "₹179"
-  },
-  {
-    id: 10,
-    label: "Derivation" as const,
-    chapterName: "Electromagnetic Theory",
-    subjectName: "Physics",
-    goals: ["IOE"],
-    cost: "Free"
-  },
-  {
-    id: 11,
-    label: "Formula" as const,
-    chapterName: "Probability",
-    subjectName: "Math",
-    goals: ["CEE", "IOE"],
-    cost: "₹129"
-  },
-  {
-    id: 12,
-    label: "Derivation" as const,
-    chapterName: "Acid-Base Equilibrium",
-    subjectName: "Chemistry",
-    goals: ["CEE"],
-    cost: "₹89"
-  }
-];
+// Get data from centralized source
+const notesData = getAllNotes();
+const formulasData = getAllFormulas();
 
 export default function Notes() {
   const [selectedGoal, setSelectedGoal] = useState<string>("CEE");

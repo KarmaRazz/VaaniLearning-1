@@ -1,96 +1,23 @@
 import { Button } from "@/components/ui/button";
-import NoteCard from "@/components/NoteCard";
-import FormulaCard from "@/components/FormulaCard";
-
-// Dummy data for notes
-const notesData = [
-  {
-    chapterName: "Optics",
-    subject: "Physics",
-    goal: ["CEE", "IOE"],
-    type: "Note",
-    price: "Free",
-    buttonLabel: "Get"
-  },
-  {
-    chapterName: "Organic Chemistry",
-    subject: "Chemistry",
-    goal: ["CEE"],
-    type: "Note",
-    price: "₹199",
-    buttonLabel: "Add"
-  },
-  {
-    chapterName: "Cell Biology",
-    subject: "Biology",
-    goal: ["CEE"],
-    type: "Note",
-    price: "Free",
-    buttonLabel: "Get"
-  },
-  {
-    chapterName: "Trigonometry",
-    subject: "Mathematics",
-    goal: ["CEE", "IOE"],
-    type: "Note",
-    price: "₹149",
-    buttonLabel: "Add"
-  },
-  {
-    chapterName: "Current Affairs",
-    subject: "General Knowledge",
-    goal: ["Lok Sewa"],
-    type: "Note",
-    price: "Free",
-    buttonLabel: "Get"
-  }
-];
-
-// Dummy data for formulas/derivations
-const formulasData = [
-  {
-    chapterName: "Newton's Laws",
-    subject: "Physics",
-    goal: ["CEE", "IOE"],
-    type: "Formula",
-    price: "Free",
-    buttonLabel: "Get"
-  },
-  {
-    chapterName: "Thermodynamics",
-    subject: "Chemistry",
-    goal: ["CEE"],
-    type: "Derivation",
-    price: "₹99",
-    buttonLabel: "Add"
-  },
-  {
-    chapterName: "Calculus Basics",
-    subject: "Mathematics",
-    goal: ["CEE", "IOE"],
-    type: "Formula",
-    price: "₹179",
-    buttonLabel: "Add"
-  },
-  {
-    chapterName: "Electromagnetic Theory",
-    subject: "Physics",
-    goal: ["IOE"],
-    type: "Derivation",
-    price: "Free",
-    buttonLabel: "Get"
-  },
-  {
-    chapterName: "Probability",
-    subject: "Mathematics",
-    goal: ["CEE", "IOE"],
-    type: "Formula",
-    price: "₹129",
-    buttonLabel: "Add"
-  }
-];
+import NotesPageCard from "@/components/NotesPageCard";
+import { getNotesForHomepage, getFormulasForHomepage } from "@/data/notesData";
 
 export default function NotesFormulasSection() {
+  // Get data from centralized source
+  const notesData = getNotesForHomepage(15); // Show 15 notes
+  const formulasData = getFormulasForHomepage(15); // Show 15 formulas
+
+  // Handler functions
+  const handleView = (id: number) => {
+    console.log("View clicked for item:", id);
+    // This can be connected to actual view functionality later
+  };
+
+  const handleGetAdd = (id: number) => {
+    console.log("Get/Add clicked for item:", id);
+    // This can be connected to actual purchase/download functionality later
+  };
+
   return (
     <section className="py-16 bg-[#FDF7F3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -107,15 +34,16 @@ export default function NotesFormulasSection() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
-            {notesData.map((note, index) => (
-              <NoteCard
-                key={index}
+            {notesData.map((note) => (
+              <NotesPageCard
+                key={note.id}
+                label={note.label}
                 chapterName={note.chapterName}
-                subject={note.subject}
-                goal={note.goal}
-                type={note.type}
-                price={note.price}
-                buttonLabel={note.buttonLabel}
+                subjectName={note.subjectName}
+                goals={note.goals}
+                cost={note.cost}
+                onView={() => handleView(note.id)}
+                onGetAdd={() => handleGetAdd(note.id)}
               />
             ))}
           </div>
@@ -141,15 +69,16 @@ export default function NotesFormulasSection() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
-            {formulasData.map((formula, index) => (
-              <FormulaCard
-                key={index}
+            {formulasData.map((formula) => (
+              <NotesPageCard
+                key={formula.id}
+                label={formula.label}
                 chapterName={formula.chapterName}
-                subject={formula.subject}
-                goal={formula.goal}
-                type={formula.type}
-                price={formula.price}
-                buttonLabel={formula.buttonLabel}
+                subjectName={formula.subjectName}
+                goals={formula.goals}
+                cost={formula.cost}
+                onView={() => handleView(formula.id)}
+                onGetAdd={() => handleGetAdd(formula.id)}
               />
             ))}
           </div>
