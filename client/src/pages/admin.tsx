@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -1285,6 +1285,7 @@ const CoursesContent = () => {
   );
 };
 const NotesContent = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'notes' | 'formulas'>('notes');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -1318,9 +1319,24 @@ const NotesContent = () => {
       return response.json();
     },
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
       setShowCreateForm(false);
       resetForm();
+    }
+  });
+
+  const deleteNoteMutation = useMutation({
+    mutationFn: async (noteId: number) => {
+      const response = await fetch(`/api/admin/notes/${noteId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete note');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
     }
   });
 
@@ -1364,6 +1380,12 @@ const NotesContent = () => {
   const handleCreateClick = () => {
     resetForm();
     setShowCreateForm(true);
+  };
+
+  const handleDeleteNote = (noteId: number) => {
+    if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+      deleteNoteMutation.mutate(noteId);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1488,7 +1510,13 @@ const NotesContent = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button className="text-[#F26B1D] hover:text-[#D72638] mr-3">Edit</button>
-                      <button className="text-red-600 hover:text-red-900">Delete</button>
+                      <button 
+                        onClick={() => handleDeleteNote(note.id)}
+                        disabled={deleteNoteMutation.isPending}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                      >
+                        {deleteNoteMutation.isPending ? 'Deleting...' : 'Delete'}
+                      </button>
                     </td>
                   </tr>
                 ))}
