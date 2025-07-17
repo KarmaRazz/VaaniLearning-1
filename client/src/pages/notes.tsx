@@ -3,7 +3,6 @@ import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NotesPageCard from "@/components/NotesPageCard";
-import NotesPreviewModal from "@/components/NotesPreviewModal";
 import { Search } from "lucide-react";
 
 // Placeholder data for goals
@@ -18,7 +17,7 @@ const subjectsByGoal: { [key: string]: string[] } = {
   "Language": ["English Grammar", "Vocabulary", "Comprehension", "Writing Skills"]
 };
 
-// Placeholder data for notes with preview content
+// Placeholder data for notes
 const notesData = [
   {
     id: 1,
@@ -26,14 +25,7 @@ const notesData = [
     chapterName: "Optics",
     subjectName: "Physics",
     goals: ["CEE", "IOE"],
-    cost: "Free",
-    preview: {
-      description: "Comprehensive notes covering all aspects of optics including reflection, refraction, lenses, and optical instruments. Perfect for CEE and IOE preparation.",
-      topics: ["Reflection of Light", "Refraction and Snell's Law", "Lenses and Mirror Formula", "Optical Instruments", "Wave Optics", "Interference and Diffraction"],
-      sampleContent: "Chapter 1: Reflection of Light\n\nWhen light falls on a surface, it can undergo reflection. The laws of reflection state:\n\n1. The incident ray, reflected ray, and normal all lie in the same plane\n2. The angle of incidence equals the angle of reflection\n\nTypes of Reflection:\n• Regular Reflection: Occurs on smooth surfaces\n• Irregular Reflection: Occurs on rough surfaces\n\nApplications:\n- Plane mirrors\n- Curved mirrors (concave and convex)\n- Periscopes and kaleidoscopes",
-      totalPages: 45,
-      previewPages: 3
-    }
+    cost: "Free"
   },
   {
     id: 2,
@@ -41,14 +33,7 @@ const notesData = [
     chapterName: "Organic Chemistry",
     subjectName: "Chemistry",
     goals: ["CEE"],
-    cost: "₹199",
-    preview: {
-      description: "Detailed organic chemistry notes covering nomenclature, reactions, and mechanisms. Essential for CEE medical entrance preparation.",
-      topics: ["Nomenclature", "Hydrocarbons", "Functional Groups", "Reaction Mechanisms", "Stereochemistry", "Biomolecules"],
-      sampleContent: "Chapter 1: Introduction to Organic Chemistry\n\nOrganic chemistry is the study of carbon compounds. Carbon's unique properties:\n\n• Tetravalency: Carbon can form 4 bonds\n• Catenation: Ability to form chains\n• Multiple bonding: Can form single, double, triple bonds\n\nTypes of Organic Compounds:\n1. Aliphatic compounds\n2. Aromatic compounds\n3. Heterocyclic compounds\n\n[Full content available after purchase]",
-      totalPages: 67,
-      previewPages: 5
-    }
+    cost: "₹199"
   },
   {
     id: 3,
@@ -56,14 +41,7 @@ const notesData = [
     chapterName: "Cell Biology",
     subjectName: "Zoology",
     goals: ["CEE"],
-    cost: "Free",
-    preview: {
-      description: "Complete cell biology notes covering cell structure, organelles, and cellular processes for medical entrance exams.",
-      topics: ["Cell Theory", "Cell Organelles", "Cell Division", "Cell Membrane", "Cellular Respiration", "Photosynthesis"],
-      sampleContent: "Chapter 1: Cell Theory\n\nThe cell theory consists of three main principles:\n\n1. All living things are composed of cells\n2. The cell is the basic unit of life\n3. All cells arise from pre-existing cells\n\nCell Types:\n• Prokaryotic cells (bacteria)\n• Eukaryotic cells (plants, animals)\n\nKey Differences:\n- Nucleus: Present in eukaryotes, absent in prokaryotes\n- Organelles: Membrane-bound organelles only in eukaryotes",
-      totalPages: 52,
-      previewPages: 4
-    }
+    cost: "Free"
   },
   {
     id: 4,
@@ -71,14 +49,7 @@ const notesData = [
     chapterName: "Trigonometry",
     subjectName: "Math",
     goals: ["CEE", "IOE"],
-    cost: "₹149",
-    preview: {
-      description: "Comprehensive trigonometry notes with formulas, identities, and solved examples for engineering and medical entrance exams.",
-      topics: ["Trigonometric Ratios", "Trigonometric Identities", "Inverse Functions", "Heights and Distances", "Trigonometric Equations"],
-      sampleContent: "Chapter 1: Basic Trigonometric Ratios\n\nFor a right-angled triangle with angle θ:\n\nsin θ = opposite/hypotenuse\ncos θ = adjacent/hypotenuse\ntan θ = opposite/adjacent\n\nReciprocal Ratios:\ncosec θ = 1/sin θ\nsec θ = 1/cos θ\ncot θ = 1/tan θ\n\n[Complete formulas and examples available after purchase]",
-      totalPages: 38,
-      previewPages: 3
-    }
+    cost: "₹149"
   },
   {
     id: 5,
@@ -86,14 +57,7 @@ const notesData = [
     chapterName: "Current Affairs",
     subjectName: "General Knowledge",
     goals: ["Lok Sewa"],
-    cost: "Free",
-    preview: {
-      description: "Latest current affairs compilation for Lok Sewa examination covering national and international events, government policies, and important appointments.",
-      topics: ["National Politics", "International Relations", "Economic Policies", "Sports Updates", "Awards and Honors", "Government Schemes"],
-      sampleContent: "Current Affairs - January 2025\n\nNational Updates:\n• New budget allocation for education sector\n• Infrastructure development projects launched\n• Policy changes in agriculture sector\n\nInternational News:\n• Climate change summit outcomes\n• Trade agreements with neighboring countries\n• Global economic trends affecting Nepal\n\nImportant Appointments:\n• New governors appointed in various provinces",
-      totalPages: 28,
-      previewPages: 5
-    }
+    cost: "Free"
   },
   {
     id: 6,
@@ -101,18 +65,11 @@ const notesData = [
     chapterName: "Plant Biology",
     subjectName: "Botany",
     goals: ["CEE"],
-    cost: "₹99",
-    preview: {
-      description: "Detailed plant biology notes covering plant anatomy, physiology, and reproduction for medical entrance preparation.",
-      topics: ["Plant Anatomy", "Photosynthesis", "Plant Hormones", "Reproduction", "Plant Diseases", "Economic Botany"],
-      sampleContent: "Chapter 1: Plant Cell Structure\n\nPlant cells have unique features:\n\n• Cell Wall: Provides structural support\n• Chloroplasts: Site of photosynthesis\n• Large Vacuole: Maintains turgor pressure\n\nCell Wall Composition:\n- Primary wall: Cellulose, hemicellulose, pectin\n- Secondary wall: Lignin for additional strength\n\n[Full content available after purchase]",
-      totalPages: 41,
-      previewPages: 4
-    }
+    cost: "₹99"
   }
 ];
 
-// Placeholder data for formulas and derivations with preview content
+// Placeholder data for formulas and derivations
 const formulasData = [
   {
     id: 7,
@@ -120,14 +77,7 @@ const formulasData = [
     chapterName: "Newton's Laws",
     subjectName: "Physics",
     goals: ["CEE", "IOE"],
-    cost: "Free",
-    preview: {
-      description: "Complete compilation of Newton's laws of motion with formulas, derivations, and practical applications.",
-      topics: ["First Law of Motion", "Second Law of Motion", "Third Law of Motion", "Applications", "Problem Solving"],
-      sampleContent: "Newton's Laws of Motion - Formula Sheet\n\nFirst Law (Law of Inertia):\nAn object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.\n\nSecond Law:\nF = ma\nWhere: F = Force, m = mass, a = acceleration\n\nThird Law:\nFor every action, there is an equal and opposite reaction.\nF₁₂ = -F₂₁",
-      totalPages: 15,
-      previewPages: 3
-    }
+    cost: "Free"
   },
   {
     id: 8,
@@ -135,14 +85,7 @@ const formulasData = [
     chapterName: "Thermodynamics",
     subjectName: "Chemistry",
     goals: ["CEE"],
-    cost: "₹99",
-    preview: {
-      description: "Step-by-step derivations of thermodynamic equations including ideal gas law, enthalpy, and entropy calculations.",
-      topics: ["Ideal Gas Law", "First Law of Thermodynamics", "Enthalpy", "Entropy", "Gibbs Free Energy"],
-      sampleContent: "Derivation: Ideal Gas Law\n\nStarting from Boyle's Law and Charles's Law:\n\nBoyle's Law: PV = constant (at constant T)\nCharles's Law: V/T = constant (at constant P)\n\nCombining these relationships:\nPV/T = constant\n\nFor n moles of gas:\nPV = nRT\n\n[Complete derivations available after purchase]",
-      totalPages: 22,
-      previewPages: 2
-    }
+    cost: "₹99"
   },
   {
     id: 9,
@@ -150,14 +93,7 @@ const formulasData = [
     chapterName: "Calculus Basics",
     subjectName: "Math",
     goals: ["CEE", "IOE"],
-    cost: "₹179",
-    preview: {
-      description: "Essential calculus formulas covering differentiation, integration, and their applications for entrance exams.",
-      topics: ["Differentiation Rules", "Integration Formulas", "Limits", "Applications", "Solved Examples"],
-      sampleContent: "Basic Differentiation Formulas:\n\nd/dx(xⁿ) = nxⁿ⁻¹\nd/dx(sin x) = cos x\nd/dx(cos x) = -sin x\nd/dx(eˣ) = eˣ\nd/dx(ln x) = 1/x\n\nProduct Rule: d/dx(uv) = u'v + uv'\nQuotient Rule: d/dx(u/v) = (u'v - uv')/v²\n\n[Complete formula sheet available after purchase]",
-      totalPages: 18,
-      previewPages: 2
-    }
+    cost: "₹179"
   },
   {
     id: 10,
@@ -165,14 +101,7 @@ const formulasData = [
     chapterName: "Electromagnetic Theory",
     subjectName: "Physics",
     goals: ["IOE"],
-    cost: "Free",
-    preview: {
-      description: "Detailed derivations of electromagnetic equations including Maxwell's equations and wave equations.",
-      topics: ["Coulomb's Law", "Electric Field", "Magnetic Field", "Maxwell's Equations", "Electromagnetic Waves"],
-      sampleContent: "Derivation: Electric Field due to Point Charge\n\nFrom Coulomb's Law:\nF = kq₁q₂/r²\n\nElectric field E is force per unit charge:\nE = F/q₂ = kq₁/r²\n\nIn vector form:\nE⃗ = (kq/r²)r̂\n\nWhere k = 1/(4πε₀) = 9 × 10⁹ N⋅m²/C²",
-      totalPages: 25,
-      previewPages: 4
-    }
+    cost: "Free"
   },
   {
     id: 11,
@@ -180,14 +109,7 @@ const formulasData = [
     chapterName: "Probability",
     subjectName: "Math",
     goals: ["CEE", "IOE"],
-    cost: "₹129",
-    preview: {
-      description: "Comprehensive probability formulas including permutations, combinations, and probability distributions.",
-      topics: ["Basic Probability", "Permutations", "Combinations", "Conditional Probability", "Probability Distributions"],
-      sampleContent: "Probability Formulas:\n\nBasic Probability:\nP(A) = Number of favorable outcomes / Total number of outcomes\n\nPermutations:\nP(n,r) = n!/(n-r)!\n\nCombinations:\nC(n,r) = n!/(r!(n-r)!)\n\nConditional Probability:\nP(A|B) = P(A∩B)/P(B)\n\n[Complete formulas available after purchase]",
-      totalPages: 16,
-      previewPages: 2
-    }
+    cost: "₹129"
   },
   {
     id: 12,
@@ -195,14 +117,7 @@ const formulasData = [
     chapterName: "Acid-Base Equilibrium",
     subjectName: "Chemistry",
     goals: ["CEE"],
-    cost: "₹89",
-    preview: {
-      description: "Step-by-step derivations of acid-base equilibrium equations including pH, pOH, and buffer calculations.",
-      topics: ["pH and pOH", "Acid Dissociation", "Buffer Solutions", "Henderson-Hasselbalch", "Titration Curves"],
-      sampleContent: "Derivation: pH Formula\n\nFor water dissociation:\nH₂O ⇌ H⁺ + OH⁻\n\nKw = [H⁺][OH⁻] = 1.0 × 10⁻¹⁴ at 25°C\n\nTaking negative logarithm:\n-log(Kw) = -log[H⁺] - log[OH⁻]\n14 = pH + pOH\n\n[Complete derivations available after purchase]",
-      totalPages: 19,
-      previewPages: 3
-    }
+    cost: "₹89"
   }
 ];
 
@@ -211,8 +126,6 @@ export default function Notes() {
   const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [contentType, setContentType] = useState<"notes" | "formulas">("notes");
-  const [previewModalOpen, setPreviewModalOpen] = useState<boolean>(false);
-  const [selectedNoteForPreview, setSelectedNoteForPreview] = useState<any>(null);
 
   const handleGoalClick = (goal: string) => {
     setSelectedGoal(goal);
@@ -228,30 +141,13 @@ export default function Notes() {
   };
 
   const handleView = (id: number) => {
-    const currentData = contentType === "notes" ? notesData : formulasData;
-    const noteToPreview = currentData.find(item => item.id === id);
-    if (noteToPreview) {
-      setSelectedNoteForPreview(noteToPreview);
-      setPreviewModalOpen(true);
-    }
+    console.log("View clicked for item:", id);
+    // Add view logic here
   };
 
   const handleGetAdd = (id: number) => {
     console.log("Get/Add clicked for item:", id);
-    // Add purchase/download logic here
-  };
-
-  const handlePurchase = () => {
-    if (selectedNoteForPreview) {
-      console.log("Purchasing/downloading:", selectedNoteForPreview.chapterName);
-      // Add actual purchase/download logic here
-      setPreviewModalOpen(false);
-    }
-  };
-
-  const handleClosePreview = () => {
-    setPreviewModalOpen(false);
-    setSelectedNoteForPreview(null);
+    // Add get/add logic here
   };
 
   // Get available subjects for selected goal
@@ -404,14 +300,6 @@ export default function Notes() {
             </div>
           </div>
         )}
-
-        {/* Preview Modal */}
-        <NotesPreviewModal
-          isOpen={previewModalOpen}
-          onClose={handleClosePreview}
-          noteData={selectedNoteForPreview}
-          onPurchase={handlePurchase}
-        />
       </div>
     </div>
   );
