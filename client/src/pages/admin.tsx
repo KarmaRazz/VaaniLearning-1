@@ -1288,6 +1288,7 @@ const NotesContent = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'notes' | 'formulas'>('notes');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingNote, setEditingNote] = useState<any>(null);
   const [formData, setFormData] = useState({
     chapterName: '',
     label: 'Note' as 'Note' | 'Formula' | 'Derivation',
@@ -1340,6 +1341,25 @@ const NotesContent = () => {
     }
   });
 
+  const updateNoteMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof formData }) => {
+      const response = await fetch(`/api/admin/notes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update note');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      setShowCreateForm(false);
+      setEditingNote(null);
+      resetForm();
+    }
+  });
+
   const resetForm = () => {
     setFormData({
       chapterName: '',
@@ -1350,6 +1370,7 @@ const NotesContent = () => {
       driveLink: '',
       isPublished: false
     });
+    setEditingNote(null);
   };
 
   // Filter notes based on active tab
@@ -1388,9 +1409,27 @@ const NotesContent = () => {
     }
   };
 
+  const handleEditNote = (note: any) => {
+    setEditingNote(note);
+    setFormData({
+      chapterName: note.chapterName,
+      label: note.label,
+      subjectName: note.subjectName,
+      goals: note.goals,
+      cost: note.cost,
+      driveLink: note.driveLink || '',
+      isPublished: note.isPublished
+    });
+    setShowCreateForm(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createNoteMutation.mutate(formData);
+    if (editingNote) {
+      updateNoteMutation.mutate({ id: editingNote.id, data: formData });
+    } else {
+      createNoteMutation.mutate(formData);
+    }
   };
 
   const handleGoalToggle = (goal: string) => {
@@ -1403,7 +1442,25 @@ const NotesContent = () => {
   };
 
   const availableGoals = ['CEE', 'IOE', 'Lok Sewa', 'ACCA', 'Language'];
-  const availableSubjects = ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany', 'General Knowledge', 'English Grammar', 'Nepal History', 'Geography', 'Constitution', 'Financial Accounting'];
+  
+  const subjectsByGoal = {
+    'CEE': ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany'],
+    'IOE': ['Physics', 'Chemistry', 'Math'],
+    'Lok Sewa': ['General Knowledge', 'Nepal History', 'Geography', 'Constitution'],
+    'ACCA': ['Financial Accounting', 'Management Accounting', 'Corporate Law', 'Taxation'],
+    'Language': ['English Grammar', 'Vocabulary', 'Comprehension', 'Writing Skills']
+  };
+
+  const getAvailableSubjects = () => {
+    if (formData.goals.length === 0) {
+      return Object.values(subjectsByGoal).flat();
+    }
+    const subjects = new Set<string>();
+    formData.goals.forEach(goal => {
+      subjectsByGoal[goal as keyof typeof subjectsByGoal]?.forEach(subject => subjects.add(subject));
+    });
+    return Array.from(subjects);
+  };
 
   return (
     <div className="space-y-6">
@@ -1509,7 +1566,12 @@ const NotesContent = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-[#F26B1D] hover:text-[#D72638] mr-3">Edit</button>
+                      <button 
+                        onClick={() => handleEditNote(note)}
+                        className="text-[#F26B1D] hover:text-[#D72638] mr-3"
+                      >
+                        Edit
+                      </button>
                       <button 
                         onClick={() => handleDeleteNote(note.id)}
                         disabled={deleteNoteMutation.isPending}
@@ -1533,7 +1595,10 @@ const NotesContent = () => {
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {activeTab === 'notes' ? 'Create New Note' : 'Create New Formula/Derivation'}
+                  {editingNote ? 
+                    `Edit ${editingNote.label}` : 
+                    (activeTab === 'notes' ? 'Create New Note' : 'Create New Formula/Derivation')
+                  }
                 </h2>
                 <button
                   onClick={() => setShowCreateForm(false)}
@@ -1589,7 +1654,7 @@ const NotesContent = () => {
                   required
                 >
                   <option value="">Select Subject</option>
-                  {availableSubjects.map(subject => (
+                  {getAvailableSubjects().map(subject => (
                     <option key={subject} value={subject}>{subject}</option>
                   ))}
                 </select>
@@ -1666,10 +1731,13 @@ const NotesContent = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={createNoteMutation.isPending}
+                  disabled={createNoteMutation.isPending || updateNoteMutation.isPending}
                   className="px-4 py-2 text-sm font-medium text-white bg-[#F26B1D] border border-transparent rounded-md hover:bg-[#D72638] disabled:opacity-50"
                 >
-                  {createNoteMutation.isPending ? 'Creating...' : 'Create Note'}
+                  {editingNote ? 
+                    (updateNoteMutation.isPending ? 'Updating...' : 'Update Note') :
+                    (createNoteMutation.isPending ? 'Creating...' : 'Create Note')
+                  }
                 </button>
               </div>
             </form>
