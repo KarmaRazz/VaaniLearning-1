@@ -1,4 +1,4 @@
-// Centralized data for notes and formulas - easily replaceable with API calls
+// Centralized data for notes and formulas - now using API calls
 
 export interface NoteItem {
   id: number;
@@ -8,6 +8,20 @@ export interface NoteItem {
   goals: string[];
   cost: string;
 }
+
+// API fetch functions
+export const fetchNotesFromAPI = async (): Promise<NoteItem[]> => {
+  try {
+    const response = await fetch('/api/notes');
+    if (!response.ok) {
+      throw new Error('Failed to fetch notes');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching notes from API:', error);
+    return [];
+  }
+};
 
 // Extended notes data - 20 items
 export const notesData: NoteItem[] = [
@@ -321,12 +335,27 @@ export const formulasData: NoteItem[] = [
   }
 ];
 
-// Helper functions for easy data access
-export const getAllNotes = (): NoteItem[] => notesData;
-export const getAllFormulas = (): NoteItem[] => formulasData;
+// Helper functions for easy data access (now supports both static and API data)
+export const getAllNotes = async (): Promise<NoteItem[]> => {
+  const allData = await fetchNotesFromAPI();
+  return allData.filter(item => item.label === "Note");
+};
 
-export const getNotesForHomepage = (limit: number = 5): NoteItem[] => 
-  notesData.slice(0, limit);
+export const getAllFormulas = async (): Promise<NoteItem[]> => {
+  const allData = await fetchNotesFromAPI();
+  return allData.filter(item => item.label === "Formula" || item.label === "Derivation");
+};
 
-export const getFormulasForHomepage = (limit: number = 5): NoteItem[] => 
-  formulasData.slice(0, limit);
+export const getNotesForHomepage = async (limit: number = 5): Promise<NoteItem[]> => {
+  const notes = await getAllNotes();
+  return notes.slice(0, limit);
+};
+
+export const getFormulasForHomepage = async (limit: number = 5): Promise<NoteItem[]> => {
+  const formulas = await getAllFormulas();
+  return formulas.slice(0, limit);
+};
+
+// Fallback static data for backward compatibility
+export const getAllNotesStatic = (): NoteItem[] => notesData;
+export const getAllFormulasStatic = (): NoteItem[] => formulasData;

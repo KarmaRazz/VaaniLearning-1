@@ -2,11 +2,19 @@ import { Button } from "@/components/ui/button";
 import NotesPageCard from "@/components/NotesPageCard";
 import { getNotesForHomepage, getFormulasForHomepage } from "@/data/notesData";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 
 export default function NotesFormulasSection() {
-  // Get data from centralized source
-  const notesData = getNotesForHomepage(12); // Show 12 notes
-  const formulasData = getFormulasForHomepage(12); // Show 12 formulas
+  // Get data from API using React Query
+  const { data: notesData = [], isLoading: notesLoading } = useQuery({
+    queryKey: ['/api/notes', 'homepage-notes'],
+    queryFn: () => getNotesForHomepage(12),
+  });
+
+  const { data: formulasData = [], isLoading: formulasLoading } = useQuery({
+    queryKey: ['/api/notes', 'homepage-formulas'],
+    queryFn: () => getFormulasForHomepage(12),
+  });
 
   // Handler functions
   const handleView = (id: number) => {
@@ -36,21 +44,29 @@ export default function NotesFormulasSection() {
           
           {/* Horizontal scrollable container for notes */}
           <div className="overflow-x-auto pb-4 mb-8">
-            <div className="flex gap-6 min-w-max">
-              {notesData.map((note) => (
-                <div key={note.id} className="flex-shrink-0 w-64">
-                  <NotesPageCard
-                    label={note.label}
-                    chapterName={note.chapterName}
-                    subjectName={note.subjectName}
-                    goals={note.goals}
-                    cost={note.cost}
-                    onView={() => handleView(note.id)}
-                    onGetAdd={() => handleGetAdd(note.id)}
-                  />
-                </div>
-              ))}
-            </div>
+            {notesLoading ? (
+              <div className="flex gap-6 min-w-max">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-6 min-w-max">
+                {notesData.map((note) => (
+                  <div key={note.id} className="flex-shrink-0 w-64">
+                    <NotesPageCard
+                      label={note.label}
+                      chapterName={note.chapterName}
+                      subjectName={note.subjectName}
+                      goals={note.goals}
+                      cost={note.cost}
+                      onView={() => handleView(note.id)}
+                      onGetAdd={() => handleGetAdd(note.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           <div className="text-center">
@@ -77,21 +93,29 @@ export default function NotesFormulasSection() {
           
           {/* Horizontal scrollable container for formulas */}
           <div className="overflow-x-auto pb-4 mb-8">
-            <div className="flex gap-6 min-w-max">
-              {formulasData.map((formula) => (
-                <div key={formula.id} className="flex-shrink-0 w-64">
-                  <NotesPageCard
-                    label={formula.label}
-                    chapterName={formula.chapterName}
-                    subjectName={formula.subjectName}
-                    goals={formula.goals}
-                    cost={formula.cost}
-                    onView={() => handleView(formula.id)}
-                    onGetAdd={() => handleGetAdd(formula.id)}
-                  />
-                </div>
-              ))}
-            </div>
+            {formulasLoading ? (
+              <div className="flex gap-6 min-w-max">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-6 min-w-max">
+                {formulasData.map((formula) => (
+                  <div key={formula.id} className="flex-shrink-0 w-64">
+                    <NotesPageCard
+                      label={formula.label}
+                      chapterName={formula.chapterName}
+                      subjectName={formula.subjectName}
+                      goals={formula.goals}
+                      cost={formula.cost}
+                      onView={() => handleView(formula.id)}
+                      onGetAdd={() => handleGetAdd(formula.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           <div className="text-center">

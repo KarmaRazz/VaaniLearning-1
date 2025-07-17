@@ -6,6 +6,7 @@ import NotesPageCard from "@/components/NotesPageCard";
 import { Search } from "lucide-react";
 import { getAllNotes, getAllFormulas } from "@/data/notesData";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 
 // Placeholder data for goals
 const goals = ["CEE", "IOE", "Lok Sewa", "ACCA", "Language"];
@@ -19,11 +20,17 @@ const subjectsByGoal: { [key: string]: string[] } = {
   "Language": ["English Grammar", "Vocabulary", "Comprehension", "Writing Skills"]
 };
 
-// Get data from centralized source
-const notesData = getAllNotes();
-const formulasData = getAllFormulas();
-
 export default function Notes() {
+  // Get data from API using React Query
+  const { data: notesData = [] } = useQuery({
+    queryKey: ['/api/notes', 'all-notes'],
+    queryFn: getAllNotes,
+  });
+
+  const { data: formulasData = [] } = useQuery({
+    queryKey: ['/api/notes', 'all-formulas'],
+    queryFn: getAllFormulas,
+  });
   const [location] = useLocation();
   const [selectedGoal, setSelectedGoal] = useState<string>("CEE");
   const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
