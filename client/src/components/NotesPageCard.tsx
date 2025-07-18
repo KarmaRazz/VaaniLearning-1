@@ -1,24 +1,51 @@
 import { Button } from "@/components/ui/button";
 
 interface NotesPageCardProps {
+  id: number;
   label: "Note" | "Formula" | "Derivation";
   chapterName: string;
   subjectName: string;
   goals: string[];
   cost: string;
-  onView: () => void;
-  onGetAdd: () => void;
+  driveLink?: string;
+  isPublished?: boolean;
+  onView?: () => void;
+  onGetAdd?: () => void;
 }
 
 export default function NotesPageCard({
+  id,
   label,
   chapterName,
   subjectName,
   goals,
   cost,
+  driveLink,
+  isPublished = true,
   onView,
   onGetAdd
 }: NotesPageCardProps) {
+  
+  const handleView = () => {
+    if (driveLink) {
+      // Open Google Drive link in new tab
+      window.open(driveLink, '_blank');
+    } else if (onView) {
+      onView();
+    } else {
+      alert('Content link not available');
+    }
+  };
+
+  const handleGetAdd = () => {
+    if (onGetAdd) {
+      onGetAdd();
+    } else {
+      console.log(`Note ${id} added to student LMS`);
+      // Future: Add to student's personal collection
+      alert(`"${chapterName}" has been added to your collection!`);
+    }
+  };
   const getLabelColor = () => {
     switch (label) {
       case "Note":
@@ -74,15 +101,17 @@ export default function NotesPageCard({
           <Button 
             variant="outline"
             size="sm"
-            className="flex-1 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
-            onClick={onView}
+            className="flex-1 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white disabled:opacity-50"
+            onClick={handleView}
+            disabled={!isPublished}
           >
             View
           </Button>
           <Button 
             size="sm"
-            className="flex-1 bg-[#F26B1D] hover:bg-[#D72638] text-white"
-            onClick={onGetAdd}
+            className="flex-1 bg-[#F26B1D] hover:bg-[#D72638] text-white disabled:opacity-50"
+            onClick={handleGetAdd}
+            disabled={!isPublished}
           >
             {isFree ? "Get" : "Add"}
           </Button>
