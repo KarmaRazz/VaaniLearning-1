@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   LayoutDashboard, 
@@ -1459,7 +1459,7 @@ const NotesContent = () => {
   };
 
   // Update selectAll state when notes or selectedNotes change
-  React.useEffect(() => {
+  useEffect(() => {
     if (notes.length > 0) {
       const allSelected = notes.every(note => selectedNotes.includes(note.id));
       setSelectAll(allSelected);
@@ -1481,7 +1481,7 @@ const NotesContent = () => {
   };
 
   // Update available subjects when goalFilter changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (goalFilter) {
       const subjectsForGoal = subjectsByGoal[goalFilter as keyof typeof subjectsByGoal] || [];
       setAvailableSubjectsForGoal(subjectsForGoal);
