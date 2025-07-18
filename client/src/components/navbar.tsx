@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import logoImage from "@assets/Logo Png_1749717205842.png";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -61,18 +70,49 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Login/Register Button */}
+          {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/admin">
               <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
                 Admin
               </Button>
             </Link>
-            <Link href="/login">
-              <Button className="bg-primary-orange hover:bg-orange-600 text-white">
-                Login / Register
-              </Button>
-            </Link>
+            
+            {isAuthenticated && user ? (
+              <>
+                <Link href="/student-dashboard">
+                  <Button variant="outline" className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white">
+                    Dashboard
+                  </Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span>{user.name}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href="/student-dashboard" className="w-full">
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button className="bg-primary-orange hover:bg-orange-600 text-white">
+                  Login / Register
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -117,14 +157,43 @@ export default function Navbar() {
                   Admin
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button
-                  className="w-full bg-primary-orange hover:bg-orange-600 text-white"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Login / Register
-                </Button>
-              </Link>
+              
+              {isAuthenticated && user ? (
+                <>
+                  <Link href="/student-dashboard">
+                    <Button
+                      variant="outline"
+                      className="w-full border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <div className="flex items-center justify-between w-full p-2 text-sm text-gray-600">
+                    <span>Welcome, {user.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        logout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    className="w-full bg-primary-orange hover:bg-orange-600 text-white"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login / Register
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

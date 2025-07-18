@@ -2,8 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertNoteSchema } from "@shared/schema";
+import { signup, login, logout, getCurrentUser, authenticateToken, AuthenticatedRequest } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication Routes
+  app.post("/api/auth/signup", signup);
+  app.post("/api/auth/login", login);
+  app.post("/api/auth/logout", logout);
+  app.get("/api/auth/me", authenticateToken, getCurrentUser);
+
   // put application routes here
   // prefix all routes with /api
 
@@ -171,9 +178,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
-  // Student Dashboard Routes
+  // Student Dashboard Routes (Protected)
   // GET /api/student/notes - Get student's accessible notes
-  app.get("/api/student/notes", async (req, res) => {
+  app.get("/api/student/notes", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       // For demo purposes, we'll return published notes with student access info
       // In a real app, this would check user's purchased/accessible notes
@@ -199,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/student/test-history - Get student's test history
-  app.get("/api/student/test-history", async (req, res) => {
+  app.get("/api/student/test-history", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       // Mock test history data - in real app, this would come from a tests table
       const testHistory = [
@@ -255,7 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/student/profile - Get student profile information
-  app.get("/api/student/profile", async (req, res) => {
+  app.get("/api/student/profile", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       // Mock student profile - in real app, this would come from user table with additional fields
       const profile = {
@@ -279,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/student/profile - Update student profile
-  app.put("/api/student/profile", async (req, res) => {
+  app.put("/api/student/profile", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       const { name, email, goals } = req.body;
       
@@ -306,7 +313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/student/progress - Get student progress data
-  app.get("/api/student/progress", async (req, res) => {
+  app.get("/api/student/progress", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
       // Mock progress data - in real app, this would be calculated from user activity
       const progressData = {
