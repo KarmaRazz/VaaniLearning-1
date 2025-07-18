@@ -171,6 +171,221 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
+  // Student Dashboard Routes
+  // GET /api/student/notes - Get student's accessible notes
+  app.get("/api/student/notes", async (req, res) => {
+    try {
+      // For demo purposes, we'll return published notes with student access info
+      // In a real app, this would check user's purchased/accessible notes
+      const allNotes = await storage.getPublishedNotes();
+      
+      const studentNotes = allNotes.map(note => ({
+        id: note.id,
+        title: note.chapterName,
+        subject: note.subjectName,
+        goal: note.goals,
+        cost: note.cost,
+        accessType: note.cost === 'Free' ? 'free' : 'paid',
+        downloadUrl: note.driveLink,
+        viewUrl: note.driveLink,
+        isAccessible: true // For demo, all notes are accessible
+      }));
+      
+      res.json(studentNotes);
+    } catch (error) {
+      console.error("Error fetching student notes:", error);
+      res.status(500).json({ error: "Failed to fetch notes" });
+    }
+  });
+
+  // GET /api/student/test-history - Get student's test history
+  app.get("/api/student/test-history", async (req, res) => {
+    try {
+      // Mock test history data - in real app, this would come from a tests table
+      const testHistory = [
+        {
+          id: 1,
+          testName: "Physics Mock Test 1",
+          subject: "Physics",
+          goal: "CEE",
+          dateTaken: "2025-01-15",
+          score: 42,
+          totalQuestions: 50,
+          percentage: 84,
+          rank: 15,
+          totalParticipants: 150,
+          duration: 120,
+          status: "completed"
+        },
+        {
+          id: 2,
+          testName: "Chemistry Practice Test",
+          subject: "Chemistry",
+          goal: "CEE",
+          dateTaken: "2025-01-12",
+          score: 38,
+          totalQuestions: 50,
+          percentage: 76,
+          rank: 28,
+          totalParticipants: 120,
+          duration: 90,
+          status: "completed"
+        },
+        {
+          id: 3,
+          testName: "Math Foundation Test",
+          subject: "Math",
+          goal: "IOE",
+          dateTaken: "2025-01-10",
+          score: 45,
+          totalQuestions: 50,
+          percentage: 90,
+          rank: 8,
+          totalParticipants: 200,
+          duration: 150,
+          status: "completed"
+        }
+      ];
+      
+      res.json(testHistory);
+    } catch (error) {
+      console.error("Error fetching test history:", error);
+      res.status(500).json({ error: "Failed to fetch test history" });
+    }
+  });
+
+  // GET /api/student/profile - Get student profile information
+  app.get("/api/student/profile", async (req, res) => {
+    try {
+      // Mock student profile - in real app, this would come from user table with additional fields
+      const profile = {
+        id: 1,
+        name: "Ramesh Sharma",
+        email: "ramesh.sharma@email.com",
+        username: "ramesh_student",
+        profilePicture: null,
+        joinDate: "2024-09-15",
+        goals: ["CEE", "IOE"],
+        totalNotesAccessed: 25,
+        totalTestsTaken: 12,
+        averageScore: 78
+      };
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
+  // PUT /api/student/profile - Update student profile
+  app.put("/api/student/profile", async (req, res) => {
+    try {
+      const { name, email, goals } = req.body;
+      
+      // In real app, this would update the user record in database
+      // For demo, we'll just return the updated data
+      const updatedProfile = {
+        id: 1,
+        name: name || "Ramesh Sharma",
+        email: email || "ramesh.sharma@email.com",
+        username: "ramesh_student",
+        profilePicture: null,
+        joinDate: "2024-09-15",
+        goals: goals || ["CEE", "IOE"],
+        totalNotesAccessed: 25,
+        totalTestsTaken: 12,
+        averageScore: 78
+      };
+      
+      res.json(updatedProfile);
+    } catch (error) {
+      console.error("Error updating student profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  // GET /api/student/progress - Get student progress data
+  app.get("/api/student/progress", async (req, res) => {
+    try {
+      // Mock progress data - in real app, this would be calculated from user activity
+      const progressData = {
+        overallProgress: 68,
+        subjectProgress: [
+          {
+            subject: "Physics",
+            goal: "CEE",
+            progress: 75,
+            notesCompleted: 12,
+            totalNotes: 16,
+            testsCompleted: 5,
+            averageScore: 82
+          },
+          {
+            subject: "Chemistry",
+            goal: "CEE",
+            progress: 60,
+            notesCompleted: 8,
+            totalNotes: 14,
+            testsCompleted: 3,
+            averageScore: 76
+          },
+          {
+            subject: "Math",
+            goal: "IOE",
+            progress: 85,
+            notesCompleted: 15,
+            totalNotes: 18,
+            testsCompleted: 6,
+            averageScore: 88
+          }
+        ],
+        weeklyActivity: [
+          { date: "2025-01-13", notesStudied: 3, testsTaken: 1, timeSpent: 120 },
+          { date: "2025-01-14", notesStudied: 2, testsTaken: 0, timeSpent: 80 },
+          { date: "2025-01-15", notesStudied: 4, testsTaken: 2, timeSpent: 150 },
+          { date: "2025-01-16", notesStudied: 1, testsTaken: 1, timeSpent: 90 },
+          { date: "2025-01-17", notesStudied: 5, testsTaken: 0, timeSpent: 110 },
+          { date: "2025-01-18", notesStudied: 2, testsTaken: 1, timeSpent: 95 },
+          { date: "2025-01-19", notesStudied: 0, testsTaken: 0, timeSpent: 0 }
+        ],
+        achievements: [
+          {
+            id: 1,
+            title: "First Test Completed",
+            description: "Successfully completed your first mock test",
+            icon: "trophy",
+            unlockedDate: "2025-01-10",
+            category: "tests"
+          },
+          {
+            id: 2,
+            title: "Study Streak - 7 Days",
+            description: "Studied consistently for 7 days in a row",
+            icon: "calendar",
+            unlockedDate: "2025-01-16",
+            category: "streak"
+          },
+          {
+            id: 3,
+            title: "High Scorer",
+            description: "Achieved 90% or higher in a test",
+            icon: "star",
+            unlockedDate: "2025-01-10",
+            category: "score"
+          }
+        ],
+        currentStreak: 5,
+        totalStudyTime: 45
+      };
+      
+      res.json(progressData);
+    } catch (error) {
+      console.error("Error fetching student progress:", error);
+      res.status(500).json({ error: "Failed to fetch progress" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

@@ -12,6 +12,7 @@ import MockTest from "@/pages/mock-test";
 import Login from "@/pages/login";
 import AdminPanel from "@/pages/admin";
 import CourseDetails from "@/pages/course-details";
+import StudentDashboardPage from "@/pages/student-dashboard";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/mock-test" component={MockTest} />
       <Route path="/login" component={Login} />
       <Route path="/admin" component={AdminPanel} />
+      <Route path="/student-dashboard" component={StudentDashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );
