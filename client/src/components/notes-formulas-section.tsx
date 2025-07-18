@@ -3,6 +3,179 @@ import NotesPageCard from "@/components/NotesPageCard";
 import { getNotesForHomepage, getFormulasForHomepage } from "@/data/notesData";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+
+// Custom Carousel Component with drag/swipe functionality
+function Carousel({ 
+  children, 
+  className = "", 
+  itemWidth = 256 // w-64 = 16rem = 256px
+}: { 
+  children: React.ReactNode[]; 
+  className?: string; 
+  itemWidth?: number;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [itemsPerView, setItemsPerView] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const maxIndex = Math.max(0, children.length - itemsPerView);
+
+  // Calculate items per view based on container width
+  useEffect(() => {
+    const calculateItemsPerView = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.parentElement?.clientWidth || window.innerWidth;
+        const newItemsPerView = Math.floor((containerWidth - 64) / (itemWidth + 24)); // 64px for padding, 24px for gap
+        setItemsPerView(Math.max(1, newItemsPerView));
+      }
+    };
+
+    calculateItemsPerView();
+    window.addEventListener('resize', calculateItemsPerView);
+    return () => window.removeEventListener('resize', calculateItemsPerView);
+  }, [itemWidth]);
+
+  // Adjust currentIndex when itemsPerView changes
+  useEffect(() => {
+    const newMaxIndex = Math.max(0, children.length - itemsPerView);
+    if (currentIndex > newMaxIndex) {
+      setCurrentIndex(newMaxIndex);
+    }
+  }, [itemsPerView, children.length, currentIndex]);
+
+  const goToPrevious = () => {
+    setCurrentIndex(Math.max(0, currentIndex - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex(Math.min(maxIndex, currentIndex + 1));
+  };
+
+  // Mouse events for drag functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const diff = startX - e.clientX;
+    // Drag threshold for navigation
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  // Touch events for swipe functionality
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent scrolling during touch
+    if (isDragging) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const x = e.changedTouches[0].clientX;
+    const diff = startX - x;
+    
+    // Swipe threshold
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      goToPrevious();
+    } else if (e.key === 'ArrowRight') {
+      goToNext();
+    }
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Left Arrow */}
+      <button
+        onClick={goToPrevious}
+        disabled={currentIndex === 0}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg rounded-full p-2 transition-all duration-200"
+        style={{ marginLeft: '-20px' }}
+      >
+        <ChevronLeft className="w-6 h-6 text-gray-700" />
+      </button>
+
+      {/* Right Arrow */}
+      <button
+        onClick={goToNext}
+        disabled={currentIndex >= maxIndex}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg rounded-full p-2 transition-all duration-200"
+        style={{ marginRight: '-20px' }}
+      >
+        <ChevronRight className="w-6 h-6 text-gray-700" />
+      </button>
+
+      {/* Carousel Container */}
+      <div
+        ref={containerRef}
+        className="overflow-hidden cursor-grab active:cursor-grabbing focus:outline-none"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="region"
+        aria-label="Notes carousel"
+      >
+        <div
+          className="flex gap-6 transition-transform duration-300 ease-in-out"
+          style={{
+            transform: `translateX(-${currentIndex * (itemWidth + 24)}px)`,
+            width: `${children.length * (itemWidth + 24)}px`
+          }}
+        >
+          {children.map((child, index) => (
+            <div key={index} className="flex-shrink-0" style={{ width: `${itemWidth}px` }}>
+              {child}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function NotesFormulasSection() {
   // Get data from API using React Query
@@ -50,30 +223,29 @@ export default function NotesFormulasSection() {
             </p>
           </div>
           
-          {/* Horizontal scrollable container for notes */}
-          <div className="overflow-x-auto pb-4 mb-8">
+          {/* Carousel container for notes */}
+          <div className="mb-8 px-8">
             {notesLoading ? (
-              <div className="flex gap-6 min-w-max">
+              <div className="flex gap-6 overflow-hidden">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
                 ))}
               </div>
             ) : (
-              <div className="flex gap-6 min-w-max">
+              <Carousel className="pb-4">
                 {notesData.map((note) => (
-                  <div key={note.id} className="flex-shrink-0 w-64">
-                    <NotesPageCard
-                      label={note.label}
-                      chapterName={note.chapterName}
-                      subjectName={note.subjectName}
-                      goals={note.goals}
-                      cost={note.cost}
-                      onView={() => handleView(note.id)}
-                      onGetAdd={() => handleGetAdd(note.id)}
-                    />
-                  </div>
+                  <NotesPageCard
+                    key={note.id}
+                    label={note.label}
+                    chapterName={note.chapterName}
+                    subjectName={note.subjectName}
+                    goals={note.goals}
+                    cost={note.cost}
+                    onView={() => handleView(note.id)}
+                    onGetAdd={() => handleGetAdd(note.id)}
+                  />
                 ))}
-              </div>
+              </Carousel>
             )}
           </div>
           
@@ -99,30 +271,29 @@ export default function NotesFormulasSection() {
             </p>
           </div>
           
-          {/* Horizontal scrollable container for formulas */}
-          <div className="overflow-x-auto pb-4 mb-8">
+          {/* Carousel container for formulas */}
+          <div className="mb-8 px-8">
             {formulasLoading ? (
-              <div className="flex gap-6 min-w-max">
+              <div className="flex gap-6 overflow-hidden">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
                 ))}
               </div>
             ) : (
-              <div className="flex gap-6 min-w-max">
+              <Carousel className="pb-4">
                 {formulasData.map((formula) => (
-                  <div key={formula.id} className="flex-shrink-0 w-64">
-                    <NotesPageCard
-                      label={formula.label}
-                      chapterName={formula.chapterName}
-                      subjectName={formula.subjectName}
-                      goals={formula.goals}
-                      cost={formula.cost}
-                      onView={() => handleView(formula.id)}
-                      onGetAdd={() => handleGetAdd(formula.id)}
-                    />
-                  </div>
+                  <NotesPageCard
+                    key={formula.id}
+                    label={formula.label}
+                    chapterName={formula.chapterName}
+                    subjectName={formula.subjectName}
+                    goals={formula.goals}
+                    cost={formula.cost}
+                    onView={() => handleView(formula.id)}
+                    onGetAdd={() => handleGetAdd(formula.id)}
+                  />
                 ))}
-              </div>
+              </Carousel>
             )}
           </div>
           
