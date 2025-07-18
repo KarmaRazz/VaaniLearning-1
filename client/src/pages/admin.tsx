@@ -1315,6 +1315,7 @@ const NotesContent = () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: limit.toString(),
+        activeTab: activeTab, // Include activeTab in API call
         ...(searchTerm && { search: searchTerm }),
         ...(goalFilter && { goal: goalFilter }),
         ...(subjectFilter && { subject: subjectFilter })
@@ -1336,20 +1337,10 @@ const NotesContent = () => {
     }
   });
 
-  const allNotes = paginatedData?.notes || [];
-  const totalNotesAll = paginatedData?.total || 0;
-  
-  // Filter notes based on activeTab for display
-  const notes = allNotes.filter(note => {
-    if (activeTab === 'notes') {
-      return note.label === 'Note';
-    } else {
-      return note.label === 'Formula' || note.label === 'Derivation';
-    }
-  });
-  
-  const totalNotes = notes.length;
-  const totalPages = Math.ceil(totalNotesAll / limit);
+  // Data is already filtered by backend based on activeTab and other filters
+  const notes = paginatedData?.notes || [];
+  const totalNotes = paginatedData?.total || 0;
+  const totalPages = Math.ceil(totalNotes / limit);
 
   const createNoteMutation = useMutation({
     mutationFn: async (noteData: typeof formData) => {
@@ -1407,6 +1398,26 @@ const NotesContent = () => {
     }
   });
 
+  // Add bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const response = await fetch('/api/admin/notes/bulk', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      });
+      if (!response.ok) throw new Error('Failed to delete notes');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      setSelectedNotes([]);
+      setSelectAll(false);
+    }
+  });
+
   const resetForm = () => {
     setFormData({
       chapterName: '',
@@ -1420,14 +1431,69 @@ const NotesContent = () => {
     setEditingNote(null);
   };
 
-  // Filter notes based on active tab
-  const filteredNotes = notes.filter(note => {
-    if (activeTab === 'notes') {
-      return note.label === 'Note';
+  // Selection handlers for bulk actions
+  const handleSelectNote = (noteId: number) => {
+    setSelectedNotes(prev => 
+      prev.includes(noteId) 
+        ? prev.filter(id => id !== noteId)
+        : [...prev, noteId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedNotes([]);
     } else {
-      return note.label === 'Formula' || note.label === 'Derivation';
+      setSelectedNotes(notes.map(note => note.id));
     }
-  });
+    setSelectAll(!selectAll);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedNotes.length === 0) return;
+    
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedNotes.length} selected notes?`);
+    if (confirmDelete) {
+      bulkDeleteMutation.mutate(selectedNotes);
+    }
+  };
+
+  // Update selectAll state when notes or selectedNotes change
+  React.useEffect(() => {
+    if (notes.length > 0) {
+      const allSelected = notes.every(note => selectedNotes.includes(note.id));
+      setSelectAll(allSelected);
+    } else {
+      setSelectAll(false);
+    }
+  }, [notes, selectedNotes]);
+
+  // Dynamic subject filtering based on selected goal
+  const [availableSubjectsForGoal, setAvailableSubjectsForGoal] = useState<string[]>([]);
+
+  // Static subject mappings for each goal
+  const subjectsByGoal = {
+    'CEE': ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany'],
+    'IOE': ['Physics', 'Chemistry', 'Math'],
+    'Lok Sewa': ['General Knowledge', 'Nepal History', 'Geography', 'Constitution'],
+    'ACCA': ['Financial Accounting', 'Management Accounting', 'Corporate Law', 'Taxation'],
+    'Language': ['English Grammar', 'Vocabulary', 'Comprehension', 'Writing Skills']
+  };
+
+  // Update available subjects when goalFilter changes
+  React.useEffect(() => {
+    if (goalFilter) {
+      const subjectsForGoal = subjectsByGoal[goalFilter as keyof typeof subjectsByGoal] || [];
+      setAvailableSubjectsForGoal(subjectsForGoal);
+      
+      // Reset subject filter if current selection is not valid for the selected goal
+      if (subjectFilter && !subjectsForGoal.includes(subjectFilter)) {
+        setSubjectFilter('');
+      }
+    } else {
+      setAvailableSubjectsForGoal(availableSubjectsFromDB);
+    }
+  }, [goalFilter, availableSubjectsFromDB, subjectFilter]);
 
   const getCreateButtonText = () => {
     return activeTab === 'notes' ? 'Create Note' : 'Create Formula/Derivation';
@@ -1473,52 +1539,6 @@ const NotesContent = () => {
     setShowCreateForm(true);
   };
 
-  // Bulk delete mutation
-  const bulkDeleteMutation = useMutation({
-    mutationFn: async (ids: number[]) => {
-      const response = await fetch('/api/admin/notes/bulk', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids })
-      });
-      if (!response.ok) throw new Error('Failed to delete notes');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
-      setSelectedNotes([]);
-      setSelectAll(false);
-    }
-  });
-
-  // Checkbox handlers
-  const handleSelectNote = (noteId: number) => {
-    setSelectedNotes(prev => 
-      prev.includes(noteId) 
-        ? prev.filter(id => id !== noteId)
-        : [...prev, noteId]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedNotes([]);
-    } else {
-      setSelectedNotes(notes.map((note: any) => note.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const handleBulkDelete = () => {
-    if (selectedNotes.length === 0) return;
-    
-    if (window.confirm(`Are you sure you want to delete ${selectedNotes.length} selected notes? This action cannot be undone.`)) {
-      bulkDeleteMutation.mutate(selectedNotes);
-    }
-  };
-
   // Search and filter handlers
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -1558,14 +1578,6 @@ const NotesContent = () => {
   };
 
   const availableGoals = ['CEE', 'IOE', 'Lok Sewa', 'ACCA', 'Language'];
-  
-  const subjectsByGoal = {
-    'CEE': ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany'],
-    'IOE': ['Physics', 'Chemistry', 'Math'],
-    'Lok Sewa': ['General Knowledge', 'Nepal History', 'Geography', 'Constitution'],
-    'ACCA': ['Financial Accounting', 'Management Accounting', 'Corporate Law', 'Taxation'],
-    'Language': ['English Grammar', 'Vocabulary', 'Comprehension', 'Writing Skills']
-  };
 
   const getAvailableSubjects = () => {
     if (formData.goals.length === 0) {
@@ -1659,7 +1671,7 @@ const NotesContent = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
             >
               <option value="">All Subjects</option>
-              {availableSubjectsFromDB.map((subject: string) => (
+              {availableSubjectsForGoal.map((subject: string) => (
                 <option key={subject} value={subject}>{subject}</option>
               ))}
             </select>

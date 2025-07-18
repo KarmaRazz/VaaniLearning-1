@@ -174,13 +174,20 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount !== undefined && result.rowCount > 0;
   }
 
-  async getNotesWithPagination(page: number = 1, limit: number = 20, search?: string, goalFilter?: string, subjectFilter?: string): Promise<{ notes: Note[], total: number }> {
+  async getNotesWithPagination(page: number = 1, limit: number = 20, search?: string, goalFilter?: string, subjectFilter?: string, activeTab?: string): Promise<{ notes: Note[], total: number }> {
     const offset = (page - 1) * limit;
     
     let query = db.select().from(notes);
     let countQuery = db.select({ count: sql<number>`count(*)` }).from(notes);
     
     const conditions = [];
+    
+    // Filter by activeTab first (Note vs Formula/Derivation)
+    if (activeTab === 'notes') {
+      conditions.push(eq(notes.label, 'Note'));
+    } else if (activeTab === 'formulas') {
+      conditions.push(or(eq(notes.label, 'Formula'), eq(notes.label, 'Derivation')));
+    }
     
     if (search) {
       conditions.push(
@@ -224,6 +231,7 @@ export class DatabaseStorage implements IStorage {
   async deleteMultipleNotes(ids: number[]): Promise<boolean> {
     if (ids.length === 0) return true;
     
+    // Use inArray for better type safety with Drizzle
     const result = await db.delete(notes).where(
       sql`${notes.id} = ANY(${ids})`
     );

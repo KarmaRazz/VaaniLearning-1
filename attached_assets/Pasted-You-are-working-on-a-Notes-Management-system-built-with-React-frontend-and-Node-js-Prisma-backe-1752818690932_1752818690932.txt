@@ -1,0 +1,41 @@
+You are working on a Notes Management system built with React (frontend) and Node.js + Prisma (backend). The current code has several issues related to filtering, pagination, and bulk delete. Fix all of the following:
+
+---
+
+✅ 1. Filter Dependency Bug:
+- When a Goal is selected from the dropdown, update the Subject dropdown options to only show the subjects related to that selected goal.
+- Implement this using a `useEffect` that updates subject options dynamically.
+
+✅ 2. Filter Logic Not Working:
+- Fix the filter so that:
+  - When only Goal is selected, it shows all notes for that goal.
+  - When only Subject is selected, it shows all notes for that subject.
+  - When both are selected, it shows notes that match both Goal and Subject.
+
+✅ 3. Bulk Delete Not Working:
+- Enable multi-select delete.
+- Track selected note IDs in `selectedNotes` state.
+- On clicking "Delete Selected":
+  - Call the backend API to delete all selected notes from the database using `prisma.note.deleteMany({ where: { id: { in: [...] } } })`.
+  - Then update frontend to remove them from the list.
+
+✅ 4. Notes Count on Header is Static:
+- Fix the `Notes (20)` header so it dynamically shows the number of filtered results, not the full dataset.
+
+✅ 5. "Showing 1 to X of Y Entries" is Wrong:
+- Make this text dynamic. It should show the correct start and end indexes and total count.
+  - Example: If 20 items per page and you're on page 2 of 52 total items, show: `Showing 21 to 40 of 52 entries`.
+
+✅ 6. Pagination Issue:
+- Ensure only 20 notes are shown per page.
+- When navigating to the next page, display the correct subset.
+- Fix logic so pages aren't empty or misaligned.
+
+---
+
+You will find the following files involved:
+- `NotesPage.tsx` or `NotesPage.jsx` → UI & logic
+- `notes.controller.js` → deleteMany logic
+- Make sure filter logic is applied *before* pagination slicing.
+
+Apply modular code updates, clean formatting, and add comments explaining your changes. Only fix these features. Do not modify unrelated UI or backend code.

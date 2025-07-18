@@ -124,8 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const search = req.query.search as string;
       const goalFilter = req.query.goal as string;
       const subjectFilter = req.query.subject as string;
+      const activeTab = req.query.activeTab as string; // Add activeTab parameter
 
-      const result = await storage.getNotesWithPagination(page, limit, search, goalFilter, subjectFilter);
+      const result = await storage.getNotesWithPagination(page, limit, search, goalFilter, subjectFilter, activeTab);
       res.json(result);
     } catch (error) {
       console.error('Error fetching paginated notes:', error);
@@ -153,8 +154,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid or empty ids array" });
       }
 
-      await storage.deleteMultipleNotes(ids);
-      res.json({ message: `Successfully deleted ${ids.length} notes` });
+      // Validate that all IDs are numbers
+      const validIds = ids.filter(id => typeof id === 'number' && !isNaN(id));
+      if (validIds.length === 0) {
+        return res.status(400).json({ error: "Invalid note IDs" });
+      }
+
+      await storage.deleteMultipleNotes(validIds);
+      res.json({ message: `Successfully deleted ${validIds.length} notes` });
     } catch (error) {
       console.error('Error bulk deleting notes:', error);
       res.status(500).json({ error: "Failed to delete notes" });
