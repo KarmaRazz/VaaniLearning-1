@@ -1,6 +1,6 @@
 import { users, notes, type User, type InsertUser, type Note, type InsertNote } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, or, ilike, sql } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -15,6 +15,9 @@ export interface IStorage {
   getNote(id: number): Promise<Note | undefined>;
   updateNote(id: number, note: Partial<InsertNote>): Promise<Note | undefined>;
   deleteNote(id: number): Promise<boolean>;
+  getNotesWithPagination(page: number, limit: number, search?: string, goalFilter?: string, subjectFilter?: string): Promise<{ notes: Note[], total: number }>;
+  getUniqueSubjects(): Promise<string[]>;
+  deleteMultipleNotes(ids: number[]): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -78,6 +81,43 @@ export class MemStorage implements IStorage {
   async deleteNote(id: number): Promise<boolean> {
     return this.notes.delete(id);
   }
+
+  async getNotesWithPagination(page: number = 1, limit: number = 20, search?: string, goalFilter?: string, subjectFilter?: string): Promise<{ notes: Note[], total: number }> {
+    const allNotes = Array.from(this.notes.values());
+    let filteredNotes = allNotes;
+
+    if (search) {
+      filteredNotes = filteredNotes.filter(note => 
+        note.chapterName.toLowerCase().includes(search.toLowerCase()) ||
+        note.subjectName.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (goalFilter) {
+      filteredNotes = filteredNotes.filter(note => note.goals.includes(goalFilter));
+    }
+
+    if (subjectFilter) {
+      filteredNotes = filteredNotes.filter(note => note.subjectName === subjectFilter);
+    }
+
+    const total = filteredNotes.length;
+    const offset = (page - 1) * limit;
+    const paginatedNotes = filteredNotes.slice(offset, offset + limit);
+
+    return { notes: paginatedNotes, total };
+  }
+
+  async getUniqueSubjects(): Promise<string[]> {
+    const allNotes = Array.from(this.notes.values());
+    const subjects = [...new Set(allNotes.map(note => note.subjectName))];
+    return subjects.filter(Boolean);
+  }
+
+  async deleteMultipleNotes(ids: number[]): Promise<boolean> {
+    ids.forEach(id => this.notes.delete(id));
+    return true;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -132,6 +172,63 @@ export class DatabaseStorage implements IStorage {
   async deleteNote(id: number): Promise<boolean> {
     const result = await db.delete(notes).where(eq(notes.id, id));
     return result.rowCount !== undefined && result.rowCount > 0;
+  }
+
+  async getNotesWithPagination(page: number = 1, limit: number = 20, search?: string, goalFilter?: string, subjectFilter?: string): Promise<{ notes: Note[], total: number }> {
+    const offset = (page - 1) * limit;
+    
+    let query = db.select().from(notes);
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(notes);
+    
+    const conditions = [];
+    
+    if (search) {
+      conditions.push(
+        or(
+          ilike(notes.chapterName, `%${search}%`),
+          ilike(notes.subjectName, `%${search}%`)
+        )
+      );
+    }
+    
+    if (goalFilter) {
+      conditions.push(sql`${notes.goals} @> ${JSON.stringify([goalFilter])}`);
+    }
+    
+    if (subjectFilter) {
+      conditions.push(eq(notes.subjectName, subjectFilter));
+    }
+    
+    if (conditions.length > 0) {
+      const whereCondition = conditions.length === 1 ? conditions[0] : and(...conditions);
+      query = query.where(whereCondition);
+      countQuery = countQuery.where(whereCondition);
+    }
+    
+    const [notesResult, countResult] = await Promise.all([
+      query.limit(limit).offset(offset).execute(),
+      countQuery.execute()
+    ]);
+    
+    return {
+      notes: notesResult,
+      total: countResult[0]?.count || 0
+    };
+  }
+
+  async getUniqueSubjects(): Promise<string[]> {
+    const result = await db.selectDistinct({ subjectName: notes.subjectName }).from(notes);
+    return result.map(r => r.subjectName).filter(Boolean);
+  }
+
+  async deleteMultipleNotes(ids: number[]): Promise<boolean> {
+    if (ids.length === 0) return true;
+    
+    const result = await db.delete(notes).where(
+      sql`${notes.id} = ANY(${ids})`
+    );
+    
+    return true;
   }
 }
 

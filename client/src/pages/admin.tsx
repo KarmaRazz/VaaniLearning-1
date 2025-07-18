@@ -1299,15 +1299,57 @@ const NotesContent = () => {
     isPublished: false
   });
 
-  // Fetch notes using React Query
-  const { data: notes = [], isLoading, refetch } = useQuery({
-    queryKey: ['/api/admin/notes'],
+  // New states for pagination, filtering, and bulk actions
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [goalFilter, setGoalFilter] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('');
+  const [selectedNotes, setSelectedNotes] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const limit = 20;
+
+  // Fetch paginated notes using React Query
+  const { data: paginatedData, isLoading } = useQuery({
+    queryKey: ['/api/admin/notes/paginated', currentPage, searchTerm, goalFilter, subjectFilter, activeTab],
     queryFn: async () => {
-      const response = await fetch('/api/admin/notes');
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: limit.toString(),
+        ...(searchTerm && { search: searchTerm }),
+        ...(goalFilter && { goal: goalFilter }),
+        ...(subjectFilter && { subject: subjectFilter })
+      });
+      
+      const response = await fetch(`/api/admin/notes/paginated?${params}`);
       if (!response.ok) throw new Error('Failed to fetch notes');
       return response.json();
     }
   });
+
+  // Fetch unique subjects for filter dropdown
+  const { data: availableSubjectsFromDB = [] } = useQuery({
+    queryKey: ['/api/admin/notes/subjects'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/notes/subjects');
+      if (!response.ok) throw new Error('Failed to fetch subjects');
+      return response.json();
+    }
+  });
+
+  const allNotes = paginatedData?.notes || [];
+  const totalNotesAll = paginatedData?.total || 0;
+  
+  // Filter notes based on activeTab for display
+  const notes = allNotes.filter(note => {
+    if (activeTab === 'notes') {
+      return note.label === 'Note';
+    } else {
+      return note.label === 'Formula' || note.label === 'Derivation';
+    }
+  });
+  
+  const totalNotes = notes.length;
+  const totalPages = Math.ceil(totalNotesAll / limit);
 
   const createNoteMutation = useMutation({
     mutationFn: async (noteData: typeof formData) => {
@@ -1321,6 +1363,7 @@ const NotesContent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
       setShowCreateForm(false);
       resetForm();
@@ -1337,7 +1380,10 @@ const NotesContent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      setSelectedNotes([]);
+      setSelectAll(false);
     }
   });
 
@@ -1353,6 +1399,7 @@ const NotesContent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
       setShowCreateForm(false);
       setEditingNote(null);
@@ -1396,6 +1443,9 @@ const NotesContent = () => {
       setShowCreateForm(false);
       resetForm();
     }
+    setCurrentPage(1); // Reset to first page when changing tabs
+    setSelectedNotes([]); // Clear selections when changing tabs
+    setSelectAll(false);
   };
 
   const handleCreateClick = () => {
@@ -1421,6 +1471,72 @@ const NotesContent = () => {
       isPublished: note.isPublished
     });
     setShowCreateForm(true);
+  };
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const response = await fetch('/api/admin/notes/bulk', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids })
+      });
+      if (!response.ok) throw new Error('Failed to delete notes');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/notes/paginated'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      setSelectedNotes([]);
+      setSelectAll(false);
+    }
+  });
+
+  // Checkbox handlers
+  const handleSelectNote = (noteId: number) => {
+    setSelectedNotes(prev => 
+      prev.includes(noteId) 
+        ? prev.filter(id => id !== noteId)
+        : [...prev, noteId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedNotes([]);
+    } else {
+      setSelectedNotes(notes.map((note: any) => note.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedNotes.length === 0) return;
+    
+    if (window.confirm(`Are you sure you want to delete ${selectedNotes.length} selected notes? This action cannot be undone.`)) {
+      bulkDeleteMutation.mutate(selectedNotes);
+    }
+  };
+
+  // Search and filter handlers
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleFilterChange = (type: 'goal' | 'subject', value: string) => {
+    if (type === 'goal') {
+      setGoalFilter(value);
+    } else {
+      setSubjectFilter(value);
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1504,10 +1620,75 @@ const NotesContent = () => {
         </nav>
       </div>
 
+      {/* Search and Filter Controls */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search Bar */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input
+              type="text"
+              placeholder="Search by title or subject..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+            />
+          </div>
+
+          {/* Goal Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Goal</label>
+            <select
+              value={goalFilter}
+              onChange={(e) => handleFilterChange('goal', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+            >
+              <option value="">All Goals</option>
+              {availableGoals.map(goal => (
+                <option key={goal} value={goal}>{goal}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subject Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Subject</label>
+            <select
+              value={subjectFilter}
+              onChange={(e) => handleFilterChange('subject', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F26B1D]"
+            >
+              <option value="">All Subjects</option>
+              {availableSubjectsFromDB.map((subject: string) => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Bulk Actions */}
+      {selectedNotes.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex justify-between items-center">
+            <span className="text-blue-800 font-medium">
+              {selectedNotes.length} note{selectedNotes.length !== 1 ? 's' : ''} selected
+            </span>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkDeleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
+            >
+              {bulkDeleteMutation.isPending ? 'Deleting...' : 'Delete Selected'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Notes List */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{getTabTitle()} ({filteredNotes.length})</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{getTabTitle()} ({totalNotes})</h2>
         </div>
         
         {isLoading ? (
@@ -1523,6 +1704,14 @@ const NotesContent = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="rounded border-gray-300 text-[#F26B1D] focus:ring-[#F26B1D]"
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
@@ -1533,8 +1722,16 @@ const NotesContent = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredNotes.map((note: any) => (
+                {notes.map((note: any) => (
                   <tr key={note.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedNotes.includes(note.id)}
+                        onChange={() => handleSelectNote(note.id)}
+                        className="rounded border-gray-300 text-[#F26B1D] focus:ring-[#F26B1D]"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{note.chapterName}</div>
                     </td>
@@ -1584,6 +1781,64 @@ const NotesContent = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, totalNotes)} of {totalNotes} entries
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                
+                {/* Page Numbers */}
+                <div className="flex space-x-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          currentPage === pageNum
+                            ? 'bg-[#F26B1D] text-white'
+                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

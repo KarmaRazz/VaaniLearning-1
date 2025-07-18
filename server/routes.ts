@@ -116,6 +116,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get paginated notes with filters
+  app.get("/api/admin/notes/paginated", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const search = req.query.search as string;
+      const goalFilter = req.query.goal as string;
+      const subjectFilter = req.query.subject as string;
+
+      const result = await storage.getNotesWithPagination(page, limit, search, goalFilter, subjectFilter);
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching paginated notes:', error);
+      res.status(500).json({ error: "Failed to fetch notes" });
+    }
+  });
+
+  // Get unique subjects
+  app.get("/api/admin/notes/subjects", async (req, res) => {
+    try {
+      const subjects = await storage.getUniqueSubjects();
+      res.json(subjects);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      res.status(500).json({ error: "Failed to fetch subjects" });
+    }
+  });
+
+  // Bulk delete notes
+  app.delete("/api/admin/notes/bulk", async (req, res) => {
+    try {
+      const { ids } = req.body;
+      
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: "Invalid or empty ids array" });
+      }
+
+      await storage.deleteMultipleNotes(ids);
+      res.json({ message: `Successfully deleted ${ids.length} notes` });
+    } catch (error) {
+      console.error('Error bulk deleting notes:', error);
+      res.status(500).json({ error: "Failed to delete notes" });
+    }
+  });
+
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
