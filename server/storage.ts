@@ -1,6 +1,6 @@
 import { users, notes, type User, type InsertUser, type Note, type InsertNote } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, or, ilike, sql } from "drizzle-orm";
+import { eq, and, or, ilike, sql, inArray } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -199,7 +199,8 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (goalFilter) {
-      conditions.push(sql`${notes.goals} @> ${JSON.stringify([goalFilter])}`);
+      // Use PostgreSQL = ANY() syntax which is safer for text arrays
+      conditions.push(sql`${goalFilter} = ANY(${notes.goals})`);
     }
     
     if (subjectFilter) {
@@ -233,7 +234,7 @@ export class DatabaseStorage implements IStorage {
     
     // Use inArray for better type safety with Drizzle
     const result = await db.delete(notes).where(
-      sql`${notes.id} = ANY(${ids})`
+      inArray(notes.id, ids)
     );
     
     return true;
