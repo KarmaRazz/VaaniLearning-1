@@ -12,6 +12,7 @@ export interface AuthenticatedRequest extends Request {
     id: number;
     email: string;
     name: string;
+    role: string;
   };
 }
 
@@ -23,12 +24,13 @@ export async function comparePassword(password: string, hash: string): Promise<b
   return await bcrypt.compare(password, hash);
 }
 
-export function generateToken(user: { id: number; email: string; name: string }): string {
+export function generateToken(user: { id: number; email: string; name: string; role: string }): string {
   return jwt.sign(
     { 
       id: user.id, 
       email: user.email, 
-      name: user.name 
+      name: user.name,
+      role: user.role
     },
     JWT_SECRET,
     { expiresIn: '30d' }
@@ -67,7 +69,7 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
     return res.status(403).json({ error: 'User not found' });
   }
 
-  req.user = { id: user.id, email: user.email, name: user.name };
+  req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
   next();
 }
 
@@ -99,10 +101,11 @@ export async function signup(req: Request, res: Response) {
       email,
       username,
       password: hashedPassword,
+      role: "STUDENT", // Default role for new users
     });
 
     // Generate JWT token
-    const token = generateToken({ id: user.id, email: user.email, name: user.name });
+    const token = generateToken({ id: user.id, email: user.email, name: user.name, role: user.role });
 
     // Set HTTP-only cookie
     res.cookie('token', token, {
@@ -152,7 +155,7 @@ export async function login(req: Request, res: Response) {
     }
 
     // Generate JWT token
-    const token = generateToken({ id: user.id, email: user.email, name: user.name });
+    const token = generateToken({ id: user.id, email: user.email, name: user.name, role: user.role });
 
     // Set HTTP-only cookie
     res.cookie('token', token, {
@@ -196,7 +199,8 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
     res.json({
       id: user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      role: user.role
     });
   } catch (error) {
     console.error('Get current user error:', error);

@@ -36,25 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single note
-  app.get("/api/notes/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid note ID" });
-      }
-      
-      const note = await storage.getNote(id);
-      if (!note) {
-        return res.status(404).json({ error: "Note not found" });
-      }
-      
-      res.json(note);
-    } catch (error) {
-      console.error("Error fetching note:", error);
-      res.status(500).json({ error: "Failed to fetch note" });
-    }
-  });
+
 
   // Create new note (admin endpoint)
   app.post("/api/admin/notes", async (req, res) => {
@@ -390,6 +372,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching student progress:", error);
       res.status(500).json({ error: "Failed to fetch progress" });
+    }
+  });
+
+  // UserNote Management Routes (Student only)
+  
+  // GET /notes/mine - Get all notes added by the logged-in student (must be before /notes/:id)
+  app.get("/api/notes/mine", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Check if user is a student
+      if (req.user!.role !== "STUDENT") {
+        return res.status(403).json({ error: "Only students can access personal notes" });
+      }
+      
+      const userNotes = await storage.getUserNotes(userId);
+      res.json(userNotes);
+      
+    } catch (error) {
+      console.error("Error fetching user notes:", error);
+      res.status(500).json({ error: "Failed to fetch user notes" });
+    }
+  });
+
+  // Get single note (must be after specific routes like /notes/mine)
+  app.get("/api/notes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+      
+      const note = await storage.getNote(id);
+      if (!note) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+      
+      res.json(note);
+    } catch (error) {
+      console.error("Error fetching note:", error);
+      res.status(500).json({ error: "Failed to fetch note" });
+    }
+  });
+  
+  // POST /notes/add/:noteId - Add note to student's dashboard
+  app.post("/api/notes/add/:noteId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const noteId = parseInt(req.params.noteId);
+      const userId = req.user!.id;
+      
+      if (isNaN(noteId)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+      
+      // Check if user is a student
+      if (req.user!.role !== "STUDENT") {
+        return res.status(403).json({ error: "Only students can add notes to dashboard" });
+      }
+      
+      // Check if note exists
+      const note = await storage.getNote(noteId);
+      if (!note) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+      
+      // Check if note is already added
+      const isAlreadyAdded = await storage.isNoteAddedByUser(userId, noteId);
+      if (isAlreadyAdded) {
+        return res.status(409).json({ error: "Note already added to dashboard" });
+      }
+      
+      // Add note to user's dashboard
+      const userNote = await storage.addNoteToUser(userId, noteId);
+      res.status(201).json({ 
+        message: "Note added to dashboard successfully",
+        userNote 
+      });
+      
+    } catch (error) {
+      console.error("Error adding note to dashboard:", error);
+      res.status(500).json({ error: "Failed to add note to dashboard" });
+    }
+  });
+
+  
+  // DELETE /notes/remove/:noteId - Remove note from student's dashboard
+  app.delete("/api/notes/remove/:noteId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const noteId = parseInt(req.params.noteId);
+      const userId = req.user!.id;
+      
+      if (isNaN(noteId)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+      
+      // Check if user is a student
+      if (req.user!.role !== "STUDENT") {
+        return res.status(403).json({ error: "Only students can remove notes from dashboard" });
+      }
+      
+      // Check if note is added by user
+      const isAdded = await storage.isNoteAddedByUser(userId, noteId);
+      if (!isAdded) {
+        return res.status(404).json({ error: "Note not found in dashboard" });
+      }
+      
+      // Remove note from user's dashboard
+      const removed = await storage.removeNoteFromUser(userId, noteId);
+      if (!removed) {
+        return res.status(500).json({ error: "Failed to remove note from dashboard" });
+      }
+      
+      res.json({ message: "Note removed from dashboard successfully" });
+      
+    } catch (error) {
+      console.error("Error removing note from dashboard:", error);
+      res.status(500).json({ error: "Failed to remove note from dashboard" });
     }
   });
 
