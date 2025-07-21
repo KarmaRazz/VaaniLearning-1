@@ -231,6 +231,11 @@ export default function NotesFormulasSection() {
                   <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
                 ))}
               </div>
+            ) : notesData.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg mb-4">No notes available yet</p>
+                <p className="text-gray-500">Notes will appear here once added by the admin</p>
+              </div>
             ) : (
               <Carousel className="pb-4">
                 {notesData.map((note) => (
@@ -278,6 +283,11 @@ export default function NotesFormulasSection() {
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="flex-shrink-0 w-64 h-48 bg-gray-200 rounded-lg animate-pulse"></div>
                 ))}
+              </div>
+            ) : formulasData.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg mb-4">No formulas available yet</p>
+                <p className="text-gray-500">Formulas and derivations will appear here once added by the admin</p>
               </div>
             ) : (
               <Carousel className="pb-4">

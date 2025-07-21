@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NotesPageCard from "@/components/NotesPageCard";
 import { Search } from "lucide-react";
-import { getAllNotes, getAllFormulas } from "@/data/notesData";
+import { getAllNotes, getAllFormulas, type NoteItem } from "@/data/notesData";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,12 +22,12 @@ const subjectsByGoal: { [key: string]: string[] } = {
 
 export default function Notes() {
   // Get data from API using React Query
-  const { data: notesData = [] } = useQuery({
+  const { data: notesData = [] } = useQuery<NoteItem[]>({
     queryKey: ['/api/notes', 'all-notes'],
     queryFn: getAllNotes,
   });
 
-  const { data: formulasData = [] } = useQuery({
+  const { data: formulasData = [] } = useQuery<NoteItem[]>({
     queryKey: ['/api/notes', 'all-formulas'],
     queryFn: getAllFormulas,
   });
