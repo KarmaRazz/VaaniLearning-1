@@ -71,9 +71,39 @@ export default function Notes() {
     }
   };
 
-  const handleGetAdd = (id: number) => {
-    console.log("Get/Add clicked for item:", id);
-    // Add get/add logic here
+  const handleGetAdd = async (id: number) => {
+    try {
+      const response = await fetch(`/api/notes/add/${id}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to add note to dashboard');
+      }
+
+      const result = await response.json();
+      
+      // Show success message
+      alert('Note added to dashboard successfully!');
+    } catch (error) {
+      console.error('Error adding note to dashboard:', error);
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('Access token required')) {
+          alert('Please login to add notes to your dashboard');
+          // Redirect to login page
+          window.location.href = '/login';
+        } else {
+          alert(error.message);
+        }
+      } else {
+        alert('Failed to add note to dashboard');
+      }
+    }
   };
 
   // Get available subjects for selected goal

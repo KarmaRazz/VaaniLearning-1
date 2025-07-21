@@ -84,7 +84,7 @@ export default function NotesPageCard({
             className="flex-1 bg-[#F26B1D] hover:bg-[#D72638] text-white"
             onClick={onGetAdd}
           >
-            {isFree ? "Get" : "Add"}
+            Add to Dashboard
           </Button>
         </div>
       </div>

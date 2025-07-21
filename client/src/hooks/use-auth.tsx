@@ -6,6 +6,7 @@ interface User {
   id: number;
   name: string;
   email: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (response.status === 401) return null;
         throw new Error('Failed to get user');
       }
-      return response.json() as User;
+      return response.json();
     },
     retry: false
   });
