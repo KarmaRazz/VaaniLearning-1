@@ -14,7 +14,14 @@ export class AdminAuth {
     try {
       const existingAdmin = await db.get('admin:evaanilearn@gmail.com');
       
-      if (!existingAdmin) {
+      // Check if admin exists (handle Replit DB wrapper)
+      const actualData = existingAdmin && existingAdmin.ok ? existingAdmin.value : existingAdmin;
+      const adminExists = actualData && 
+                         typeof actualData === 'object' && 
+                         'email' in actualData && 
+                         'hashedPassword' in actualData;
+      
+      if (!adminExists) {
         // Create default admin account
         const saltRounds = 12;
         const hashedPassword = await bcrypt.hash('V@an!@#123', saltRounds);
@@ -38,12 +45,25 @@ export class AdminAuth {
   static async authenticateAdmin(email: string, password: string): Promise<boolean> {
     try {
       const adminData = await db.get(`admin:${email}`);
+      // Handle Replit DB wrapper - extract actual data
+      const actualData = adminData && adminData.ok ? adminData.value : adminData;
       
-      if (!adminData || typeof adminData !== 'object') {
+      // Check if valid admin data exists
+      const isValidAdminData = actualData && 
+                              typeof actualData === 'object' && 
+                              'email' in actualData && 
+                              'hashedPassword' in actualData;
+      
+      if (!isValidAdminData) {
         return false;
       }
       
-      const admin = adminData as Admin;
+      const admin = actualData as Admin;
+      
+      if (!admin.hashedPassword) {
+        return false;
+      }
+      
       const isValidPassword = await bcrypt.compare(password, admin.hashedPassword);
       return isValidPassword;
     } catch (error) {
@@ -57,11 +77,20 @@ export class AdminAuth {
     try {
       const adminData = await db.get(`admin:${email}`);
       
-      if (!adminData || typeof adminData !== 'object') {
+      // Handle Replit DB wrapper - extract actual data
+      const actualData = adminData && adminData.ok ? adminData.value : adminData;
+      
+      // Check if valid admin data exists
+      const isValidAdminData = actualData && 
+                              typeof actualData === 'object' && 
+                              'email' in actualData && 
+                              'hashedPassword' in actualData;
+      
+      if (!isValidAdminData) {
         return null;
       }
       
-      const admin = adminData as Admin;
+      const admin = actualData as Admin;
       return {
         email: admin.email
       };
