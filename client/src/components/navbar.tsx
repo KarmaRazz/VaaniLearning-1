@@ -72,6 +72,11 @@ export default function Navbar() {
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
+            <Link href="/admin">
+              <Button variant="outline" className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white">
+                Admin
+              </Button>
+            </Link>
             {isAuthenticated && user ? (
               <>
                 <Link href="/student-dashboard">
@@ -148,6 +153,14 @@ export default function Navbar() {
                 </span>
               </Link>
             ))}
+            <Link href="/admin">
+              <span
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary-orange cursor-pointer"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Admin
+              </span>
+            </Link>
             <div className="pt-2 space-y-2">
               {isAuthenticated && user ? (
                 <>

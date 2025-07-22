@@ -31,7 +31,6 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/auth" component={Auth} />
       <Route path="/admin" component={AdminPanel} />
-      <Route path="/admin/dashboard" component={AdminPanel} />
       <Route path="/student-dashboard" component={StudentDashboardPage} />
       <Route component={NotFound} />
     </Switch>

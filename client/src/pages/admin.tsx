@@ -2238,48 +2238,12 @@ function AdminLogin() {
 }
 
 export default function AdminPanel() {
-  const { isAuthenticated, isLoading, authKey } = useAdminAuth();
-  const [location] = useLocation();
-  
-  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading, 'authKey:', authKey, 'location:', location);
-
-  // Check if admin cookie exists to determine authentication status
-  const checkAdminCookie = () => {
-    const cookies = document.cookie;
-    console.log('Current cookies:', cookies);
-    const hasAdminToken = cookies.includes('admin_token=');
-    console.log('Has admin token:', hasAdminToken);
-    return hasAdminToken;
-  };
-
-  // If we're on /admin/dashboard, check authentication
-  if (location === '/admin/dashboard') {
-    const isAuthenticated = checkAdminCookie();
-    console.log('Dashboard route - authenticated:', isAuthenticated);
-    
-    if (isAuthenticated) {
-      return (
-        <AdminLayout>
-          <div className="h-full">
-            {/* Authenticated admin content will be rendered by the layout */}
-          </div>
-        </AdminLayout>
-      );
-    } else {
-      // Not authenticated, redirect to login
-      console.log('Not authenticated, redirecting to /admin');
-      window.location.href = '/admin';
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F26B1D] mx-auto mb-4"></div>
-            <p className="text-gray-600">Redirecting to login...</p>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  // For /admin route, always show login form
-  return <AdminLogin />;
+  // Direct access to admin dashboard without authentication
+  return (
+    <AdminLayout>
+      <div className="h-full">
+        {/* Admin dashboard content rendered by the layout */}
+      </div>
+    </AdminLayout>
+  );
 }
