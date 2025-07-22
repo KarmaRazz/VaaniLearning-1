@@ -10,6 +10,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserProfilePic(userId: number, profilePicPath: string): Promise<User>;
   getNotes(): Promise<Note[]>;
   getPublishedNotes(): Promise<Note[]>;
   createNote(note: InsertNote): Promise<Note>;
@@ -69,7 +70,8 @@ export class MemStorage implements IStorage {
       role: insertUser.role || "STUDENT",
       gender: insertUser.gender || null,
       goalId: insertUser.goalId || null,
-      phoneNumber: insertUser.phoneNumber || null
+      phoneNumber: insertUser.phoneNumber || null,
+      profilePic: null
     };
     this.users.set(id, user);
     return user;
@@ -196,6 +198,10 @@ export class MemStorage implements IStorage {
 
   async getAllSubjects(): Promise<Subject[]> {
     throw new Error("Subjects functionality not implemented in MemStorage");
+  }
+
+  async updateUserProfilePic(userId: number, profilePicPath: string): Promise<User> {
+    throw new Error("Profile picture functionality not implemented in MemStorage");
   }
 }
 
@@ -399,6 +405,15 @@ export class DatabaseStorage implements IStorage {
 
   async getAllSubjects(): Promise<Subject[]> {
     return await db.select().from(subjects).orderBy(subjects.name);
+  }
+
+  async updateUserProfilePic(userId: number, profilePicPath: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ profilePic: profilePicPath })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 }
 

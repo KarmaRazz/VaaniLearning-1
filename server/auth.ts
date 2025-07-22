@@ -1,5 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import { storage } from './storage';
 import { signupSchema, loginSchema } from '@shared/schema';
@@ -206,10 +209,98 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      profilePic: user.profilePic
     });
   } catch (error) {
     console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Configure multer for profile picture uploads
+const uploadsDir = path.join(process.cwd(), 'uploads', 'profile-pics');
+
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const profilePicStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const profilePicUpload = multer({ 
+  storage: profilePicStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Check if file is an image
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      const error = new Error('Only image files are allowed') as any;
+      error.code = 'INVALID_FILE_TYPE';
+      cb(error, false);
+    }
+  }
+});
+
+export const uploadProfilePic = profilePicUpload.single('profilePic');
+
+export async function handleProfilePicUpload(req: AuthenticatedRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  try {
+    // Get the current user
+    const user = await storage.getUser(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Delete old profile picture if it exists
+    if (user.profilePic) {
+      const oldPicPath = path.join(process.cwd(), user.profilePic);
+      if (fs.existsSync(oldPicPath)) {
+        fs.unlinkSync(oldPicPath);
+      }
+    }
+
+    // Generate the relative path for the database
+    const profilePicPath = `/uploads/profile-pics/${req.file.filename}`;
+
+    // Update user profile pic in database
+    const updatedUser = await storage.updateUserProfilePic(req.user.id, profilePicPath);
+    
+    res.json({
+      success: true,
+      message: 'Profile picture uploaded successfully',
+      profilePic: profilePicPath
+    });
+  } catch (error) {
+    console.error('Profile pic upload error:', error);
+    
+    // Clean up the uploaded file if database update failed
+    if (req.file) {
+      const filePath = req.file.path;
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 }

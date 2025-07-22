@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertNoteSchema, insertGoalSchema, insertSubjectSchema } from "@shared/schema";
-import { signup, login, logout, getCurrentUser, authenticateToken, AuthenticatedRequest } from "./auth";
+import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, AuthenticatedRequest } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication Routes
@@ -10,6 +10,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", login);
   app.post("/api/auth/logout", logout);
   app.get("/api/auth/me", authenticateToken, getCurrentUser);
+  app.post("/api/auth/upload-profile-pic", authenticateToken, uploadProfilePic, handleProfilePicUpload);
 
   // put application routes here
   // prefix all routes with /api

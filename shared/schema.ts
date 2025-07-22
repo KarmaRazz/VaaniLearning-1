@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   gender: varchar("gender", { length: 10 }),
   goalId: integer("goal_id").references(() => goals.id),
   phoneNumber: varchar("phone_number", { length: 15 }),
+  profilePic: text("profile_pic"), // URL or path to profile picture
   role: varchar("role", { length: 20 }).notNull().default("STUDENT"),
 });
 
