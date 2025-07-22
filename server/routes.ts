@@ -160,6 +160,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Goals and Subjects API endpoints
   
+  // Student Profile API
+  app.get("/api/student/profile", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Get goal name if goalId exists
+      let goalName = null;
+      if (user.goalId) {
+        try {
+          const goals = await storage.getGoals();
+          const userGoal = goals.find(goal => goal.id === user.goalId);
+          goalName = userGoal?.name || null;
+        } catch (error) {
+          console.error("Error fetching goal name:", error);
+        }
+      }
+
+      // For now, return default values for learning statistics
+      // These will be replaced with real data from database in future
+      const profileData = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        profilePic: user.profilePic,
+        phoneNumber: user.phoneNumber,
+        goalName: goalName,
+        totalNotesAccessed: 0, // TODO: Implement real counting from user activity
+        totalTestsTaken: 0,     // TODO: Implement real counting from test history
+        averageScore: 0         // TODO: Calculate from actual test results
+      };
+
+      res.json(profileData);
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
   // GET /api/goals - Get all goals
   app.get("/api/goals", async (req, res) => {
     try {

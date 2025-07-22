@@ -1,82 +1,42 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Mail, Calendar, Edit2, Save, X, Camera } from 'lucide-react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { User, Mail, Phone, Target, Shield, Camera, UserCheck } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
 
 interface StudentProfile {
   id: number;
   name: string;
   email: string;
   username: string;
-  profilePicture?: string;
-  joinDate: string;
-  goals: string[];
+  profilePic?: string | null;
+  phoneNumber?: string | null;
+  goalName?: string | null;
   totalNotesAccessed: number;
   totalTestsTaken: number;
   averageScore: number;
 }
 
 const ProfileInfo = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    email: '',
-    goals: [] as string[]
-  });
-
-  const queryClient = useQueryClient();
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const { user } = useAuth();
 
   const { data: profile, isLoading, error } = useQuery({
     queryKey: ['/api/student/profile'],
     queryFn: async () => {
-      const response = await fetch('/api/student/profile');
-      if (!response.ok) throw new Error('Failed to fetch profile');
-      return response.json() as StudentProfile;
-    }
-  });
-
-  // Update form when profile data loads
-  useEffect(() => {
-    if (profile) {
-      setEditForm({
-        name: profile.name,
-        email: profile.email,
-        goals: profile.goals
-      });
-    }
-  }, [profile]);
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updates: Partial<StudentProfile>) => {
       const response = await fetch('/api/student/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        credentials: 'include'
       });
-      if (!response.ok) throw new Error('Failed to update profile');
-      return response.json();
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please login to view your profile');
+        }
+        throw new Error('Failed to fetch profile');
+      }
+      return response.json() as StudentProfile;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/student/profile'] });
-      setIsEditing(false);
-    }
+    retry: false
   });
-
-  const handleSave = () => {
-    updateProfileMutation.mutate(editForm);
-  };
-
-  const handleCancel = () => {
-    if (profile) {
-      setEditForm({
-        name: profile.name,
-        email: profile.email,
-        goals: profile.goals
-      });
-    }
-    setIsEditing(false);
-  };
-
-  const goalOptions = ['CEE', 'IOE', 'Lok Sewa', 'ACCA', 'Language'];
 
   if (isLoading) {
     return (
@@ -100,13 +60,13 @@ const ProfileInfo = () => {
     );
   }
 
-  if (error || !profile) {
+  if (error || !user) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Info</h2>
         <div className="text-center py-8">
           <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">Failed to load profile information. Please try again later.</p>
+          <p className="text-gray-500">Please login to view your profile information.</p>
         </div>
       </div>
     );
@@ -116,24 +76,23 @@ const ProfileInfo = () => {
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900">Profile Info</h2>
-        {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center space-x-1 px-3 py-2 text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white border border-[#F26B1D] rounded-lg transition-colors"
-          >
-            <Edit2 className="h-4 w-4" />
-            <span>Edit</span>
-          </button>
-        )}
+        <Button
+          onClick={() => setShowChangePassword(true)}
+          variant="outline"
+          className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
+        >
+          <Shield className="h-4 w-4 mr-2" />
+          Change Password
+        </Button>
       </div>
 
       {/* Profile Header */}
       <div className="flex items-center space-x-6 mb-8">
         <div className="relative">
           <div className="w-24 h-24 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
-            {profile.profilePicture ? (
+            {user?.profilePic ? (
               <img
-                src={profile.profilePicture}
+                src={user.profilePic}
                 alt="Profile"
                 className="w-full h-full rounded-full object-cover"
               />
@@ -141,137 +100,104 @@ const ProfileInfo = () => {
               <User className="h-12 w-12 text-white" />
             )}
           </div>
-          {isEditing && (
-            <button className="absolute bottom-0 right-0 p-1 bg-[#F26B1D] text-white rounded-full hover:bg-[#D72638] transition-colors">
-              <Camera className="h-4 w-4" />
-            </button>
-          )}
+          <button className="absolute bottom-0 right-0 p-1 bg-[#F26B1D] text-white rounded-full hover:bg-[#D72638] transition-colors">
+            <Camera className="h-4 w-4" />
+          </button>
         </div>
         <div>
-          {isEditing ? (
-            <input
-              type="text"
-              value={editForm.name}
-              onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-              className="text-2xl font-bold text-gray-900 border-b-2 border-[#F26B1D] bg-transparent focus:outline-none"
-            />
-          ) : (
-            <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
-          )}
+          <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
           <div className="flex items-center space-x-2 text-gray-600 mt-1">
             <Mail className="h-4 w-4" />
-            {isEditing ? (
-              <input
-                type="email"
-                value={editForm.email}
-                onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                className="border-b border-gray-300 bg-transparent focus:outline-none focus:border-[#F26B1D]"
-              />
-            ) : (
-              <span>{profile.email}</span>
-            )}
+            <span>{user.email}</span>
           </div>
           <div className="flex items-center space-x-2 text-gray-500 text-sm mt-1">
-            <Calendar className="h-4 w-4" />
-            <span>Joined {new Date(profile.joinDate).toLocaleDateString()}</span>
+            <UserCheck className="h-4 w-4" />
+            <span>Student Member</span>
           </div>
         </div>
       </div>
-
-      {/* Action Buttons for Edit Mode */}
-      {isEditing && (
-        <div className="flex space-x-2 mb-6">
-          <button
-            onClick={handleSave}
-            disabled={updateProfileMutation.isPending}
-            className="flex items-center space-x-1 px-4 py-2 bg-[#F26B1D] hover:bg-[#D72638] text-white rounded-lg transition-colors disabled:opacity-50"
-          >
-            <Save className="h-4 w-4" />
-            <span>{updateProfileMutation.isPending ? 'Saving...' : 'Save'}</span>
-          </button>
-          <button
-            onClick={handleCancel}
-            className="flex items-center space-x-1 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <X className="h-4 w-4" />
-            <span>Cancel</span>
-          </button>
-        </div>
-      )}
 
       {/* Profile Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Information */}
         <div>
-          <h4 className="font-semibold text-gray-900 mb-3">Personal Information</h4>
-          <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium text-gray-500">Username</label>
-              <p className="text-gray-900">{profile.username}</p>
+          <h4 className="font-semibold text-gray-900 mb-4">Personal Information</h4>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <UserCheck className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Username</p>
+                <p className="text-gray-900">{profile?.username || 'Not available'}</p>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Learning Goals</label>
-              {isEditing ? (
-                <div className="space-y-2">
-                  {goalOptions.map((goal) => (
-                    <label key={goal} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={editForm.goals.includes(goal)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setEditForm({...editForm, goals: [...editForm.goals, goal]});
-                          } else {
-                            setEditForm({...editForm, goals: editForm.goals.filter(g => g !== goal)});
-                          }
-                        }}
-                        className="rounded border-gray-300 text-[#F26B1D] focus:ring-[#F26B1D]"
-                      />
-                      <span className="text-sm text-gray-700">{goal}</span>
-                    </label>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {profile.goals.map((goal) => (
-                    <span
-                      key={goal}
-                      className="px-3 py-1 bg-[#F26B1D] bg-opacity-10 text-[#F26B1D] text-sm font-medium rounded-full"
-                    >
-                      {goal}
-                    </span>
-                  ))}
-                </div>
-              )}
+            
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <Mail className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Email</p>
+                <p className="text-gray-900">{user.email}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <Phone className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Phone Number</p>
+                <p className="text-gray-900">{profile?.phoneNumber || 'Not provided'}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <Target className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-500">Goal</p>
+                <p className="text-gray-900">{profile?.goalName || 'Not selected'}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Statistics */}
+        {/* Learning Statistics */}
         <div>
-          <h4 className="font-semibold text-gray-900 mb-3">Learning Statistics</h4>
+          <h4 className="font-semibold text-gray-900 mb-4">Learning Statistics</h4>
           <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-blue-900">Notes Accessed</span>
-                <span className="text-xl font-bold text-blue-600">{profile.totalNotesAccessed}</span>
+                <span className="text-2xl font-bold text-blue-600">{profile?.totalNotesAccessed || 0}</span>
               </div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-green-900">Tests Taken</span>
-                <span className="text-xl font-bold text-green-600">{profile.totalTestsTaken}</span>
+                <span className="text-2xl font-bold text-green-600">{profile?.totalTestsTaken || 0}</span>
               </div>
             </div>
-            <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-yellow-900">Average Score</span>
-                <span className="text-xl font-bold text-yellow-600">{profile.averageScore}%</span>
+                <span className="text-sm font-medium text-orange-900">Average Score</span>
+                <span className="text-2xl font-bold text-orange-600">{profile?.averageScore || 0}%</span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal Placeholder */}
+      {showChangePassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Change Password</h3>
+            <p className="text-gray-600 mb-4">Password change functionality will be available soon.</p>
+            <Button
+              onClick={() => setShowChangePassword(false)}
+              className="bg-[#F26B1D] hover:bg-[#D72638] text-white w-full"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
