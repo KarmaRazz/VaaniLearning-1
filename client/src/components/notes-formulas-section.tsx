@@ -2,7 +2,10 @@ import { Button } from "@/components/ui/button";
 import NotesPageCard from "@/components/NotesPageCard";
 import { getNotesForHomepage, getFormulasForHomepage } from "@/data/notesData";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -178,6 +181,8 @@ function Carousel({
 }
 
 export default function NotesFormulasSection() {
+  const { toast } = useToast();
+
   // Get data from API using React Query
   const { data: notesData = [], isLoading: notesLoading } = useQuery({
     queryKey: ['/api/notes', 'homepage-notes'],
@@ -187,6 +192,30 @@ export default function NotesFormulasSection() {
   const { data: formulasData = [], isLoading: formulasLoading } = useQuery({
     queryKey: ['/api/notes', 'homepage-formulas'],
     queryFn: () => getFormulasForHomepage(12),
+  });
+
+  // Add note to dashboard mutation
+  const addNoteMutation = useMutation({
+    mutationFn: async (noteId: number) => {
+      const response = await apiRequest('POST', '/api/student/notes', { noteId });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Note added to your dashboard!",
+      });
+      // Invalidate student notes query to refresh dashboard
+      queryClient.invalidateQueries({ queryKey: ['/api/student/notes'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.error || error?.message || 'Failed to add note to dashboard';
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+    },
   });
 
   // Handler functions
@@ -199,43 +228,16 @@ export default function NotesFormulasSection() {
       // Open Google Drive link in new tab
       window.open(item.driveLink, '_blank');
     } else {
-      alert('Content link not available');
+      toast({
+        title: "Error",
+        description: "Content link not available",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleGetAdd = async (id: number) => {
-    try {
-      const response = await fetch(`/api/notes/add/${id}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to add note to dashboard');
-      }
-
-      const result = await response.json();
-      
-      // Show success message
-      alert('Note added to dashboard successfully!');
-    } catch (error) {
-      console.error('Error adding note to dashboard:', error);
-      if (error instanceof Error) {
-        if (error.message.includes('401') || error.message.includes('Access token required')) {
-          alert('Please login to add notes to your dashboard');
-          // Redirect to login page
-          window.location.href = '/login';
-        } else {
-          alert(error.message);
-        }
-      } else {
-        alert('Failed to add note to dashboard');
-      }
-    }
+  const handleGetAdd = (id: number) => {
+    addNoteMutation.mutate(id);
   };
 
   return (

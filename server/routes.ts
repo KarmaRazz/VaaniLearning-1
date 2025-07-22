@@ -589,45 +589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // POST /notes/add/:noteId - Add note to student's dashboard
-  app.post("/api/notes/add/:noteId", authenticateToken, async (req: AuthenticatedRequest, res) => {
-    try {
-      const noteId = parseInt(req.params.noteId);
-      const userId = req.user!.id;
-      
-      if (isNaN(noteId)) {
-        return res.status(400).json({ error: "Invalid note ID" });
-      }
-      
-      // Check if user is a student
-      if (req.user!.role !== "STUDENT") {
-        return res.status(403).json({ error: "Only students can add notes to dashboard" });
-      }
-      
-      // Check if note exists
-      const note = await storage.getNote(noteId);
-      if (!note) {
-        return res.status(404).json({ error: "Note not found" });
-      }
-      
-      // Check if note is already added
-      const isAlreadyAdded = await storage.isNoteAddedByUser(userId, noteId);
-      if (isAlreadyAdded) {
-        return res.status(409).json({ error: "Note already added to dashboard" });
-      }
-      
-      // Add note to user's dashboard
-      const userNote = await storage.addNoteToUser(userId, noteId);
-      res.status(201).json({ 
-        message: "Note added to dashboard successfully",
-        userNote 
-      });
-      
-    } catch (error) {
-      console.error("Error adding note to dashboard:", error);
-      res.status(500).json({ error: "Failed to add note to dashboard" });
-    }
-  });
+
 
   
   // DELETE /notes/remove/:noteId - Remove note from student's dashboard
