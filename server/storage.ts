@@ -31,6 +31,8 @@ export interface IStorage {
   getSubjectsByGoal(goalId: number): Promise<Subject[]>;
   createSubject(subject: InsertSubject): Promise<Subject>;
   getAllSubjects(): Promise<Subject[]>;
+  // User notes summary
+  getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -202,6 +204,10 @@ export class MemStorage implements IStorage {
 
   async updateUserProfilePic(userId: number, profilePicPath: string): Promise<User> {
     throw new Error("Profile picture functionality not implemented in MemStorage");
+  }
+
+  async getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]> {
+    throw new Error("UserNote functionality not implemented in MemStorage");
   }
 }
 
@@ -414,6 +420,24 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  async getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]> {
+    const result = await db
+      .select({
+        subject: notes.subjectName,
+        count: sql<number>`count(*)::int`
+      })
+      .from(userNotes)
+      .innerJoin(notes, eq(userNotes.noteId, notes.id))
+      .where(eq(userNotes.userId, userId))
+      .groupBy(notes.subjectName)
+      .orderBy(sql`count(*) DESC`, notes.subjectName);
+    
+    return result.map(r => ({
+      subject: r.subject || 'Unknown',
+      count: r.count
+    }));
   }
 }
 

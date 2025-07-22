@@ -160,6 +160,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Goals and Subjects API endpoints
   
+  // Student Notes Summary API
+  app.get("/api/student/notes-summary", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const notesGrouped = await storage.getUserNotesGroupedBySubject(req.user.id);
+      const totalNotes = notesGrouped.reduce((acc, item) => acc + item.count, 0);
+      
+      res.json({
+        totalNotes,
+        subjectBreakdown: notesGrouped
+      });
+    } catch (error) {
+      console.error("Error fetching user notes summary:", error);
+      res.status(500).json({ error: "Failed to fetch notes summary" });
+    }
+  });
+
   // Student Profile API
   app.get("/api/student/profile", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
