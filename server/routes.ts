@@ -248,6 +248,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Users Management API
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const { search, goal, sort, page } = req.query;
+      
+      const searchTerm = typeof search === 'string' ? search : undefined;
+      const goalFilter = goal && typeof goal === 'string' ? parseInt(goal) : undefined;
+      const sortBy = (sort === 'newest' || sort === 'oldest') ? sort : 'newest';
+      const pageNum = page && typeof page === 'string' ? parseInt(page) : 1;
+      const limit = 10;
+
+      const result = await storage.getUsersWithFilters(searchTerm, goalFilter, sortBy, pageNum, limit);
+      
+      res.json({
+        success: true,
+        users: result.users,
+        total: result.total,
+        goals: result.goals,
+        currentPage: pageNum,
+        totalPages: Math.ceil(result.total / limit),
+        hasNextPage: pageNum * limit < result.total,
+        hasPrevPage: pageNum > 1
+      });
+    } catch (error) {
+      console.error("Get users error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Goals and Subjects API endpoints
   
   // Student Notes Summary API

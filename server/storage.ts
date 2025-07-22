@@ -35,6 +35,8 @@ export interface IStorage {
   getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]>;
   // Password update
   updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
+  // Users management
+  getUsersWithFilters(search?: string, goalFilter?: number, sortBy?: 'newest' | 'oldest', page?: number, limit?: number): Promise<{ users: User[], total: number, goals: Goal[] }>;
 }
 
 export class MemStorage implements IStorage {
@@ -451,6 +453,103 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
+  }
+
+  async getUsersWithFilters(search?: string, goalFilter?: number, sortBy?: 'newest' | 'oldest', page?: number, limit?: number): Promise<{ users: User[], total: number, goals: Goal[] }> {
+    const offset = page && limit ? (page - 1) * limit : 0;
+    const limitClause = limit || 10;
+
+    // Build the base query with joins
+    let query = db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        username: users.username,
+        password: users.password,
+        gender: users.gender,
+        goalId: users.goalId,
+        phoneNumber: users.phoneNumber,
+        profilePic: users.profilePic,
+        role: users.role,
+        goalName: goals.name,
+      })
+      .from(users)
+      .leftJoin(goals, eq(users.goalId, goals.id))
+      .$dynamic();
+
+    // Add search filter
+    if (search) {
+      query = query.where(
+        or(
+          ilike(users.name, `%${search}%`),
+          ilike(users.email, `%${search}%`),
+          ilike(users.phoneNumber, `%${search}%`)
+        )
+      );
+    }
+
+    // Add goal filter
+    if (goalFilter) {
+      query = query.where(eq(users.goalId, goalFilter));
+    }
+
+    // Add sorting - assuming users table has a createdAt field, if not we'll use id as proxy
+    if (sortBy === 'newest') {
+      query = query.orderBy(sql`${users.id} DESC`);
+    } else if (sortBy === 'oldest') {
+      query = query.orderBy(sql`${users.id} ASC`);
+    } else {
+      query = query.orderBy(sql`${users.id} DESC`); // Default to newest
+    }
+
+    // Get total count for pagination
+    let countQuery = db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(users)
+      .$dynamic();
+
+    // Apply same filters to count query
+    if (search) {
+      countQuery = countQuery.where(
+        or(
+          ilike(users.name, `%${search}%`),
+          ilike(users.email, `%${search}%`),
+          ilike(users.phoneNumber, `%${search}%`)
+        )
+      );
+    }
+
+    if (goalFilter) {
+      countQuery = countQuery.where(eq(users.goalId, goalFilter));
+    }
+
+    // Execute queries
+    const [usersResult, countResult, goalsResult] = await Promise.all([
+      query.limit(limitClause).offset(offset),
+      countQuery,
+      db.select().from(goals).orderBy(goals.name)
+    ]);
+
+    // Transform the results to match User interface
+    const transformedUsers: User[] = usersResult.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      password: user.password,
+      gender: user.gender,
+      goalId: user.goalId,
+      phoneNumber: user.phoneNumber,
+      profilePic: user.profilePic,
+      role: user.role,
+    }));
+
+    return {
+      users: transformedUsers,
+      total: countResult[0]?.count || 0,
+      goals: goalsResult
+    };
   }
 }
 
