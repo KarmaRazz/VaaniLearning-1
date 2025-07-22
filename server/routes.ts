@@ -31,12 +31,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create admin session token
       const token = Buffer.from(`admin:${email}:${Date.now()}`).toString('base64');
       
-      // Set secure cookie
+      // Set secure cookie with development-friendly settings
       res.cookie('admin_token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: false, // Set to false for development (http://localhost)
+        sameSite: 'lax' as const, // More permissive for development
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        path: '/' // Ensure cookie is available for all paths
       });
       
       const adminData = await AdminAuth.getAdmin(email);

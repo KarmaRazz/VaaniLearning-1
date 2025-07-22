@@ -2095,6 +2095,8 @@ function useAdminAuth() {
         const data = await response.json();
         setIsAuthenticated(true);
         setAdmin(data.admin);
+        // Force a re-check of authentication to ensure state is updated
+        await checkAdminAuth();
         return { success: true };
       } else {
         const error = await response.json();
@@ -2140,9 +2142,10 @@ function AdminLogin() {
     
     if (!result.success) {
       setError(result.error || 'Login failed');
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
+    // If login is successful, the useAdminAuth hook will update the authentication state
+    // and the component will automatically re-render to show the admin dashboard
   };
 
   return (
