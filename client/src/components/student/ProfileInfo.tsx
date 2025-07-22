@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { User, Mail, Phone, Target, Shield, Camera, UserCheck } from 'lucide-react';
+import { User, Mail, Phone, Target, Shield, UserCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 
@@ -88,21 +88,8 @@ const ProfileInfo = () => {
 
       {/* Profile Header */}
       <div className="flex items-center space-x-6 mb-8">
-        <div className="relative">
-          <div className="w-24 h-24 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
-            {user?.profilePic ? (
-              <img
-                src={user.profilePic}
-                alt="Profile"
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-12 w-12 text-white" />
-            )}
-          </div>
-          <button className="absolute bottom-0 right-0 p-1 bg-[#F26B1D] text-white rounded-full hover:bg-[#D72638] transition-colors">
-            <Camera className="h-4 w-4" />
-          </button>
+        <div className="w-24 h-24 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
+          <User className="h-12 w-12 text-white" />
         </div>
         <div>
           <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>

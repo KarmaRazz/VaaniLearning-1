@@ -315,51 +315,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/student/test-history - Get student's test history
   app.get("/api/student/test-history", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
-      // Mock test history data - in real app, this would come from a tests table
-      const testHistory = [
-        {
-          id: 1,
-          testName: "Physics Mock Test 1",
-          subject: "Physics",
-          goal: "CEE",
-          dateTaken: "2025-01-15",
-          score: 42,
-          totalQuestions: 50,
-          percentage: 84,
-          rank: 15,
-          totalParticipants: 150,
-          duration: 120,
-          status: "completed"
-        },
-        {
-          id: 2,
-          testName: "Chemistry Practice Test",
-          subject: "Chemistry",
-          goal: "CEE",
-          dateTaken: "2025-01-12",
-          score: 38,
-          totalQuestions: 50,
-          percentage: 76,
-          rank: 28,
-          totalParticipants: 120,
-          duration: 90,
-          status: "completed"
-        },
-        {
-          id: 3,
-          testName: "Math Foundation Test",
-          subject: "Math",
-          goal: "IOE",
-          dateTaken: "2025-01-10",
-          score: 45,
-          totalQuestions: 50,
-          percentage: 90,
-          rank: 8,
-          totalParticipants: 200,
-          duration: 150,
-          status: "completed"
-        }
-      ];
+      // Return empty array - in real app, this would come from a tests table
+      // TODO: Implement real test history from database when test system is built
+      const testHistory: any[] = [];
       
       res.json(testHistory);
     } catch (error) {
