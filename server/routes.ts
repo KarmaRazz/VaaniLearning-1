@@ -341,30 +341,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
-  // Student Dashboard Routes (Protected)
-  // GET /api/student/notes - Get student's accessible notes
+  // Student Notes Management Routes (Protected)
+  
+  // Add note to dashboard
+  app.post("/api/student/notes", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { noteId } = req.body;
+      
+      if (!noteId) {
+        return res.status(400).json({ error: "Note ID is required" });
+      }
+
+      // Check if note exists
+      const note = await storage.getNote(noteId);
+      if (!note) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+
+      // Add note to user's dashboard
+      const userNote = await storage.addUserNote(userId, noteId);
+      res.status(201).json({ message: "Note added to dashboard successfully", userNote });
+    } catch (error) {
+      console.error("Error adding note to dashboard:", error);
+      if (error instanceof Error && error.message.includes('duplicate')) {
+        res.status(409).json({ error: "Note already added to dashboard" });
+      } else {
+        res.status(500).json({ error: "Failed to add note to dashboard" });
+      }
+    }
+  });
+
+  // Get user's dashboard notes
   app.get("/api/student/notes", authenticateToken, async (req: AuthenticatedRequest, res) => {
     try {
-      // For demo purposes, we'll return published notes with student access info
-      // In a real app, this would check user's purchased/accessible notes
-      const allNotes = await storage.getPublishedNotes();
-      
-      const studentNotes = allNotes.map(note => ({
-        id: note.id,
-        title: note.chapterName,
-        subject: note.subjectName,
-        goal: note.goals,
-        cost: note.cost,
-        accessType: note.cost === 'Free' ? 'free' : 'paid',
-        downloadUrl: note.driveLink,
-        viewUrl: note.driveLink,
-        isAccessible: true // For demo, all notes are accessible
-      }));
-      
-      res.json(studentNotes);
+      const userId = req.user!.id;
+      const userNotes = await storage.getUserNotes(userId);
+      res.json(userNotes);
     } catch (error) {
-      console.error("Error fetching student notes:", error);
-      res.status(500).json({ error: "Failed to fetch notes" });
+      console.error("Error fetching user notes:", error);
+      res.status(500).json({ error: "Failed to fetch user notes" });
+    }
+  });
+
+  // Remove note from dashboard
+  app.delete("/api/student/notes/:noteId", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const noteId = parseInt(req.params.noteId);
+      
+      if (isNaN(noteId)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+
+      await storage.removeUserNote(userId, noteId);
+      res.json({ message: "Note removed from dashboard successfully" });
+    } catch (error) {
+      console.error("Error removing note from dashboard:", error);
+      res.status(500).json({ error: "Failed to remove note from dashboard" });
     }
   });
 

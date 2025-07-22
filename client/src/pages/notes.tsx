@@ -6,7 +6,10 @@ import NotesPageCard from "@/components/NotesPageCard";
 import { Search } from "lucide-react";
 import { getAllNotes, getAllFormulas, type NoteItem } from "@/data/notesData";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 // Fetch goals and subjects from API
 const useGoals = () => useQuery({
@@ -106,39 +109,34 @@ export default function Notes() {
     }
   };
 
-  const handleGetAdd = async (id: number) => {
-    try {
-      const response = await fetch(`/api/notes/add/${id}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  const { toast } = useToast();
+
+  // Add note to dashboard mutation
+  const addNoteMutation = useMutation({
+    mutationFn: async (noteId: number) => {
+      const response = await apiRequest('POST', '/api/student/notes', { noteId });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Note added to your dashboard!",
       });
+      // Invalidate student notes query to refresh dashboard
+      queryClient.invalidateQueries({ queryKey: ['/api/student/notes'] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.error || error?.message || 'Failed to add note to dashboard';
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+    },
+  });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to add note to dashboard');
-      }
-
-      const result = await response.json();
-      
-      // Show success message
-      alert('Note added to dashboard successfully!');
-    } catch (error) {
-      console.error('Error adding note to dashboard:', error);
-      if (error instanceof Error) {
-        if (error.message.includes('401') || error.message.includes('Access token required')) {
-          alert('Please login to add notes to your dashboard');
-          // Redirect to login page
-          window.location.href = '/login';
-        } else {
-          alert(error.message);
-        }
-      } else {
-        alert('Failed to add note to dashboard');
-      }
-    }
+  const handleGetAdd = (id: number) => {
+    addNoteMutation.mutate(id);
   };
 
   // Get available subjects for selected goal
@@ -284,8 +282,8 @@ export default function Notes() {
               goals={item.goals}
               cost={item.cost}
               noteId={item.id?.toString()}
-              onView={() => handleView(item)}
-              onGetAdd={() => handleAddToDashboard(item)}
+              onView={() => handleView(item.id || 0)}
+              onGetAdd={() => handleGetAdd(item.id || 0)}
             />
           ))}
         </div>

@@ -28,10 +28,13 @@ const MyNotes = () => {
   const { toast } = useToast();
 
   const { data: notes = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/notes/mine'],
+    queryKey: ['/api/student/notes'],
     queryFn: async () => {
-      const response = await fetch('/api/notes/mine', {
-        credentials: 'include'
+      const response = await fetch('/api/student/notes', {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       if (!response.ok) {
         if (response.status === 401) {
@@ -46,9 +49,12 @@ const MyNotes = () => {
 
   const removeNoteMutation = useMutation({
     mutationFn: async (noteId: number) => {
-      const response = await fetch(`/api/notes/remove/${noteId}`, {
+      const response = await fetch(`/api/student/notes/${noteId}`, {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       if (!response.ok) {
         const error = await response.json();
@@ -57,7 +63,7 @@ const MyNotes = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notes/mine'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student/notes'] });
       toast({
         title: 'Success',
         description: 'Note removed from dashboard',

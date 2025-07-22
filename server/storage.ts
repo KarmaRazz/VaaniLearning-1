@@ -21,8 +21,8 @@ export interface IStorage {
   getUniqueSubjects(): Promise<string[]>;
   deleteMultipleNotes(ids: number[]): Promise<boolean>;
   // UserNote methods
-  addNoteToUser(userId: number, noteId: number): Promise<UserNote>;
-  removeNoteFromUser(userId: number, noteId: number): Promise<boolean>;
+  addUserNote(userId: number, noteId: number): Promise<UserNote>;
+  removeUserNote(userId: number, noteId: number): Promise<boolean>;
   getUserNotes(userId: number): Promise<Note[]>;
   isNoteAddedByUser(userId: number, noteId: number): Promise<boolean>;
   // Goals and Subjects methods
@@ -336,7 +336,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // UserNote methods for DatabaseStorage
-  async addNoteToUser(userId: number, noteId: number): Promise<UserNote> {
+  async addUserNote(userId: number, noteId: number): Promise<UserNote> {
     const [userNote] = await db
       .insert(userNotes)
       .values({ userId, noteId })
@@ -344,7 +344,7 @@ export class DatabaseStorage implements IStorage {
     return userNote;
   }
 
-  async removeNoteFromUser(userId: number, noteId: number): Promise<boolean> {
+  async removeUserNote(userId: number, noteId: number): Promise<boolean> {
     const result = await db
       .delete(userNotes)
       .where(and(eq(userNotes.userId, userId), eq(userNotes.noteId, noteId)));
