@@ -11,6 +11,7 @@ import About from "@/pages/about";
 import Notes from "@/pages/notes";
 import MockTest from "@/pages/mock-test";
 import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 import AdminPanel from "@/pages/admin";
 import CourseDetails from "@/pages/course-details";
 import StudentDashboardPage from "@/pages/student-dashboard";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/notes" component={Notes} />
       <Route path="/mock-test" component={MockTest} />
       <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/student-dashboard" component={StudentDashboardPage} />
       <Route component={NotFound} />

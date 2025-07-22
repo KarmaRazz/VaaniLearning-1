@@ -107,11 +107,18 @@ export default function Navbar() {
                 </DropdownMenu>
               </>
             ) : (
-              <Link href="/login">
-                <Button className="bg-primary-orange hover:bg-orange-600 text-white">
-                  Login / Register
-                </Button>
-              </Link>
+              <div className="flex space-x-2">
+                <Link href="/login">
+                  <Button variant="outline" className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-[#F26B1D] hover:bg-[#D72638] text-white">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
 

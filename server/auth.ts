@@ -83,24 +83,30 @@ export async function signup(req: Request, res: Response) {
       });
     }
 
-    const { name, email, password } = validationResult.data;
+    const { name, username, email, password, gender, goalId, phoneNumber } = validationResult.data;
 
-    // Check if user already exists
-    const existingUser = await storage.getUserByEmail(email);
-    if (existingUser) {
+    // Check if user already exists by email
+    const existingUserByEmail = await storage.getUserByEmail(email);
+    if (existingUserByEmail) {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
-    // Generate username from email (before @ symbol)
-    const username = email.split('@')[0] + '_' + Date.now();
+    // Check if username already exists
+    const existingUserByUsername = await storage.getUserByUsername(username);
+    if (existingUserByUsername) {
+      return res.status(400).json({ error: 'Username already taken' });
+    }
 
     // Hash password and create user
     const hashedPassword = await hashPassword(password);
     const user = await storage.createUser({
       name,
-      email,
       username,
+      email,
       password: hashedPassword,
+      gender,
+      goalId,
+      phoneNumber,
       role: "STUDENT", // Default role for new users
     });
 

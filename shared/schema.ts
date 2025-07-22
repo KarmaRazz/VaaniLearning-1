@@ -9,6 +9,9 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  gender: varchar("gender", { length: 10 }),
+  goalId: integer("goal_id").references(() => goals.id),
+  phoneNumber: varchar("phone_number", { length: 15 }),
   role: varchar("role", { length: 20 }).notNull().default("STUDENT"),
 });
 
@@ -91,21 +94,25 @@ export const subjectsRelations = relations(subjects, ({ one }) => ({
   }),
 }));
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  name: true,
-  email: true,
-  username: true,
-  password: true,
-  role: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
 });
 
-export const signupSchema = createInsertSchema(users).pick({
-  name: true,
-  email: true,
-  password: true,
-}).extend({
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  email: z.string().email("Invalid email address"),
+export const signupSchema = z.object({
+  name: z.string().min(1, "Full name is required"),
+  username: z.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must not exceed 20 characters")
+    .regex(/^[a-z_]+$/, "Username must be lowercase letters and underscores only, no numbers or spaces"),
+  email: z.string().email("Invalid email format"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+  gender: z.enum(["Male", "Female", "Other"]).optional(),
+  goalId: z.number().int().positive("Please select a goal"),
+  phoneNumber: z.string()
+    .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
 });
 
 export const loginSchema = z.object({
