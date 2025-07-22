@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertNoteSchema, insertGoalSchema, insertSubjectSchema } from "@shared/schema";
 import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, AuthenticatedRequest } from "./auth";
+import { AdminAuth } from "./admin-auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication Routes
@@ -11,6 +12,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", logout);
   app.get("/api/auth/me", authenticateToken, getCurrentUser);
   app.post("/api/auth/upload-profile-pic", authenticateToken, uploadProfilePic, handleProfilePicUpload);
+
+  // Admin Authentication Routes
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      const isValidAdmin = await AdminAuth.authenticateAdmin(email, password);
+      
+      if (!isValidAdmin) {
+        return res.status(401).json({ error: "Invalid admin credentials" });
+      }
+      
+      // Create admin session token
+      const token = Buffer.from(`admin:${email}:${Date.now()}`).toString('base64');
+      
+      // Set secure cookie
+      res.cookie('admin_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+      
+      const adminData = await AdminAuth.getAdmin(email);
+      res.json({ 
+        success: true, 
+        message: "Admin login successful",
+        admin: adminData
+      });
+      
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/logout", (req, res) => {
+    res.clearCookie('admin_token');
+    res.json({ success: true, message: "Admin logout successful" });
+  });
+
+  app.get("/api/admin/verify", (req, res) => {
+    const adminToken = req.cookies.admin_token;
+    
+    if (!adminToken) {
+      return res.status(401).json({ error: "No admin session found" });
+    }
+    
+    try {
+      const decoded = Buffer.from(adminToken, 'base64').toString();
+      const [prefix, email, timestamp] = decoded.split(':');
+      
+      if (prefix !== 'admin' || !email) {
+        return res.status(401).json({ error: "Invalid admin token" });
+      }
+      
+      // Check if token is not expired (24 hours)
+      const tokenTime = parseInt(timestamp);
+      const now = Date.now();
+      const tokenAge = now - tokenTime;
+      const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+      
+      if (tokenAge > maxAge) {
+        res.clearCookie('admin_token');
+        return res.status(401).json({ error: "Admin session expired" });
+      }
+      
+      res.json({ 
+        success: true, 
+        admin: { email }
+      });
+      
+    } catch (error) {
+      console.error("Admin token verification error:", error);
+      res.status(401).json({ error: "Invalid admin token" });
+    }
+  });
 
   // put application routes here
   // prefix all routes with /api

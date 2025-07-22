@@ -5,6 +5,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
 import { createTestUser } from "./create-test-user";
 import { seedGoalsAndSubjects } from "./seed-goals-subjects";
+import { AdminAuth } from "./admin-auth";
 
 const app = express();
 app.use(express.json());
@@ -55,6 +56,9 @@ app.use((req, res, next) => {
   
   // Create test user account
   await createTestUser();
+  
+  // Initialize default admin account
+  await AdminAuth.initializeDefaultAdmin();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

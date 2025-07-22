@@ -72,12 +72,6 @@ export default function Navbar() {
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/admin">
-              <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
-                Admin
-              </Button>
-            </Link>
-            
             {isAuthenticated && user ? (
               <>
                 <Link href="/student-dashboard">
@@ -155,16 +149,6 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="pt-2 space-y-2">
-              <Link href="/admin">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-300 text-gray-600 hover:bg-gray-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Admin
-                </Button>
-              </Link>
-              
               {isAuthenticated && user ? (
                 <>
                   <Link href="/student-dashboard">
