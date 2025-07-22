@@ -7,7 +7,8 @@ const goalsAndSubjects = [
     subjects: [
       { name: "Physics" },
       { name: "Chemistry" },
-      { name: "Biology" },
+      { name: "Zoology" },
+      { name: "Botany" },
       { name: "Math" }
     ]
   },
