@@ -291,6 +291,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check credential uniqueness API for live validation
+  app.post("/api/auth/check-credentials", async (req, res) => {
+    try {
+      const { username, email, phoneNumber } = req.body;
+
+      if (!username && !email && !phoneNumber) {
+        return res.status(400).json({ error: "At least one credential field is required" });
+      }
+
+      const result: { [key: string]: boolean } = {};
+
+      // Check each credential individually
+      if (username) {
+        const existingByUsername = await storage.getUserByUsername(username);
+        result.username = !!existingByUsername;
+      }
+
+      if (email) {
+        const existingByEmail = await storage.getUserByEmail(email);
+        result.email = !!existingByEmail;
+      }
+
+      if (phoneNumber) {
+        const existingByPhone = await storage.getUserByPhoneNumber(phoneNumber);
+        result.phoneNumber = !!existingByPhone;
+      }
+
+      res.json({
+        success: true,
+        exists: result
+      });
+    } catch (error) {
+      console.error("Check credentials error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Goals and Subjects API endpoints
   
   // Student Notes Summary API

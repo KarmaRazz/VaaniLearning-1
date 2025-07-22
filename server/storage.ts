@@ -9,6 +9,8 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByPhoneNumber(phoneNumber: string): Promise<User | undefined>;
+  checkUniqueCredentials(username: string, email: string, phoneNumber?: string): Promise<{ field: string, exists: boolean } | null>;
   createUser(user: InsertUser): Promise<User>;
   updateUserProfilePic(userId: number, profilePicPath: string): Promise<User>;
   getNotes(): Promise<Note[]>;
@@ -234,6 +236,50 @@ export class DatabaseStorage implements IStorage {
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
+  }
+
+  async getUserByPhoneNumber(phoneNumber: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
+    return user || undefined;
+  }
+
+  async checkUniqueCredentials(username: string, email: string, phoneNumber?: string): Promise<{ field: string, exists: boolean } | null> {
+    // Build OR conditions for checking duplicates
+    const conditions = [
+      eq(users.username, username),
+      eq(users.email, email)
+    ];
+    
+    if (phoneNumber) {
+      conditions.push(eq(users.phoneNumber, phoneNumber));
+    }
+
+    const [existingUser] = await db
+      .select({
+        username: users.username,
+        email: users.email,
+        phoneNumber: users.phoneNumber
+      })
+      .from(users)
+      .where(or(...conditions))
+      .limit(1);
+
+    if (!existingUser) {
+      return null; // No conflicts
+    }
+
+    // Return which field is conflicting
+    if (existingUser.username === username) {
+      return { field: 'username', exists: true };
+    }
+    if (existingUser.email === email) {
+      return { field: 'email', exists: true };
+    }
+    if (phoneNumber && existingUser.phoneNumber === phoneNumber) {
+      return { field: 'phoneNumber', exists: true };
+    }
+
+    return null;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {

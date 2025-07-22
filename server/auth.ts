@@ -88,16 +88,24 @@ export async function signup(req: Request, res: Response) {
 
     const { name, username, email, password, gender, goalId, phoneNumber } = validationResult.data;
 
-    // Check if user already exists by email
-    const existingUserByEmail = await storage.getUserByEmail(email);
-    if (existingUserByEmail) {
-      return res.status(400).json({ error: 'User with this email already exists' });
-    }
-
-    // Check if username already exists
-    const existingUserByUsername = await storage.getUserByUsername(username);
-    if (existingUserByUsername) {
-      return res.status(400).json({ error: 'Username already taken' });
+    // Check for unique credentials (username, email, phone)
+    const credentialConflict = await storage.checkUniqueCredentials(username, email, phoneNumber);
+    if (credentialConflict) {
+      let errorMessage = '';
+      switch (credentialConflict.field) {
+        case 'username':
+          errorMessage = 'Username already exists';
+          break;
+        case 'email':
+          errorMessage = 'Email address already registered';
+          break;
+        case 'phoneNumber':
+          errorMessage = 'Phone number already in use';
+          break;
+        default:
+          errorMessage = 'Username, email, or phone number already in use';
+      }
+      return res.status(409).json({ error: errorMessage, field: credentialConflict.field });
     }
 
     // Hash password and create user

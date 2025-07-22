@@ -52,6 +52,11 @@ export default function Auth() {
   // Validation states for signup
   const [usernameValid, setUsernameValid] = useState<boolean | null>(null);
   const [passwordValid, setPasswordValid] = useState<boolean | null>(null);
+  const [emailValid, setEmailValid] = useState<boolean | null>(null);
+  const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
+  
+  // Validation messages
+  const [validationMessages, setValidationMessages] = useState<{[key: string]: string}>({});
 
   // Fetch goals from API for signup
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
@@ -120,13 +125,102 @@ export default function Auth() {
     return isValid;
   };
 
+  // Check credential uniqueness with debounce for auth modal
+  const checkCredentialUniqueness = async (field: string, value: string) => {
+    if (!value) return;
+
+    try {
+      const response = await fetch('/api/auth/check-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const exists = data.exists[field];
+        
+        if (field === 'username') {
+          setUsernameValid(!exists && validateUsername(value));
+          if (exists) {
+            setValidationMessages(prev => ({ ...prev, username: 'Username already taken' }));
+          } else {
+            setValidationMessages(prev => ({ ...prev, username: '' }));
+          }
+        } else if (field === 'email') {
+          setEmailValid(!exists);
+          if (exists) {
+            setValidationMessages(prev => ({ ...prev, email: 'Email already registered' }));
+          } else {
+            setValidationMessages(prev => ({ ...prev, email: '' }));
+          }
+        } else if (field === 'phoneNumber') {
+          setPhoneValid(!exists);
+          if (exists) {
+            setValidationMessages(prev => ({ ...prev, phoneNumber: 'Phone number already in use' }));
+          } else {
+            setValidationMessages(prev => ({ ...prev, phoneNumber: '' }));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking credentials:', error);
+    }
+  };
+
+  // Debounce credential checks for signup mode
+  useEffect(() => {
+    if (mode !== 'signup') return;
+    
+    const timer = setTimeout(() => {
+      if (signupForm.username.length >= 3) {
+        checkCredentialUniqueness('username', signupForm.username);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [signupForm.username, mode]);
+
+  useEffect(() => {
+    if (mode !== 'signup') return;
+    
+    const timer = setTimeout(() => {
+      if (signupForm.email.length > 0 && signupForm.email.includes('@')) {
+        checkCredentialUniqueness('email', signupForm.email);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [signupForm.email, mode]);
+
+  useEffect(() => {
+    if (mode !== 'signup') return;
+    
+    const timer = setTimeout(() => {
+      if (signupForm.phoneNumber.length === 10) {
+        checkCredentialUniqueness('phoneNumber', signupForm.phoneNumber);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [signupForm.phoneNumber, mode]);
+
   const handleSignupInputChange = (field: string, value: string) => {
     setSignupForm(prev => ({ ...prev, [field]: value }));
     
+    // Real-time validation
     if (field === 'username') {
-      validateUsername(value);
+      if (value.length >= 3) {
+        validateUsername(value);
+      } else {
+        setUsernameValid(null);
+        setValidationMessages(prev => ({ ...prev, username: '' }));
+      }
     } else if (field === 'password') {
       validatePassword(value);
+    } else if (field === 'email') {
+      setEmailValid(null);
+      setValidationMessages(prev => ({ ...prev, email: '' }));
+    } else if (field === 'phoneNumber') {
+      setPhoneValid(null);
+      setValidationMessages(prev => ({ ...prev, phoneNumber: '' }));
     }
   };
 
@@ -309,21 +403,39 @@ export default function Auth() {
                       </div>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Lowercase only, no spaces or numbers. Use underscore _ if needed.
-                  </p>
+                  {validationMessages.username ? (
+                    <p className="text-xs text-red-500 mt-1">{validationMessages.username}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Lowercase only, no spaces or numbers. Use underscore _ if needed.
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={signupForm.email}
-                    onChange={(e) => handleSignupInputChange('email', e.target.value)}
-                    className="mt-1"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      value={signupForm.email}
+                      onChange={(e) => handleSignupInputChange('email', e.target.value)}
+                      className={`mt-1 pr-10 ${emailValid === true ? 'border-green-500' : emailValid === false ? 'border-red-500' : ''}`}
+                      required
+                    />
+                    {emailValid !== null && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 mt-0.5">
+                        {emailValid ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <X className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {validationMessages.email && (
+                    <p className="text-xs text-red-500 mt-1">{validationMessages.email}</p>
+                  )}
                 </div>
 
                 <div>
@@ -395,18 +507,33 @@ export default function Auth() {
 
                 <div>
                   <Label htmlFor="phoneNumber">Phone Number *</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    value={signupForm.phoneNumber}
-                    onChange={(e) => handleSignupInputChange('phoneNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    className="mt-1"
-                    placeholder="9876543210"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter 10-digit phone number
-                  </p>
+                  <div className="relative">
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={signupForm.phoneNumber}
+                      onChange={(e) => handleSignupInputChange('phoneNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      className={`mt-1 pr-10 ${phoneValid === true ? 'border-green-500' : phoneValid === false ? 'border-red-500' : ''}`}
+                      placeholder="9876543210"
+                      required
+                    />
+                    {phoneValid !== null && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 mt-0.5">
+                        {phoneValid ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <X className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {validationMessages.phoneNumber ? (
+                    <p className="text-xs text-red-500 mt-1">{validationMessages.phoneNumber}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Enter 10-digit phone number
+                    </p>
+                  )}
                 </div>
 
                 <Button
