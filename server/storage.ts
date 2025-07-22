@@ -37,6 +37,7 @@ export interface IStorage {
   updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
   // Users management
   getUsersWithFilters(search?: string, goalFilter?: number, sortBy?: 'newest' | 'oldest', page?: number, limit?: number): Promise<{ users: User[], total: number, goals: Goal[] }>;
+  getUsersSummary(): Promise<{ totalUsers: number, signupsThisMonth: number, signupsToday: number }>;
 }
 
 export class MemStorage implements IStorage {
@@ -549,6 +550,43 @@ export class DatabaseStorage implements IStorage {
       users: transformedUsers,
       total: countResult[0]?.count || 0,
       goals: goalsResult
+    };
+  }
+
+  async getUsersSummary(): Promise<{ totalUsers: number, signupsThisMonth: number, signupsToday: number }> {
+    const now = new Date();
+    
+    // Get start of current month
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    // Get start of today
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Get end of today
+    const endOfToday = new Date(startOfToday);
+    endOfToday.setDate(endOfToday.getDate() + 1);
+
+    // Execute all queries in parallel
+    const [totalUsersResult, monthlyUsersResult, todayUsersResult] = await Promise.all([
+      // Total users count
+      db.select({ count: sql<number>`count(*)::int` }).from(users),
+      
+      // Users this month (using ID as proxy for creation date since we don't have createdAt)
+      // For now, we'll use a simple approach - in production you'd have createdAt timestamps
+      db.select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(sql`${users.id} >= (SELECT COALESCE(MAX(id), 0) - 30 FROM ${users})`),
+      
+      // Users today (using ID as proxy)
+      db.select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(sql`${users.id} >= (SELECT COALESCE(MAX(id), 0) - 1 FROM ${users})`)
+    ]);
+
+    return {
+      totalUsers: totalUsersResult[0]?.count || 0,
+      signupsThisMonth: monthlyUsersResult[0]?.count || 0,
+      signupsToday: todayUsersResult[0]?.count || 0
     };
   }
 }

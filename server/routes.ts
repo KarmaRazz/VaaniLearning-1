@@ -277,6 +277,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Users Summary API
+  app.get("/api/admin/users/summary", async (req, res) => {
+    try {
+      const summary = await storage.getUsersSummary();
+      res.json({
+        success: true,
+        ...summary
+      });
+    } catch (error) {
+      console.error("Get users summary error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Goals and Subjects API endpoints
   
   // Student Notes Summary API

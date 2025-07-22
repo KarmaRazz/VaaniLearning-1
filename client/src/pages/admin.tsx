@@ -2053,6 +2053,14 @@ const UsersContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
+  // Summary data
+  const [summary, setSummary] = useState({
+    totalUsers: 0,
+    signupsThisMonth: 0,
+    signupsToday: 0
+  });
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGoal, setSelectedGoal] = useState('');
@@ -2097,10 +2105,36 @@ const UsersContent = () => {
     }
   };
 
+  // Fetch summary data
+  const fetchSummary = async () => {
+    setSummaryLoading(true);
+    try {
+      const response = await fetch('/api/admin/users/summary');
+      if (!response.ok) {
+        throw new Error('Failed to fetch summary');
+      }
+      const data = await response.json();
+      setSummary({
+        totalUsers: data.totalUsers,
+        signupsThisMonth: data.signupsThisMonth,
+        signupsToday: data.signupsToday
+      });
+    } catch (err) {
+      console.error('Error fetching summary:', err);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   // Effect to fetch users when filters change
   useEffect(() => {
     fetchUsers();
   }, [searchTerm, selectedGoal, sortBy, currentPage]);
+
+  // Effect to fetch summary on component mount
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
   // Handle search with debounce
   const [searchInput, setSearchInput] = useState('');
@@ -2145,6 +2179,72 @@ const UsersContent = () => {
         <p className="mt-2 text-sm text-gray-600">
           Manage and view all registered users. Search, filter, and sort user accounts.
         </p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Total Users Card */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Users</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {summaryLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                ) : (
+                  summary.totalUsers.toLocaleString()
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Signups This Month Card */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                <UserCircle className="w-5 h-5 text-green-600" />
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Signups This Month</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {summaryLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                ) : (
+                  summary.signupsThisMonth.toLocaleString()
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Signups Today Card */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-[#F26B1D]/10 rounded-md flex items-center justify-center">
+                <User className="w-5 h-5 text-[#F26B1D]" />
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Signups Today</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {summaryLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                ) : (
+                  summary.signupsToday.toLocaleString()
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters and Search */}
