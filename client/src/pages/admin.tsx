@@ -2139,14 +2139,20 @@ function AdminLogin() {
     setError('');
     setIsLoading(true);
 
-    const result = await login(email, password);
-    
-    if (!result.success) {
-      setError(result.error || 'Login failed');
+    try {
+      const result = await login(email, password);
+      
+      if (result.success) {
+        // Login successful - the auth state will update and show dashboard
+        setIsLoading(false);
+      } else {
+        setError(result.error || 'Invalid credentials');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setError('Login failed. Please try again.');
       setIsLoading(false);
     }
-    // If login is successful, the useAdminAuth hook will update the authentication state
-    // and the component will automatically re-render to show the admin dashboard
   };
 
   return (
