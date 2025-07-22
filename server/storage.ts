@@ -1,4 +1,4 @@
-import { users, notes, userNotes, type User, type InsertUser, type Note, type InsertNote, type UserNote, type InsertUserNote } from "@shared/schema";
+import { users, notes, userNotes, goals, subjects, type User, type InsertUser, type Note, type InsertNote, type UserNote, type InsertUserNote, type Goal, type InsertGoal, type Subject, type InsertSubject } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, ilike, sql, inArray } from "drizzle-orm";
 
@@ -24,6 +24,12 @@ export interface IStorage {
   removeNoteFromUser(userId: number, noteId: number): Promise<boolean>;
   getUserNotes(userId: number): Promise<Note[]>;
   isNoteAddedByUser(userId: number, noteId: number): Promise<boolean>;
+  // Goals and Subjects methods
+  getGoals(): Promise<Goal[]>;
+  createGoal(goal: InsertGoal): Promise<Goal>;
+  getSubjectsByGoal(goalId: number): Promise<Subject[]>;
+  createSubject(subject: InsertSubject): Promise<Subject>;
+  getAllSubjects(): Promise<Subject[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -162,6 +168,27 @@ export class MemStorage implements IStorage {
   async deleteMultipleNotes(ids: number[]): Promise<boolean> {
     ids.forEach(id => this.notes.delete(id));
     return true;
+  }
+
+  // Goals and Subjects methods for MemStorage (stub implementations)
+  async getGoals(): Promise<Goal[]> {
+    throw new Error("Goals functionality not implemented in MemStorage");
+  }
+
+  async createGoal(goal: InsertGoal): Promise<Goal> {
+    throw new Error("Goals functionality not implemented in MemStorage");
+  }
+
+  async getSubjectsByGoal(goalId: number): Promise<Subject[]> {
+    throw new Error("Subjects functionality not implemented in MemStorage");
+  }
+
+  async createSubject(subject: InsertSubject): Promise<Subject> {
+    throw new Error("Subjects functionality not implemented in MemStorage");
+  }
+
+  async getAllSubjects(): Promise<Subject[]> {
+    throw new Error("Subjects functionality not implemented in MemStorage");
   }
 }
 
@@ -332,6 +359,39 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return Boolean(result);
+  }
+
+  // Goals and Subjects methods for DatabaseStorage
+  async getGoals(): Promise<Goal[]> {
+    return await db.select().from(goals).orderBy(goals.name);
+  }
+
+  async createGoal(insertGoal: InsertGoal): Promise<Goal> {
+    const [goal] = await db
+      .insert(goals)
+      .values(insertGoal)
+      .returning();
+    return goal;
+  }
+
+  async getSubjectsByGoal(goalId: number): Promise<Subject[]> {
+    return await db
+      .select()
+      .from(subjects)
+      .where(eq(subjects.goalId, goalId))
+      .orderBy(subjects.category, subjects.name);
+  }
+
+  async createSubject(insertSubject: InsertSubject): Promise<Subject> {
+    const [subject] = await db
+      .insert(subjects)
+      .values(insertSubject)
+      .returning();
+    return subject;
+  }
+
+  async getAllSubjects(): Promise<Subject[]> {
+    return await db.select().from(subjects).orderBy(subjects.name);
   }
 }
 

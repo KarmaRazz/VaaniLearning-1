@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertNoteSchema } from "@shared/schema";
+import { insertNoteSchema, insertGoalSchema, insertSubjectSchema } from "@shared/schema";
 import { signup, login, logout, getCurrentUser, authenticateToken, AuthenticatedRequest } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -154,6 +154,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error bulk deleting notes:', error);
       res.status(500).json({ error: "Failed to delete notes" });
+    }
+  });
+
+  // Goals and Subjects API endpoints
+  
+  // GET /api/goals - Get all goals
+  app.get("/api/goals", async (req, res) => {
+    try {
+      const goals = await storage.getGoals();
+      res.json(goals);
+    } catch (error) {
+      console.error("Error fetching goals:", error);
+      res.status(500).json({ error: "Failed to fetch goals" });
+    }
+  });
+
+  // POST /api/goals - Create new goal (admin endpoint)
+  app.post("/api/goals", async (req, res) => {
+    try {
+      const validationResult = insertGoalSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid goal data", 
+          details: validationResult.error.errors 
+        });
+      }
+      
+      const goal = await storage.createGoal(validationResult.data);
+      res.status(201).json(goal);
+    } catch (error) {
+      console.error("Error creating goal:", error);
+      res.status(500).json({ error: "Failed to create goal" });
+    }
+  });
+
+  // GET /api/goals/:goalId/subjects - Get subjects for a specific goal
+  app.get("/api/goals/:goalId/subjects", async (req, res) => {
+    try {
+      const goalId = parseInt(req.params.goalId);
+      if (isNaN(goalId)) {
+        return res.status(400).json({ error: "Invalid goal ID" });
+      }
+      
+      const subjects = await storage.getSubjectsByGoal(goalId);
+      res.json(subjects);
+    } catch (error) {
+      console.error("Error fetching subjects for goal:", error);
+      res.status(500).json({ error: "Failed to fetch subjects" });
+    }
+  });
+
+  // GET /api/subjects - Get all subjects
+  app.get("/api/subjects", async (req, res) => {
+    try {
+      const subjects = await storage.getAllSubjects();
+      res.json(subjects);
+    } catch (error) {
+      console.error("Error fetching subjects:", error);
+      res.status(500).json({ error: "Failed to fetch subjects" });
+    }
+  });
+
+  // POST /api/subjects - Create new subject (admin endpoint)
+  app.post("/api/subjects", async (req, res) => {
+    try {
+      const validationResult = insertSubjectSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid subject data", 
+          details: validationResult.error.errors 
+        });
+      }
+      
+      const subject = await storage.createSubject(validationResult.data);
+      res.status(201).json(subject);
+    } catch (error) {
+      console.error("Error creating subject:", error);
+      res.status(500).json({ error: "Failed to create subject" });
     }
   });
 

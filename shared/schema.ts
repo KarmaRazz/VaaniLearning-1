@@ -12,6 +12,24 @@ export const users = pgTable("users", {
   role: varchar("role", { length: 20 }).notNull().default("STUDENT"),
 });
 
+export const goals = pgTable("goals", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const subjects = pgTable("subjects", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  goalId: integer("goal_id").notNull().references(() => goals.id, { onDelete: "cascade" }),
+  category: text("category"), // Optional field for Boards (Science/Commerce)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+  return {
+    subjectGoalUnique: unique().on(table.name, table.goalId, table.category),
+  };
+});
+
 export const notes = pgTable("notes", {
   id: serial("id").primaryKey(),
   // New required fields with defaults to avoid data loss
@@ -62,6 +80,17 @@ export const userNotesRelations = relations(userNotes, ({ one }) => ({
   }),
 }));
 
+export const goalsRelations = relations(goals, ({ many }) => ({
+  subjects: many(subjects),
+}));
+
+export const subjectsRelations = relations(subjects, ({ one }) => ({
+  goal: one(goals, {
+    fields: [subjects.goalId],
+    references: [goals.id],
+  }),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
   email: true,
@@ -94,6 +123,16 @@ export const insertUserNoteSchema = createInsertSchema(userNotes).omit({
   addedAt: true,
 });
 
+export const insertGoalSchema = createInsertSchema(goals).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSubjectSchema = createInsertSchema(subjects).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type SignupData = z.infer<typeof signupSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
@@ -102,3 +141,7 @@ export type InsertNote = z.infer<typeof insertNoteSchema>;
 export type Note = typeof notes.$inferSelect;
 export type UserNote = typeof userNotes.$inferSelect;
 export type InsertUserNote = z.infer<typeof insertUserNoteSchema>;
+export type Goal = typeof goals.$inferSelect;
+export type InsertGoal = z.infer<typeof insertGoalSchema>;
+export type Subject = typeof subjects.$inferSelect;
+export type InsertSubject = z.infer<typeof insertSubjectSchema>;
