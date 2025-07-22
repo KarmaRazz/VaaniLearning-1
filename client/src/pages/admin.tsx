@@ -2094,11 +2094,13 @@ function useAdminAuth() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Login successful, setting auth state:', data);
         setIsAuthenticated(true);
         setAdmin(data.admin);
         return { success: true };
       } else {
         const error = await response.json();
+        console.log('Login failed:', error);
         return { success: false, error: error.error };
       }
     } catch (error) {
@@ -2233,6 +2235,8 @@ function AdminLogin() {
 
 export default function AdminPanel() {
   const { isAuthenticated, isLoading } = useAdminAuth();
+  
+  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
 
   if (isLoading) {
     return (
