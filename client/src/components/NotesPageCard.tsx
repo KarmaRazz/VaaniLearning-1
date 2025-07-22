@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useAuthModal } from "@/hooks/use-auth-modal";
 
 interface NotesPageCardProps {
   label: "Note" | "Formula" | "Derivation";
@@ -6,6 +8,7 @@ interface NotesPageCardProps {
   subjectName: string;
   goals: string[];
   cost: string;
+  noteId?: string;
   onView: () => void;
   onGetAdd: () => void;
 }
@@ -16,9 +19,32 @@ export default function NotesPageCard({
   subjectName,
   goals,
   cost,
+  noteId,
   onView,
   onGetAdd
 }: NotesPageCardProps) {
+  const { user } = useAuth();
+  const { showAuthModal } = useAuthModal();
+
+  const handleView = () => {
+    if (!user) {
+      // Store current page and note info for redirect after login
+      const currentUrl = `/notes${window.location.search}`;
+      showAuthModal(currentUrl, noteId);
+      return;
+    }
+    onView();
+  };
+
+  const handleAddToDashboard = () => {
+    if (!user) {
+      // Store current page and note info for redirect after login
+      const currentUrl = `/notes${window.location.search}`;
+      showAuthModal(currentUrl, noteId);
+      return;
+    }
+    onGetAdd();
+  };
   const getLabelColor = () => {
     switch (label) {
       case "Note":
@@ -75,14 +101,14 @@ export default function NotesPageCard({
             variant="outline"
             size="sm"
             className="flex-1 border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
-            onClick={onView}
+            onClick={handleView}
           >
             View
           </Button>
           <Button 
             size="sm"
             className="flex-1 bg-[#F26B1D] hover:bg-[#D72638] text-white"
-            onClick={onGetAdd}
+            onClick={handleAddToDashboard}
           >
             Add to Dashboard
           </Button>

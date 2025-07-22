@@ -49,10 +49,21 @@ export default function Signup() {
     },
   });
 
-  // Redirect if already logged in
+  // Redirect if already logged in or after successful signup
   useEffect(() => {
     if (isAuthenticated && user) {
-      setLocation('/');
+      // Check if there's a return URL stored
+      const returnUrl = sessionStorage.getItem('returnUrl');
+      const returnNoteId = sessionStorage.getItem('returnNoteId');
+      
+      if (returnUrl) {
+        // Clear stored return information
+        sessionStorage.removeItem('returnUrl');
+        sessionStorage.removeItem('returnNoteId');
+        setLocation(returnUrl);
+      } else {
+        setLocation('/');
+      }
     }
   }, [isAuthenticated, user, setLocation]);
 

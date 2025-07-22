@@ -17,10 +17,21 @@ export default function Login() {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in
+  // Redirect if already logged in or after successful login
   useEffect(() => {
     if (isAuthenticated && user) {
-      setLocation('/');
+      // Check if there's a return URL stored
+      const returnUrl = sessionStorage.getItem('returnUrl');
+      const returnNoteId = sessionStorage.getItem('returnNoteId');
+      
+      if (returnUrl) {
+        // Clear stored return information
+        sessionStorage.removeItem('returnUrl');
+        sessionStorage.removeItem('returnNoteId');
+        setLocation(returnUrl);
+      } else {
+        setLocation('/');
+      }
     }
   }, [isAuthenticated, user, setLocation]);
 
@@ -38,7 +49,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       await login(loginForm.email, loginForm.password);
-      setLocation('/');
+      // Redirect will be handled by the useEffect above
     } catch (error) {
       // Error handling is done in the auth hook
     } finally {

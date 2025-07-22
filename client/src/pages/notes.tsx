@@ -283,8 +283,9 @@ export default function Notes() {
               subjectName={item.subjectName}
               goals={item.goals}
               cost={item.cost}
-              onView={() => handleView(item.id)}
-              onGetAdd={() => handleGetAdd(item.id)}
+              noteId={item.id?.toString()}
+              onView={() => handleView(item)}
+              onGetAdd={() => handleAddToDashboard(item)}
             />
           ))}
         </div>
