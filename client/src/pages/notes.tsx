@@ -8,17 +8,24 @@ import { getAllNotes, getAllFormulas, type NoteItem } from "@/data/notesData";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
-// Placeholder data for goals
-const goals = ["CEE", "IOE", "Lok Sewa", "ACCA", "Language"];
+// Fetch goals and subjects from API
+const useGoals = () => useQuery({
+  queryKey: ['/api/goals'],
+  queryFn: async () => {
+    const response = await fetch('/api/goals');
+    if (!response.ok) throw new Error('Failed to fetch goals');
+    return response.json();
+  },
+});
 
-// Placeholder data for subjects by goal
-const subjectsByGoal: { [key: string]: string[] } = {
-  "CEE": ["Physics", "Chemistry", "Zoology", "Botany", "Math"],
-  "IOE": ["Physics", "Chemistry", "Math", "English"],
-  "Lok Sewa": ["General Knowledge", "Current Affairs", "Nepal History", "Geography", "Constitution"],
-  "ACCA": ["Financial Accounting", "Management Accounting", "Corporate Law", "Taxation"],
-  "Language": ["English Grammar", "Vocabulary", "Comprehension", "Writing Skills"]
-};
+const useSubjects = () => useQuery({
+  queryKey: ['/api/subjects'],
+  queryFn: async () => {
+    const response = await fetch('/api/subjects');
+    if (!response.ok) throw new Error('Failed to fetch subjects');
+    return response.json();
+  },
+});
 
 export default function Notes() {
   // Get data from API using React Query
@@ -31,9 +38,14 @@ export default function Notes() {
     queryKey: ['/api/notes', 'all-formulas'],
     queryFn: getAllFormulas,
   });
+
+  // Fetch goals and subjects data
+  const { data: goals = [], isLoading: goalsLoading } = useGoals();
+  const { data: allSubjects = [], isLoading: subjectsLoading } = useSubjects();
+  
   const [location] = useLocation();
-  const [selectedGoal, setSelectedGoal] = useState<string>("CEE");
-  const [selectedSubject, setSelectedSubject] = useState<string>("Physics");
+  const [selectedGoal, setSelectedGoal] = useState<string>("");
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [contentType, setContentType] = useState<"notes" | "formulas">("notes");
 
@@ -45,12 +57,35 @@ export default function Notes() {
     }
   }, [location]);
 
-  const handleGoalClick = (goal: string) => {
-    setSelectedGoal(goal);
+  // Initialize selectedGoal when goals are loaded
+  useEffect(() => {
+    if (goals.length > 0 && !selectedGoal) {
+      setSelectedGoal(goals[0].name);
+    }
+  }, [goals, selectedGoal]);
+
+  // Initialize selectedSubject when allSubjects are loaded and selectedGoal changes
+  useEffect(() => {
+    if (selectedGoal && allSubjects.length > 0) {
+      const goalData = goals.find(g => g.name === selectedGoal);
+      if (goalData) {
+        const goalSubjects = allSubjects.filter(s => s.goalId === goalData.id);
+        if (goalSubjects.length > 0 && !goalSubjects.some(s => s.name === selectedSubject)) {
+          setSelectedSubject(goalSubjects[0].name);
+        }
+      }
+    }
+  }, [selectedGoal, allSubjects, goals, selectedSubject]);
+
+  const handleGoalClick = (goalName: string) => {
+    setSelectedGoal(goalName);
     // Reset subject to first subject of the selected goal
-    const subjects = subjectsByGoal[goal];
-    if (subjects && subjects.length > 0) {
-      setSelectedSubject(subjects[0]);
+    const goalData = goals.find(g => g.name === goalName);
+    if (goalData) {
+      const goalSubjects = allSubjects.filter(s => s.goalId === goalData.id);
+      if (goalSubjects.length > 0) {
+        setSelectedSubject(goalSubjects[0].name);
+      }
     }
   };
 
@@ -107,7 +142,14 @@ export default function Notes() {
   };
 
   // Get available subjects for selected goal
-  const availableSubjects = selectedGoal ? subjectsByGoal[selectedGoal] || [] : [];
+  const getAvailableSubjects = () => {
+    if (!selectedGoal) return [];
+    const goalData = goals.find(g => g.name === selectedGoal);
+    if (!goalData) return [];
+    return allSubjects.filter(s => s.goalId === goalData.id);
+  };
+
+  const availableSubjects = getAvailableSubjects();
 
   // Filter data based on selected goal, subject, search query, and content type
   const currentData = contentType === "notes" ? notesData : formulasData;
@@ -140,20 +182,24 @@ export default function Notes() {
 
         {/* Goal Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          {goals.map((goal) => (
-            <Button
-              key={goal}
-              variant={selectedGoal === goal ? "default" : "outline"}
-              onClick={() => handleGoalClick(goal)}
-              className={`px-6 py-2 font-medium transition-colors duration-200 ${
-                selectedGoal === goal
-                  ? "bg-[#F26B1D] text-white hover:bg-[#D72638]"
-                  : "border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
-              }`}
-            >
-              {goal}
-            </Button>
-          ))}
+          {goalsLoading ? (
+            <div className="text-gray-500">Loading goals...</div>
+          ) : (
+            goals.map((goal) => (
+              <Button
+                key={goal.id}
+                variant={selectedGoal === goal.name ? "default" : "outline"}
+                onClick={() => handleGoalClick(goal.name)}
+                className={`px-6 py-2 font-medium transition-colors duration-200 ${
+                  selectedGoal === goal.name
+                    ? "bg-[#F26B1D] text-white hover:bg-[#D72638]"
+                    : "border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
+                }`}
+              >
+                {goal.name}
+              </Button>
+            ))
+          )}
         </div>
 
         {/* Search Bar */}
@@ -176,20 +222,27 @@ export default function Notes() {
           {/* Subject Tabs - Horizontally Scrollable */}
           <div className="flex-1 overflow-x-auto">
             <div className="flex gap-2 min-w-max">
-              {availableSubjects.map((subject) => (
-                <Button
-                  key={subject}
-                  variant={selectedSubject === subject ? "default" : "ghost"}
-                  onClick={() => handleSubjectClick(subject)}
-                  className={`px-4 py-2 font-medium whitespace-nowrap transition-colors duration-200 ${
-                    selectedSubject === subject
-                      ? "bg-[#D72638] text-white hover:bg-[#F26B1D]"
-                      : "text-gray-600 hover:text-[#F26B1D] hover:bg-gray-100"
-                  }`}
-                >
-                  {subject}
-                </Button>
-              ))}
+              {subjectsLoading ? (
+                <div className="text-gray-500">Loading subjects...</div>
+              ) : (
+                availableSubjects.map((subject) => (
+                  <Button
+                    key={subject.id}
+                    variant={selectedSubject === subject.name ? "default" : "ghost"}
+                    onClick={() => handleSubjectClick(subject.name)}
+                    className={`px-4 py-2 font-medium whitespace-nowrap transition-colors duration-200 ${
+                      selectedSubject === subject.name
+                        ? "bg-[#D72638] text-white hover:bg-[#F26B1D]"
+                        : "text-gray-600 hover:text-[#F26B1D] hover:bg-gray-100"
+                    }`}
+                  >
+                    {subject.name}
+                    {subject.category && (
+                      <span className="ml-1 text-xs opacity-75">({subject.category})</span>
+                    )}
+                  </Button>
+                ))
+              )}
             </div>
           </div>
 

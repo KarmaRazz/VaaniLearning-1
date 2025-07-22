@@ -1471,29 +1471,44 @@ const NotesContent = () => {
   // Dynamic subject filtering based on selected goal
   const [availableSubjectsForGoal, setAvailableSubjectsForGoal] = useState<string[]>([]);
 
-  // Static subject mappings for each goal
-  const subjectsByGoal = {
-    'CEE': ['Physics', 'Chemistry', 'Math', 'Zoology', 'Botany'],
-    'IOE': ['Physics', 'Chemistry', 'Math'],
-    'Lok Sewa': ['General Knowledge', 'Nepal History', 'Geography', 'Constitution'],
-    'ACCA': ['Financial Accounting', 'Management Accounting', 'Corporate Law', 'Taxation'],
-    'Language': ['English Grammar', 'Vocabulary', 'Comprehension', 'Writing Skills']
-  };
+  // Fetch goals and subjects from API
+  const { data: goals = [] } = useQuery({
+    queryKey: ['/api/goals'],
+    queryFn: async () => {
+      const response = await fetch('/api/goals');
+      if (!response.ok) throw new Error('Failed to fetch goals');
+      return response.json();
+    },
+  });
+
+  const { data: allSubjects = [] } = useQuery({
+    queryKey: ['/api/subjects'],
+    queryFn: async () => {
+      const response = await fetch('/api/subjects');
+      if (!response.ok) throw new Error('Failed to fetch subjects');
+      return response.json();
+    },
+  });
 
   // Update available subjects when goalFilter changes
   useEffect(() => {
     if (goalFilter) {
-      const subjectsForGoal = subjectsByGoal[goalFilter as keyof typeof subjectsByGoal] || [];
-      setAvailableSubjectsForGoal(subjectsForGoal);
-      
-      // Reset subject filter if current selection is not valid for the selected goal
-      if (subjectFilter && !subjectsForGoal.includes(subjectFilter)) {
-        setSubjectFilter('');
+      const selectedGoal = goals.find(g => g.name === goalFilter);
+      if (selectedGoal) {
+        const subjectsForGoal = allSubjects
+          .filter(s => s.goalId === selectedGoal.id)
+          .map(s => s.name);
+        setAvailableSubjectsForGoal(subjectsForGoal);
+        
+        // Reset subject filter if current selection is not valid for the selected goal
+        if (subjectFilter && !subjectsForGoal.includes(subjectFilter)) {
+          setSubjectFilter('');
+        }
       }
     } else {
       setAvailableSubjectsForGoal(availableSubjectsFromDB);
     }
-  }, [goalFilter, availableSubjectsFromDB, subjectFilter]);
+  }, [goalFilter, goals, allSubjects, availableSubjectsFromDB, subjectFilter]);
 
   const getCreateButtonText = () => {
     return activeTab === 'notes' ? 'Create Note' : 'Create Formula/Derivation';
@@ -1577,15 +1592,20 @@ const NotesContent = () => {
     }));
   };
 
-  const availableGoals = ['CEE', 'IOE', 'Lok Sewa', 'ACCA', 'Language'];
+  const availableGoals = goals.map(g => g.name);
 
   const getAvailableSubjects = () => {
     if (formData.goals.length === 0) {
-      return Object.values(subjectsByGoal).flat();
+      return allSubjects.map(s => s.name);
     }
     const subjects = new Set<string>();
-    formData.goals.forEach(goal => {
-      subjectsByGoal[goal as keyof typeof subjectsByGoal]?.forEach(subject => subjects.add(subject));
+    formData.goals.forEach(goalName => {
+      const goal = goals.find(g => g.name === goalName);
+      if (goal) {
+        allSubjects
+          .filter(s => s.goalId === goal.id)
+          .forEach(subject => subjects.add(subject.name));
+      }
     });
     return Array.from(subjects);
   };

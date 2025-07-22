@@ -128,6 +128,7 @@ Vaani is a comprehensive online learning platform designed specifically for Nepa
 - January 18, 2025: Created comprehensive Student Dashboard with My Notes, Test History, Profile Info, and Progress Tracker sections, all with protected API routes requiring authentication
 - January 18, 2025: Added test student account (teststudent@vaani.com / test1234) and updated user schema to include name and email fields
 - January 18, 2025: Removed all dummy data from notes database, updated seeding process to only create admin-added content, implemented empty state handling across homepage and notes page to show "no content available" messages when database is empty
+- January 22, 2025: Implemented dynamic Goals and Subjects system - created database models for Goals and Subjects with proper relationships, added API endpoints (GET /api/goals, GET /api/goals/:goalId/subjects), seeded database with complete goal/subject mappings (CEE, IOE, Language, Boards with Science/Commerce categories, ACCA), and converted all hardcoded dropdowns in Admin and Notes pages to use dynamic data from backend
 
 ## User Preferences
 ```

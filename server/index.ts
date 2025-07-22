@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
 import { createTestUser } from "./create-test-user";
+import { seedGoalsAndSubjects } from "./seed-goals-subjects";
 
 const app = express();
 app.use(express.json());
@@ -45,6 +46,9 @@ app.use((req, res, next) => {
   
   // Seed database with initial data
   await seedDatabase();
+  
+  // Seed goals and subjects
+  await seedGoalsAndSubjects();
   
   // Create test user account
   await createTestUser();
