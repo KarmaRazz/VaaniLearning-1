@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   LayoutDashboard, 
@@ -2095,14 +2096,10 @@ function useAdminAuth() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful, setting auth state:', data);
+        console.log('Login successful, redirecting to dashboard');
         
-        // Use setTimeout to ensure state updates are processed
-        setTimeout(() => {
-          setIsAuthenticated(true);
-          setAdmin(data.admin);
-          setAuthKey(prev => prev + 1);
-        }, 0);
+        // Force redirect to admin dashboard - bypass React state issues
+        window.location.href = '/admin/dashboard';
         
         return { success: true };
       } else {
@@ -2152,10 +2149,8 @@ function AdminLogin() {
       const result = await login(email, password);
       
       if (result.success) {
-        // Login successful - add a small delay to ensure state updates
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 100);
+        // Login successful - redirect will happen automatically
+        // Keep loading state until redirect completes
       } else {
         setError(result.error || 'Invalid credentials');
         setIsLoading(false);
@@ -2244,29 +2239,39 @@ function AdminLogin() {
 
 export default function AdminPanel() {
   const { isAuthenticated, isLoading, authKey } = useAdminAuth();
+  const [location] = useLocation();
   
-  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading, 'authKey:', authKey);
+  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading, 'authKey:', authKey, 'location:', location);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F26B1D] mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying admin access...</p>
+  // Check if admin cookie exists to determine authentication status
+  const checkAdminCookie = () => {
+    return document.cookie.includes('admin_token=');
+  };
+
+  // If we're on /admin/dashboard, check authentication
+  if (location === '/admin/dashboard') {
+    if (checkAdminCookie()) {
+      return (
+        <AdminLayout>
+          <div className="h-full">
+            {/* Authenticated admin content will be rendered by the layout */}
+          </div>
+        </AdminLayout>
+      );
+    } else {
+      // Not authenticated, redirect to login
+      window.location.href = '/admin';
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F26B1D] mx-auto mb-4"></div>
+            <p className="text-gray-600">Redirecting to login...</p>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
-  if (!isAuthenticated) {
-    return <AdminLogin />;
-  }
-
-  return (
-    <AdminLayout>
-      <div className="h-full">
-        {/* Authenticated admin content will be rendered by the layout */}
-      </div>
-    </AdminLayout>
-  );
+  // For /admin route, always show login form
+  return <AdminLogin />;
 }
