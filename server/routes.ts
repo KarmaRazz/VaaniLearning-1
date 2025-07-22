@@ -54,7 +54,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/admin/logout", (req, res) => {
-    res.clearCookie('admin_token');
+    res.clearCookie('admin_token', {
+      path: '/',
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax' as const
+    });
     res.json({ success: true, message: "Admin logout successful" });
   });
 

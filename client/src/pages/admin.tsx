@@ -2054,7 +2054,8 @@ function useAdminAuth() {
   const [admin, setAdmin] = useState<{email: string} | null>(null);
 
   useEffect(() => {
-    checkAdminAuth();
+    // Don't auto-check auth on page load - always start with login form
+    setIsLoading(false);
   }, []);
 
   const checkAdminAuth = async () => {
@@ -2095,8 +2096,6 @@ function useAdminAuth() {
         const data = await response.json();
         setIsAuthenticated(true);
         setAdmin(data.admin);
-        // Force a re-check of authentication to ensure state is updated
-        await checkAdminAuth();
         return { success: true };
       } else {
         const error = await response.json();
@@ -2119,6 +2118,8 @@ function useAdminAuth() {
     } finally {
       setIsAuthenticated(false);
       setAdmin(null);
+      // Reload page to ensure clean state
+      window.location.reload();
     }
   };
 
