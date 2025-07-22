@@ -2052,6 +2052,7 @@ function useAdminAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [admin, setAdmin] = useState<{email: string} | null>(null);
+  const [authKey, setAuthKey] = useState(0); // Force re-render trigger
 
   useEffect(() => {
     // Don't auto-check auth on page load - always start with login form
@@ -2095,8 +2096,14 @@ function useAdminAuth() {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful, setting auth state:', data);
-        setIsAuthenticated(true);
-        setAdmin(data.admin);
+        
+        // Use setTimeout to ensure state updates are processed
+        setTimeout(() => {
+          setIsAuthenticated(true);
+          setAdmin(data.admin);
+          setAuthKey(prev => prev + 1);
+        }, 0);
+        
         return { success: true };
       } else {
         const error = await response.json();
@@ -2125,7 +2132,7 @@ function useAdminAuth() {
     }
   };
 
-  return { isAuthenticated, isLoading, admin, login, logout };
+  return { isAuthenticated, isLoading, admin, login, logout, authKey };
 }
 
 // Admin Login Component
@@ -2145,8 +2152,10 @@ function AdminLogin() {
       const result = await login(email, password);
       
       if (result.success) {
-        // Login successful - the auth state will update and show dashboard
-        setIsLoading(false);
+        // Login successful - add a small delay to ensure state updates
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 100);
       } else {
         setError(result.error || 'Invalid credentials');
         setIsLoading(false);
@@ -2234,9 +2243,9 @@ function AdminLogin() {
 }
 
 export default function AdminPanel() {
-  const { isAuthenticated, isLoading } = useAdminAuth();
+  const { isAuthenticated, isLoading, authKey } = useAdminAuth();
   
-  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
+  console.log('AdminPanel render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading, 'authKey:', authKey);
 
   if (isLoading) {
     return (
