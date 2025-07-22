@@ -113,13 +113,6 @@ export default function Login() {
                 </button>
               </p>
             </div>
-
-            {/* Test account credentials */}
-            <div className="text-center text-sm text-gray-600 mt-6 pt-4 border-t border-gray-200">
-              <p className="font-medium">Test Account:</p>
-              <p>Email: teststudent@vaani.com</p>
-              <p>Password: test1234</p>
-            </div>
           </CardContent>
         </Card>
       </div>
