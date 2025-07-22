@@ -2245,12 +2245,19 @@ export default function AdminPanel() {
 
   // Check if admin cookie exists to determine authentication status
   const checkAdminCookie = () => {
-    return document.cookie.includes('admin_token=');
+    const cookies = document.cookie;
+    console.log('Current cookies:', cookies);
+    const hasAdminToken = cookies.includes('admin_token=');
+    console.log('Has admin token:', hasAdminToken);
+    return hasAdminToken;
   };
 
   // If we're on /admin/dashboard, check authentication
   if (location === '/admin/dashboard') {
-    if (checkAdminCookie()) {
+    const isAuthenticated = checkAdminCookie();
+    console.log('Dashboard route - authenticated:', isAuthenticated);
+    
+    if (isAuthenticated) {
       return (
         <AdminLayout>
           <div className="h-full">
@@ -2260,6 +2267,7 @@ export default function AdminPanel() {
       );
     } else {
       // Not authenticated, redirect to login
+      console.log('Not authenticated, redirecting to /admin');
       window.location.href = '/admin';
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
