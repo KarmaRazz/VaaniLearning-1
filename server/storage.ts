@@ -33,6 +33,8 @@ export interface IStorage {
   getAllSubjects(): Promise<Subject[]>;
   // User notes summary
   getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]>;
+  // Password update
+  updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -208,6 +210,10 @@ export class MemStorage implements IStorage {
 
   async getUserNotesGroupedBySubject(userId: number): Promise<{subject: string, count: number}[]> {
     throw new Error("UserNote functionality not implemented in MemStorage");
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+    throw new Error("Password update functionality not implemented in MemStorage");
   }
 }
 
@@ -438,6 +444,13 @@ export class DatabaseStorage implements IStorage {
       subject: r.subject || 'Unknown',
       count: r.count
     }));
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 }
 

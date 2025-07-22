@@ -77,7 +77,7 @@ const ProgressTracker = () => {
             {/* Subject Breakdown */}
             <div className="space-y-3">
               <h4 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">By Subject</h4>
-              {notesSummary.subjectBreakdown.map((item, index) => (
+              {notesSummary.subjectBreakdown.map((item: { subject: string; count: number }, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-[#F26B1D] rounded-full"></div>

@@ -214,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         profilePic: user.profilePic,
         phoneNumber: user.phoneNumber,
         goalName: goalName,
-        totalNotesAccessed: 0, // TODO: Implement real counting from user activity
+        totalNotesAccessed: (await storage.getUserNotes(user.id)).length, // Real count from user_notes table
         totalTestsTaken: 0,     // TODO: Implement real counting from test history
         averageScore: 0         // TODO: Calculate from actual test results
       };
@@ -223,6 +223,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching student profile:", error);
       res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
+  // Change Password API
+  app.post("/api/student/change-password", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { oldPassword, newPassword } = req.body;
+
+      // Get current user with password
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Verify old password
+      const bcrypt = require('bcrypt');
+      const oldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+      if (!oldPasswordValid) {
+        return res.status(400).json({ error: 'Current password is incorrect' });
+      }
+
+      // Hash new password
+      const saltRounds = 12;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update password in database
+      await storage.updateUserPassword(req.user.id, hashedNewPassword);
+
+      res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Failed to change password" });
     }
   });
 
