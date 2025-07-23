@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { 
   BookOpen, 
   ClipboardCheck, 
@@ -9,10 +10,12 @@ import {
   Award,
   FileText,
   BarChart3,
-  Camera
+  Camera,
+  Home
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import MyNotes from './MyNotes';
 import TestHistory from './TestHistory';
 import ProfileInfo from './ProfileInfo';
@@ -23,6 +26,7 @@ type DashboardSection = 'notes' | 'tests' | 'profile' | 'progress';
 const StudentDashboard = () => {
   const [activeSection, setActiveSection] = useState<DashboardSection>('notes');
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   const sidebarItems = [
     { id: 'notes' as const, label: 'My Notes', icon: BookOpen },
@@ -60,23 +64,36 @@ const StudentDashboard = () => {
               </h1>
               <p className="text-gray-600">Manage your learning journey</p>
             </div>
-            {/* User Avatar with Profile Picture Viewer */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="cursor-pointer">
-                  {user?.profilePic ? (
-                    <img 
-                      src={user.profilePic} 
-                      alt="Profile" 
-                      className="w-12 h-12 rounded-full object-cover border-2 border-[#F26B1D]/20 hover:border-[#F26B1D] transition-colors"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center hover:shadow-lg transition-shadow">
-                      <User className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                </div>
-              </DialogTrigger>
+            {/* Home Button and User Avatar */}
+            <div className="flex items-center space-x-3">
+              {/* Home Button */}
+              <Button
+                onClick={() => setLocation('/')}
+                variant="outline"
+                size="sm"
+                className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+              
+              {/* User Avatar with Profile Picture Viewer */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="cursor-pointer">
+                    {user?.profilePic ? (
+                      <img 
+                        src={user.profilePic} 
+                        alt="Profile" 
+                        className="w-12 h-12 rounded-full object-cover border-2 border-[#F26B1D]/20 hover:border-[#F26B1D] transition-colors"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center hover:shadow-lg transition-shadow">
+                        <User className="h-6 w-6 text-white" />
+                      </div>
+                    )}
+                  </div>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Profile Picture</DialogTitle>
@@ -99,7 +116,8 @@ const StudentDashboard = () => {
                   <p className="text-gray-600 text-sm">{user?.email}</p>
                 </div>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            </div>
           </div>
         </div>
       </div>
