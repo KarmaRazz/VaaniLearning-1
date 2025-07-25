@@ -885,6 +885,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset password endpoint (frontend posts to this)
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Reset token is required" });
+      }
+
+      if (!newPassword) {
+        return res.status(400).json({ error: "New password is required" });
+      }
+
+      // Hash the provided token to match what's stored in database
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+      
+      // Find and verify token
+      const resetToken = await storage.getPasswordResetToken(hashedToken);
+      
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+      
+      // Check if token has expired
+      if (new Date() > resetToken.expiresAt) {
+        // Delete expired token
+        await storage.deletePasswordResetToken(hashedToken);
+        return res.status(400).json({ error: "Reset link has expired. Please request a new password reset." });
+      }
+      
+      // Hash the new password
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+      
+      // Update user's password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      
+      // Delete the used token
+      await storage.deletePasswordResetToken(hashedToken);
+      
+      res.json({ message: "Password reset successful. You can now login with your new password." });
+      
+    } catch (error) {
+      console.error("Reset error:", error);
+      res.status(500).json({ error: "Failed to reset password. Please try again later." });
+    }
+  });
+
+  // Legacy endpoint for backwards compatibility
   app.post("/api/auth/reset-password/:token", async (req, res) => {
     try {
       const { token } = req.params;

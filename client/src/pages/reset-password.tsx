@@ -75,12 +75,12 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch(`/api/auth/reset-password/${token}`, {
+      const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password: data.password }),
+        body: JSON.stringify({ token, newPassword: data.password }),
       });
 
       const result = await response.json();
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
         description: result.message,
       });
 
-      // Redirect to login after 3 seconds
+      // Redirect to login page after 3 seconds
       setTimeout(() => setLocation("/login"), 3000);
 
     } catch (error) {

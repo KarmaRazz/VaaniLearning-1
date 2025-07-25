@@ -35,7 +35,7 @@ function Router() {
       <Route path="/admin" component={AdminPanel} />
       <Route path="/student-dashboard" component={StudentDashboardPage} />
       <Route path="/forgot-password" component={ForgotPasswordPage} />
-      <Route path="/reset-password/:token" component={ResetPasswordPage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>
   );
