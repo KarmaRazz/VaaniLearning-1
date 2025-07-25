@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertNoteSchema, insertGoalSchema, insertSubjectSchema } from "@shared/schema";
+import { insertNoteSchema, insertGoalSchema, insertSubjectSchema, forgotPasswordSchema, resetPasswordSchema } from "@shared/schema";
 import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, AuthenticatedRequest } from "./auth";
 import { AdminAuth } from "./admin-auth";
 
@@ -794,6 +794,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error removing note from dashboard:", error);
       res.status(500).json({ error: "Failed to remove note from dashboard" });
+    }
+  });
+
+  // Password Reset Routes
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      // Clean up expired tokens first
+      await storage.deleteExpiredPasswordResetTokens();
+      
+      const validationResult = forgotPasswordSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid email format", 
+          details: validationResult.error.errors 
+        });
+      }
+
+      const { email } = validationResult.data;
+      
+      // Check if user exists with this email
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success message to prevent email enumeration
+      const successMessage = "If this email exists in our system, you'll receive a password reset link shortly.";
+      
+      if (!user) {
+        return res.json({ message: successMessage });
+      }
+
+      // Generate secure token using Node.js crypto
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+      
+      // Set expiry to 1 hour from now
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1);
+      
+      // Save token to database
+      await storage.createPasswordResetToken({
+        token: hashedToken,
+        userId: user.id,
+        expiresAt
+      });
+
+      // Send email with reset link
+      const { sendPasswordResetEmail } = require('./email');
+      await sendPasswordResetEmail(user.email, resetToken, user.name);
+      
+      res.json({ message: successMessage });
+      
+    } catch (error) {
+      console.error("Error in forgot password:", error);
+      res.status(500).json({ error: "Internal server error. Please try again later." });
+    }
+  });
+
+  app.post("/api/auth/reset-password/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Reset token is required" });
+      }
+
+      const validationResult = resetPasswordSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Password validation failed", 
+          details: validationResult.error.errors 
+        });
+      }
+
+      const { password } = validationResult.data;
+      
+      // Hash the provided token to match what's stored in database
+      const crypto = require('crypto');
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+      
+      // Find and verify token
+      const resetToken = await storage.getPasswordResetToken(hashedToken);
+      
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+      
+      // Check if token has expired
+      if (new Date() > resetToken.expiresAt) {
+        // Delete expired token
+        await storage.deletePasswordResetToken(hashedToken);
+        return res.status(400).json({ error: "Reset token has expired. Please request a new one." });
+      }
+      
+      // Hash the new password
+      const bcrypt = require('bcrypt');
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      
+      // Update user's password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      
+      // Delete the used token
+      await storage.deletePasswordResetToken(hashedToken);
+      
+      res.json({ message: "Password reset successful. You can now login with your new password." });
+      
+    } catch (error) {
+      console.error("Error in reset password:", error);
+      res.status(500).json({ error: "Internal server error. Please try again later." });
     }
   });
 

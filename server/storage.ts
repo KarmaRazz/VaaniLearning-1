@@ -1,4 +1,4 @@
-import { users, notes, userNotes, goals, subjects, type User, type InsertUser, type Note, type InsertNote, type UserNote, type InsertUserNote, type Goal, type InsertGoal, type Subject, type InsertSubject } from "@shared/schema";
+import { users, notes, userNotes, goals, subjects, passwordResetTokens, type User, type InsertUser, type Note, type InsertNote, type UserNote, type InsertUserNote, type Goal, type InsertGoal, type Subject, type InsertSubject, type PasswordResetToken, type InsertPasswordResetToken } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, ilike, sql, inArray } from "drizzle-orm";
 
@@ -40,6 +40,11 @@ export interface IStorage {
   // Users management
   getUsersWithFilters(search?: string, goalFilter?: number, sortBy?: 'newest' | 'oldest', page?: number, limit?: number): Promise<{ users: User[], total: number, goals: Goal[] }>;
   getUsersSummary(): Promise<{ totalUsers: number, signupsThisMonth: number, signupsToday: number }>;
+  // Password reset methods
+  createPasswordResetToken(token: InsertPasswordResetToken): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  deletePasswordResetToken(token: string): Promise<boolean>;
+  deleteExpiredPasswordResetTokens(): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -634,6 +639,39 @@ export class DatabaseStorage implements IStorage {
       signupsThisMonth: monthlyUsersResult[0]?.count || 0,
       signupsToday: todayUsersResult[0]?.count || 0
     };
+  }
+
+  // Password reset token methods
+  async createPasswordResetToken(insertToken: InsertPasswordResetToken): Promise<PasswordResetToken> {
+    const [token] = await db
+      .insert(passwordResetTokens)
+      .values(insertToken)
+      .returning();
+    return token;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [result] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token))
+      .limit(1);
+    return result;
+  }
+
+  async deletePasswordResetToken(token: string): Promise<boolean> {
+    const result = await db
+      .delete(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async deleteExpiredPasswordResetTokens(): Promise<boolean> {
+    const now = new Date();
+    const result = await db
+      .delete(passwordResetTokens)
+      .where(sql`${passwordResetTokens.expiresAt} < ${now}`);
+    return (result.rowCount ?? 0) > 0;
   }
 }
 

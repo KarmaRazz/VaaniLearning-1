@@ -17,6 +17,8 @@ import Auth from "@/pages/auth";
 import AdminPanel from "@/pages/admin";
 import CourseDetails from "@/pages/course-details";
 import StudentDashboardPage from "@/pages/student-dashboard";
+import ForgotPasswordPage from "@/pages/forgot-password";
+import ResetPasswordPage from "@/pages/reset-password";
 
 function Router() {
   return (
@@ -32,6 +34,8 @@ function Router() {
       <Route path="/auth" component={Auth} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/student-dashboard" component={StudentDashboardPage} />
+      <Route path="/forgot-password" component={ForgotPasswordPage} />
+      <Route path="/reset-password/:token" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>
   );
