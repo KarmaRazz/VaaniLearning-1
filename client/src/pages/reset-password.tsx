@@ -28,13 +28,12 @@ export default function ResetPasswordPage() {
     },
   });
 
-  // Extract token from URL and validate it
+  // Extract token from URL query parameter and validate it
   useEffect(() => {
-    const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/');
-    const tokenFromUrl = pathParts[pathParts.length - 1];
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
     
-    if (tokenFromUrl && tokenFromUrl !== 'reset-password') {
+    if (tokenFromUrl) {
       setToken(tokenFromUrl);
       
       // Validate token on page load
@@ -53,7 +52,7 @@ export default function ResetPasswordPage() {
           setTimeout(() => setLocation("/forgot-password"), 3000);
         });
     } else {
-      // Invalid URL format, redirect to forgot password
+      // No token in URL, redirect to forgot password
       toast({
         title: "Invalid reset link",
         description: "The password reset link is invalid or malformed.",

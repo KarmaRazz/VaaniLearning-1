@@ -5,18 +5,45 @@ const resend = new Resend(RESEND_API_KEY);
 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
   
-  const resetLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'http://localhost:5000'}/reset-password/${token}`;
+  const resetLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'http://localhost:5000'}/reset-password?token=${token}`;
   
   const { data, error } = await resend.emails.send({
-    from: 'onboarding@resend.dev',
+    from: 'no-reply@e-vaani.com',
     to: [email],
-    subject: 'Reset your password for Vaani',
+    subject: 'Reset Your Vaani Password',
     html: `
-      <p>Hello ${name},</p>
-      <p>Click the link below to reset your password. This link is valid for 30 minutes.</p>
-      <p>Reset link: <a href="${resetLink}">${resetLink}</a></p>
-      <p>If you didn't request this password reset, please ignore this email.</p>
-      <p>— Team Vaani</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .button { 
+            display: inline-block; 
+            background-color: #F26B1D; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            margin: 20px 0;
+          }
+          .footer { margin-top: 30px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <p>Hi ${name},</p>
+          <p>We received a request to reset your Vaani password. Click the button below to reset it:</p>
+          <p><a href="${resetLink}" class="button">Reset Password</a></p>
+          <p>This link will expire in 15 minutes.</p>
+          <p>If this wasn't you, ignore this email.</p>
+          <div class="footer">
+            <p>— Team Vaani</p>
+          </div>
+        </div>
+      </body>
+      </html>
     `,
   });
 

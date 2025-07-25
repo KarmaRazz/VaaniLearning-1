@@ -827,9 +827,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resetToken = crypto.randomBytes(32).toString('hex');
       const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
       
-      // Set expiry to 30 minutes from now
+      // Set expiry to 15 minutes from now
       const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+      expiresAt.setMinutes(expiresAt.getMinutes() + 15);
       
       // Save token to database
       await storage.createPasswordResetToken({
@@ -874,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (new Date() > resetToken.expiresAt) {
         // Delete expired token
         await storage.deletePasswordResetToken(hashedToken);
-        return res.status(400).json({ error: "Reset token has expired. Please request a new password reset." });
+        return res.status(400).json({ error: "Reset link has expired. Please request a new password reset." });
       }
       
       res.json({ message: "Token is valid" });
@@ -917,7 +917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (new Date() > resetToken.expiresAt) {
         // Delete expired token
         await storage.deletePasswordResetToken(hashedToken);
-        return res.status(400).json({ error: "Reset token has expired. Please request a new password reset." });
+        return res.status(400).json({ error: "Reset link has expired. Please request a new password reset." });
       }
       
       // Hash the new password
