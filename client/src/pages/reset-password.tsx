@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
     },
   });
 
-  // Extract token from URL
+  // Extract token from URL and validate it
   useEffect(() => {
     const currentPath = window.location.pathname;
     const pathParts = currentPath.split('/');
@@ -36,6 +36,22 @@ export default function ResetPasswordPage() {
     
     if (tokenFromUrl && tokenFromUrl !== 'reset-password') {
       setToken(tokenFromUrl);
+      
+      // Validate token on page load
+      fetch(`/api/auth/validate-reset-token/${tokenFromUrl}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Invalid or expired token');
+          }
+        })
+        .catch(() => {
+          toast({
+            title: "Invalid reset link",
+            description: "The password reset link is invalid or has expired.",
+            variant: "destructive",
+          });
+          setTimeout(() => setLocation("/forgot-password"), 3000);
+        });
     } else {
       // Invalid URL format, redirect to forgot password
       toast({

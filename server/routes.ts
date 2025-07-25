@@ -819,20 +819,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user exists with this email
       const user = await storage.getUserByEmail(email);
       
-      // Always return success message to prevent email enumeration
-      const successMessage = "If this email exists in our system, you'll receive a password reset link shortly.";
-      
       if (!user) {
-        return res.json({ message: successMessage });
+        return res.status(400).json({ error: "This email is not registered." });
       }
 
       // Generate secure token using Node.js crypto
       const resetToken = crypto.randomBytes(32).toString('hex');
       const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
       
-      // Set expiry to 1 hour from now
+      // Set expiry to 30 minutes from now
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 1);
+      expiresAt.setMinutes(expiresAt.getMinutes() + 30);
       
       // Save token to database
       await storage.createPasswordResetToken({
@@ -846,11 +843,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await sendPasswordResetEmail(user.email, resetToken, user.name);
       console.log(`Password reset email sent successfully to: ${user.email}`);
       
-      res.json({ message: successMessage });
+      res.json({ message: "Password reset email sent successfully. Check your inbox." });
       
     } catch (error) {
-      console.error("Error in forgot password:", error);
-      res.status(500).json({ error: "Internal server error. Please try again later." });
+      console.error("Reset error:", error);
+      res.status(500).json({ error: "Failed to send password reset email. Please try again later." });
+    }
+  });
+
+  // Validate reset token endpoint
+  app.get("/api/auth/validate-reset-token/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Reset token is required" });
+      }
+
+      // Hash the provided token to match what's stored in database
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+      
+      // Find and verify token
+      const resetToken = await storage.getPasswordResetToken(hashedToken);
+      
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+      
+      // Check if token has expired
+      if (new Date() > resetToken.expiresAt) {
+        // Delete expired token
+        await storage.deletePasswordResetToken(hashedToken);
+        return res.status(400).json({ error: "Reset token has expired. Please request a new password reset." });
+      }
+      
+      res.json({ message: "Token is valid" });
+      
+    } catch (error) {
+      console.error("Reset error:", error);
+      res.status(500).json({ error: "Failed to validate token." });
     }
   });
 
@@ -886,7 +917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (new Date() > resetToken.expiresAt) {
         // Delete expired token
         await storage.deletePasswordResetToken(hashedToken);
-        return res.status(400).json({ error: "Reset token has expired. Please request a new one." });
+        return res.status(400).json({ error: "Reset token has expired. Please request a new password reset." });
       }
       
       // Hash the new password
@@ -902,8 +933,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Password reset successful. You can now login with your new password." });
       
     } catch (error) {
-      console.error("Error in reset password:", error);
-      res.status(500).json({ error: "Internal server error. Please try again later." });
+      console.error("Reset error:", error);
+      res.status(500).json({ error: "Failed to reset password. Please try again later." });
     }
   });
 

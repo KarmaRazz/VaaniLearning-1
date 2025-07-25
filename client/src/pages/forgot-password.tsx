@@ -44,12 +44,12 @@ export default function ForgotPasswordPage() {
 
       setIsSubmitted(true);
       toast({
-        title: "Reset link sent",
+        title: "Success",
         description: result.message,
       });
 
     } catch (error) {
-      console.error("Forgot password error:", error);
+      console.error("Reset error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to send reset email",
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">Check Your Email</CardTitle>
             <CardDescription>
-              If the email address you entered is registered with us, you'll receive a password reset link shortly.
+              Your password reset email has been sent. Please check your inbox and follow the instructions.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
