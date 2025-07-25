@@ -73,33 +73,37 @@ export default function Navbar() {
           {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated && user ? (
-              <>
-                <Link href="/student-dashboard">
-                  <Button variant="outline" className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white">
-                    Dashboard
-                  </Button>
-                </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>{user.name}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href="/student-dashboard" className="w-full">
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                    {user.profilePic ? (
+                      <img 
+                        src={user.profilePic} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full object-cover border-2 border-[#F26B1D]/20"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                    <span className="font-medium text-gray-900">{user.name}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/student-dashboard" className="w-full">
+                      <User className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="flex space-x-2">
                 <Link href="/login">
@@ -151,29 +155,47 @@ export default function Navbar() {
             <div className="pt-2 space-y-2">
               {isAuthenticated && user ? (
                 <>
+                  {/* Mobile User Profile Section */}
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    {user.profilePic ? (
+                      <img 
+                        src={user.profilePic} 
+                        alt="Profile" 
+                        className="w-10 h-10 rounded-full object-cover border-2 border-[#F26B1D]/20"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm text-gray-500">Student</p>
+                    </div>
+                  </div>
+                  
                   <Link href="/student-dashboard">
                     <Button
                       variant="outline"
                       className="w-full border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
+                      <User className="h-4 w-4 mr-2" />
                       Dashboard
                     </Button>
                   </Link>
-                  <div className="flex items-center justify-between w-full p-2 text-sm text-gray-600">
-                    <span>Welcome, {user.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        logout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <LogOut className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
                 </>
               ) : (
                 <Link href="/login">
