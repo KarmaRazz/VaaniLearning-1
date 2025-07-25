@@ -180,14 +180,14 @@ const ProfileInfo = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Info</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Profile Info</h2>
         <div className="animate-pulse">
-          <div className="flex items-center space-x-6 mb-6">
-            <div className="w-24 h-24 bg-gray-200 rounded-full"></div>
-            <div className="space-y-2">
-              <div className="h-6 bg-gray-200 rounded w-48"></div>
-              <div className="h-4 bg-gray-200 rounded w-64"></div>
+          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-full"></div>
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="h-5 sm:h-6 bg-gray-200 rounded w-32 sm:w-48 mx-auto sm:mx-0"></div>
+              <div className="h-3 sm:h-4 bg-gray-200 rounded w-40 sm:w-64 mx-auto sm:mx-0"></div>
             </div>
           </div>
           <div className="space-y-4">
@@ -202,48 +202,49 @@ const ProfileInfo = () => {
 
   if (error || !user) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Info</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Profile Info</h2>
         <div className="text-center py-8">
-          <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">Please login to view your profile information.</p>
+          <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-sm sm:text-base text-gray-500">Please login to view your profile information.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Profile Info</h2>
+    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900">Profile Info</h2>
         <Button
           onClick={() => setShowChangePassword(true)}
           variant="outline"
-          className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white"
+          size="sm"
+          className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white text-xs sm:text-sm w-full sm:w-auto"
         >
-          <Shield className="h-4 w-4 mr-2" />
+          <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
           Change Password
         </Button>
       </div>
 
       {/* Profile Header */}
-      <div className="flex items-center space-x-6 mb-8">
+      <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
         <div className="relative">
           {profile?.profilePic ? (
             <img 
               src={profile.profilePic} 
               alt="Profile" 
-              className="w-24 h-24 rounded-full object-cover border-4 border-[#F26B1D]/20"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-[#F26B1D]/20"
             />
           ) : (
-            <div className="w-24 h-24 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
-              <User className="h-12 w-12 text-white" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
+              <User className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
             </div>
           )}
           <Dialog>
             <DialogTrigger asChild>
-              <button className="absolute -bottom-2 -right-2 bg-[#F26B1D] hover:bg-[#D72638] text-white rounded-full p-2 shadow-lg transition-colors">
-                <Camera className="h-4 w-4" />
+              <button className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-[#F26B1D] hover:bg-[#D72638] text-white rounded-full p-1.5 sm:p-2 shadow-lg transition-colors">
+                <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -292,54 +293,54 @@ const ProfileInfo = () => {
             </DialogContent>
           </Dialog>
         </div>
-        <div>
-          <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
-          <div className="flex items-center space-x-2 text-gray-600 mt-1">
-            <Mail className="h-4 w-4" />
-            <span>{user.email}</span>
+        <div className="text-center sm:text-left">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{user.name}</h3>
+          <div className="flex items-center justify-center sm:justify-start space-x-2 text-gray-600 mt-1 text-sm sm:text-base">
+            <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="break-all">{user.email}</span>
           </div>
-          <div className="flex items-center space-x-2 text-gray-500 text-sm mt-1">
-            <UserCheck className="h-4 w-4" />
+          <div className="flex items-center justify-center sm:justify-start space-x-2 text-gray-500 text-xs sm:text-sm mt-1">
+            <UserCheck className="h-3 w-3 sm:h-4 sm:w-4" />
             <span>Student Member</span>
           </div>
         </div>
       </div>
 
       {/* Profile Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Personal Information */}
         <div>
-          <h4 className="font-semibold text-gray-900 mb-4">Personal Information</h4>
-          <div className="space-y-4">
+          <h4 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base">Personal Information</h4>
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <UserCheck className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Username</p>
-                <p className="text-gray-900">{profile?.username || 'Not available'}</p>
+              <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Username</p>
+                <p className="text-sm sm:text-base text-gray-900 truncate">{profile?.username || 'Not available'}</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <Mail className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Email</p>
-                <p className="text-gray-900">{user.email}</p>
+              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Email</p>
+                <p className="text-sm sm:text-base text-gray-900 break-all">{user.email}</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <Phone className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Phone Number</p>
-                <p className="text-gray-900">{profile?.phoneNumber || 'Not provided'}</p>
+              <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Phone Number</p>
+                <p className="text-sm sm:text-base text-gray-900">{profile?.phoneNumber || 'Not provided'}</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <Target className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Goal</p>
-                <p className="text-gray-900">{profile?.goalName || 'Not selected'}</p>
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Goal</p>
+                <p className="text-sm sm:text-base text-gray-900">{profile?.goalName || 'Not selected'}</p>
               </div>
             </div>
           </div>

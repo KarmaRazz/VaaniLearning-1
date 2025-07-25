@@ -57,24 +57,24 @@ const StudentDashboard = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-4 sm:gap-0">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Hi, {user?.name || 'Student'}
               </h1>
-              <p className="text-gray-600">Manage your learning journey</p>
+              <p className="text-sm sm:text-base text-gray-600">Manage your learning journey</p>
             </div>
             {/* Home Button and User Avatar */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               {/* Home Button */}
               <Button
                 onClick={() => setLocation('/')}
                 variant="outline"
                 size="sm"
-                className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors"
+                className="border-[#F26B1D] text-[#F26B1D] hover:bg-[#F26B1D] hover:text-white transition-colors text-xs sm:text-sm"
               >
-                <Home className="h-4 w-4 mr-2" />
-                Home
+                <Home className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Home</span>
               </Button>
               
               {/* User Avatar with Profile Picture Viewer */}
@@ -85,16 +85,16 @@ const StudentDashboard = () => {
                       <img 
                         src={user.profilePic} 
                         alt="Profile" 
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#F26B1D]/20 hover:border-[#F26B1D] transition-colors"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-[#F26B1D]/20 hover:border-[#F26B1D] transition-colors"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center hover:shadow-lg transition-shadow">
-                        <User className="h-6 w-6 text-white" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center hover:shadow-lg transition-shadow">
+                        <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                       </div>
                     )}
                   </div>
                 </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md mx-4">
                 <DialogHeader>
                   <DialogTitle>Profile Picture</DialogTitle>
                 </DialogHeader>
@@ -103,11 +103,11 @@ const StudentDashboard = () => {
                     <img 
                       src={user.profilePic} 
                       alt="Profile" 
-                      className="w-48 h-48 rounded-full object-cover border-4 border-[#F26B1D]/20"
+                      className="w-32 h-32 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-[#F26B1D]/20"
                     />
                   ) : (
-                    <div className="w-48 h-48 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
-                      <User className="h-24 w-24 text-white" />
+                    <div className="w-32 h-32 sm:w-48 sm:h-48 bg-gradient-to-br from-[#F26B1D] to-[#D72638] rounded-full flex items-center justify-center">
+                      <User className="h-16 w-16 sm:h-24 sm:w-24 text-white" />
                     </div>
                   )}
                 </div>
@@ -122,10 +122,35 @@ const StudentDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Mobile Tab Navigation - Visible only on small screens */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-2">
+            <div className="grid grid-cols-2 gap-2">
+              {sidebarItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`flex flex-col items-center space-y-1 px-3 py-3 rounded-lg text-center transition-colors ${
+                      activeSection === item.id
+                        ? 'bg-[#F26B1D] text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="w-64 flex-shrink-0">
+          {/* Desktop Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <nav className="space-y-2">
                 {sidebarItems.map((item) => {
@@ -150,7 +175,7 @@ const StudentDashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {renderActiveSection()}
           </div>
         </div>

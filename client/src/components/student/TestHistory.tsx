@@ -28,18 +28,18 @@ const TestHistory = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Test History</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Test History</h2>
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="flex items-center space-x-4 p-4 border rounded-lg">
-                <div className="w-12 h-12 bg-gray-200 rounded"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 border rounded-lg">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex-shrink-0"></div>
+                <div className="flex-1 space-y-2 w-full">
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
-                <div className="w-20 h-8 bg-gray-200 rounded"></div>
+                <div className="w-16 sm:w-20 h-6 sm:h-8 bg-gray-200 rounded flex-shrink-0"></div>
               </div>
             </div>
           ))}
@@ -50,11 +50,11 @@ const TestHistory = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Test History</h2>
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Test History</h2>
         <div className="text-center py-8">
-          <ClipboardCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">Failed to load test history. Please try again later.</p>
+          <ClipboardCheck className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-sm sm:text-base text-gray-500">Failed to load test history. Please try again later.</p>
         </div>
       </div>
     );
@@ -62,13 +62,13 @@ const TestHistory = () => {
 
   if (!testHistory || testHistory.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Test History</h2>
-        <div className="text-center py-12">
-          <ClipboardCheck className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Tests Taken</h3>
-          <p className="text-gray-500 mb-6">You haven't taken any mock tests yet. Start practicing to improve your scores!</p>
-          <button className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Test History</h2>
+        <div className="text-center py-8 sm:py-12">
+          <ClipboardCheck className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Tests Taken</h3>
+          <p className="text-sm sm:text-base text-gray-500 mb-6 px-4">You haven't taken any mock tests yet. Start practicing to improve your scores!</p>
+          <button className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base">
             Take Your First Test
           </button>
         </div>

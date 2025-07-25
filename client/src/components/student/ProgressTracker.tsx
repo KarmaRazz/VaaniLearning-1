@@ -24,10 +24,10 @@ const ProgressTracker = () => {
   return (
     <div>
       {/* Notes Summary */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <FileText className="h-6 w-6 text-[#F26B1D]" />
-          <h2 className="text-xl font-bold text-gray-900">Progress Tracker</h2>
+          <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#F26B1D]" />
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Progress Tracker</h2>
         </div>
         
         {notesLoading ? (
@@ -49,28 +49,28 @@ const ProgressTracker = () => {
           </div>
         ) : notesSummary.totalNotes === 0 ? (
           <div className="text-center py-8">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 mb-2">No Notes Added Yet</h4>
-            <p className="text-gray-500 mb-6">Start adding notes to your dashboard to track your study progress by subject.</p>
-            <button className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            <FileText className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Notes Added Yet</h4>
+            <p className="text-sm sm:text-base text-gray-500 mb-6 px-4">Start adding notes to your dashboard to track your study progress by subject.</p>
+            <button className="bg-[#F26B1D] hover:bg-[#D72638] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base">
               Browse Notes
             </button>
           </div>
         ) : (
           <div className="space-y-4">
             {/* Total Notes Count */}
-            <div className="bg-gradient-to-r from-[#F26B1D]/10 to-[#D72638]/10 p-4 rounded-lg border border-[#F26B1D]/20">
+            <div className="bg-gradient-to-r from-[#F26B1D]/10 to-[#D72638]/10 p-3 sm:p-4 rounded-lg border border-[#F26B1D]/20">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-[#F26B1D]/20 rounded-lg">
-                    <BookOpen className="h-6 w-6 text-[#F26B1D]" />
+                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                  <div className="p-1.5 sm:p-2 bg-[#F26B1D]/20 rounded-lg flex-shrink-0">
+                    <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-[#F26B1D]" />
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Total Notes Added</h4>
-                    <p className="text-sm text-gray-600">Notes saved to your dashboard</p>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Total Notes Added</h4>
+                    <p className="text-xs sm:text-sm text-gray-600">Notes saved to your dashboard</p>
                   </div>
                 </div>
-                <span className="text-3xl font-bold text-[#F26B1D]">{notesSummary.totalNotes}</span>
+                <span className="text-2xl sm:text-3xl font-bold text-[#F26B1D] flex-shrink-0">{notesSummary.totalNotes}</span>
               </div>
             </div>
 
