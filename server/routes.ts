@@ -4,6 +4,9 @@ import { storage } from "./storage";
 import { insertNoteSchema, insertGoalSchema, insertSubjectSchema, forgotPasswordSchema, resetPasswordSchema } from "@shared/schema";
 import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, AuthenticatedRequest } from "./auth";
 import { AdminAuth } from "./admin-auth";
+import { sendPasswordResetEmail } from "./email";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication Routes
@@ -784,7 +787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Remove note from user's dashboard
-      const removed = await storage.removeNoteFromUser(userId, noteId);
+      const removed = await storage.removeUserNote(userId, noteId);
       if (!removed) {
         return res.status(500).json({ error: "Failed to remove note from dashboard" });
       }
@@ -824,7 +827,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate secure token using Node.js crypto
-      const crypto = require('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
       const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
       
@@ -840,7 +842,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Send email with reset link
-      const { sendPasswordResetEmail } = require('./email');
       console.log(`Sending password reset email to: ${user.email}`);
       await sendPasswordResetEmail(user.email, resetToken, user.name);
       console.log(`Password reset email sent successfully to: ${user.email}`);
@@ -872,7 +873,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password } = validationResult.data;
       
       // Hash the provided token to match what's stored in database
-      const crypto = require('crypto');
       const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
       
       // Find and verify token
@@ -890,7 +890,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Hash the new password
-      const bcrypt = require('bcrypt');
       const saltRounds = 12;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       
