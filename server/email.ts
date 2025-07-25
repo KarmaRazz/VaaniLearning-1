@@ -1,12 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend('re_SNCK62iB_2cCRnThfJYcjmW49SjrTmenP');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
-  const resetLink = `https://vaani.replit.dev/reset-password/${token}`;
+  const resetLink = `${process.env.REPLIT_DOMAINS?.split(',')[0] || 'http://localhost:5000'}/reset-password/${token}`;
   
   const { data, error } = await resend.emails.send({
-    from: 'noreply@vaani.replit.dev',
+    from: 'onboarding@resend.dev',
     to: [email],
     subject: 'Reset Your Password – Vaani',
     html: `

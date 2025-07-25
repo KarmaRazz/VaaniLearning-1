@@ -841,7 +841,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send email with reset link
       const { sendPasswordResetEmail } = require('./email');
+      console.log(`Sending password reset email to: ${user.email}`);
       await sendPasswordResetEmail(user.email, resetToken, user.name);
+      console.log(`Password reset email sent successfully to: ${user.email}`);
       
       res.json({ message: successMessage });
       
