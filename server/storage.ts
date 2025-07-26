@@ -13,6 +13,7 @@ export interface IStorage {
   checkUniqueCredentials(username: string, email: string, phoneNumber?: string): Promise<{ field: string, exists: boolean } | null>;
   createUser(user: InsertUser): Promise<User>;
   updateUserProfilePic(userId: number, profilePicPath: string): Promise<User>;
+  deleteUserProfilePic(userId: number): Promise<User>;
   getNotes(): Promise<Note[]>;
   getPublishedNotes(): Promise<Note[]>;
   createNote(note: InsertNote): Promise<Note>;
@@ -215,6 +216,10 @@ export class MemStorage implements IStorage {
   }
 
   async updateUserProfilePic(userId: number, profilePicPath: string): Promise<User> {
+    throw new Error("Profile picture functionality not implemented in MemStorage");
+  }
+
+  async deleteUserProfilePic(userId: number): Promise<User> {
     throw new Error("Profile picture functionality not implemented in MemStorage");
   }
 
@@ -477,6 +482,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ profilePic: profilePicPath })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async deleteUserProfilePic(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ profilePic: null })
       .where(eq(users.id, userId))
       .returning();
     return user;

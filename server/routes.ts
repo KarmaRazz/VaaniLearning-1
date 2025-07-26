@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertNoteSchema, insertGoalSchema, insertSubjectSchema, forgotPasswordSchema, resetPasswordSchema } from "@shared/schema";
-import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, AuthenticatedRequest } from "./auth";
+import { signup, login, logout, getCurrentUser, authenticateToken, uploadProfilePic, handleProfilePicUpload, handleProfilePicDelete, AuthenticatedRequest } from "./auth";
 import { AdminAuth } from "./admin-auth";
 import { sendPasswordResetEmail } from "./email";
 import crypto from "crypto";
@@ -15,6 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", logout);
   app.get("/api/auth/me", authenticateToken, getCurrentUser);
   app.post("/api/auth/upload-profile-pic", authenticateToken, uploadProfilePic, handleProfilePicUpload);
+  app.delete("/api/auth/delete-profile-pic", authenticateToken, handleProfilePicDelete);
 
   // Admin Authentication Routes
   app.post("/api/admin/login", async (req, res) => {

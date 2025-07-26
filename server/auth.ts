@@ -312,3 +312,38 @@ export async function handleProfilePicUpload(req: AuthenticatedRequest, res: Res
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+export async function handleProfilePicDelete(req: AuthenticatedRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  try {
+    // Get the current user
+    const user = await storage.getUser(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.profilePic) {
+      return res.status(400).json({ error: 'No profile picture to delete' });
+    }
+
+    // Delete the physical file
+    const oldPicPath = path.join(process.cwd(), user.profilePic);
+    if (fs.existsSync(oldPicPath)) {
+      fs.unlinkSync(oldPicPath);
+    }
+
+    // Update user profile pic in database to null
+    const updatedUser = await storage.deleteUserProfilePic(req.user.id);
+    
+    res.json({
+      success: true,
+      message: 'Profile picture deleted successfully'
+    });
+  } catch (error) {
+    console.error('Profile pic delete error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

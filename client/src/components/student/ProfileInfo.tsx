@@ -121,6 +121,37 @@ const ProfileInfo = () => {
     }
   });
 
+  // Profile picture delete mutation
+  const deleteProfilePicMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/delete-profile-pic', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete profile picture');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Profile picture deleted successfully',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/student/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      setSelectedFile(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  });
+
   const handlePasswordSubmit = () => {
     // Validate password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -176,6 +207,10 @@ const ProfileInfo = () => {
     if (selectedFile) {
       uploadProfilePicMutation.mutate(selectedFile);
     }
+  };
+
+  const handleProfilePicDelete = () => {
+    deleteProfilePicMutation.mutate();
   };
 
   if (isLoading) {
@@ -283,11 +318,21 @@ const ProfileInfo = () => {
                 <div className="flex space-x-2">
                   <Button 
                     onClick={handleProfilePicUpload}
-                    disabled={!selectedFile || uploadProfilePicMutation.isPending}
+                    disabled={!selectedFile || uploadProfilePicMutation.isPending || deleteProfilePicMutation.isPending}
                     className="flex-1"
                   >
                     {uploadProfilePicMutation.isPending ? 'Uploading...' : 'Update Picture'}
                   </Button>
+                  {profile?.profilePic && (
+                    <Button 
+                      onClick={handleProfilePicDelete}
+                      disabled={deleteProfilePicMutation.isPending || uploadProfilePicMutation.isPending}
+                      variant="outline"
+                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    >
+                      {deleteProfilePicMutation.isPending ? 'Deleting...' : 'Delete'}
+                    </Button>
+                  )}
                 </div>
               </div>
             </DialogContent>
