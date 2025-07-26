@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown } from "lucide-react";
 import logoImage from "@assets/Logo Png_1749717205842.png";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,17 +18,30 @@ export default function Navbar() {
   const [location] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
+  // Fetch goals from database
+  const { data: goals } = useQuery({
+    queryKey: ["/api/goals"],
+    queryFn: async () => {
+      const response = await fetch("/api/goals");
+      if (!response.ok) throw new Error("Failed to fetch goals");
+      return response.json();
+    },
+  });
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/courses", label: "Courses" },
     { href: "/about", label: "About" },
     { href: "/notes", label: "Notes" },
     { href: "/mock-test", label: "Mock Test" },
   ];
+
+  const formatGoalUrl = (goalName: string) => {
+    return `/explore/${goalName.toLowerCase().replace(/\s+/g, "")}`;
+  };
 
   const isActiveLink = (href: string) => {
     if (href === "/" && location === "/") return true;
@@ -67,6 +81,25 @@ export default function Navbar() {
                   </span>
                 </Link>
               ))}
+              
+              {/* Courses Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <span className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-orange transition-colors duration-200 cursor-pointer flex items-center gap-1">
+                    Courses
+                    <ChevronDown className="h-4 w-4" />
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  {goals?.map((goal: any) => (
+                    <DropdownMenuItem key={goal.id} asChild>
+                      <Link href={formatGoalUrl(goal.name)}>
+                        <span className="w-full cursor-pointer">{goal.name}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -152,7 +185,22 @@ export default function Navbar() {
                 </span>
               </Link>
             ))}
-            <div className="pt-2 space-y-2">
+            
+            {/* Mobile Courses Section */}
+            <div className="border-t border-gray-200 pt-2 mt-2">
+              <div className="px-3 py-2 text-base font-medium text-gray-900">Courses</div>
+              {goals?.map((goal: any) => (
+                <Link key={goal.id} href={formatGoalUrl(goal.name)}>
+                  <span
+                    className="block px-6 py-2 text-sm text-gray-600 hover:text-primary-orange cursor-pointer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {goal.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="pt-2 space-y-2 border-t border-gray-200 mt-2">
               {isAuthenticated && user ? (
                 <>
                   {/* Mobile User Profile Section */}
