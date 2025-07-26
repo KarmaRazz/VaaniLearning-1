@@ -17,11 +17,13 @@ RESEND_API_KEY=your_resend_api_key_for_emails
 
 ### 2. Server Configuration
 
-The server is now configured to:
-- ✅ Trust proxy headers for HTTPS detection
-- ✅ Force redirect HTTP → HTTPS in production
+The server is now configured with enhanced HTTPS support:
+- ✅ Trust proxy headers for HTTPS detection (multiple header formats supported)
+- ✅ Force redirect HTTP → HTTPS on all platforms (not just production)
+- ✅ Enhanced protocol detection (x-forwarded-proto, x-forwarded-protocol, x-url-scheme)
 - ✅ Set secure cookie flags for HTTPS
-- ✅ Add security headers (HSTS, XSS protection, etc.)
+- ✅ Add comprehensive security headers (HSTS, CSP, XSS protection, etc.)
+- ✅ Automatic HTTPS detection for Replit, Vercel, Railway, Heroku, and other platforms
 
 ### 3. Platform-Specific Deployment Instructions
 
@@ -64,19 +66,40 @@ If using a custom domain:
 3. **Domain Verification**: Complete domain ownership verification
 4. **Force HTTPS**: The server automatically redirects HTTP to HTTPS
 
-### 5. Troubleshooting HTTPS Issues
+### 5. Enhanced HTTPS Configuration
+
+The server now includes enhanced HTTPS detection and enforcement:
+
+- **Multi-platform support**: Detects HTTPS headers from Replit, Vercel, Railway, Heroku, and others
+- **Automatic redirects**: Forces HTTP to HTTPS on all non-localhost domains
+- **Security headers**: HSTS, CSP, XSS protection automatically applied
+- **Debug logging**: Console logs show redirect attempts for troubleshooting
+
+### 6. Troubleshooting HTTPS Issues
 
 #### Problem: "Not Secure" warning
-**Solution**: Ensure `NODE_ENV=production` is set and deployment platform supports HTTPS
+**Solutions**:
+1. Check browser console for redirect logs: `Redirecting HTTP to HTTPS`
+2. Verify deployment platform provides SSL certificates
+3. Ensure custom domain DNS is properly configured
+4. Check if platform requires SSL certificate installation
 
 #### Problem: Cookies not working
 **Solution**: Verify secure cookie settings are properly configured (already done)
 
-#### Problem: Mixed content warnings
+#### Problem: Mixed content warnings  
 **Solution**: Ensure all assets (CSS, JS, images) are served over HTTPS
 
 #### Problem: Redirect loops
-**Solution**: Check if your platform already handles HTTPS (some platforms terminate SSL at load balancer)
+**Solutions**:
+1. Check server logs for redirect messages
+2. Verify platform doesn't already handle HTTPS termination
+3. Some platforms handle SSL at load balancer level
+
+#### Problem: Platform-specific issues
+**Replit**: SSL should work automatically with `.replit.app` domains
+**Custom Domain**: Ensure DNS points to platform and SSL is enabled
+**Cloudflare**: Check SSL/TLS setting is "Full" or "Full (strict)"
 
 ### 6. Security Headers Included
 
