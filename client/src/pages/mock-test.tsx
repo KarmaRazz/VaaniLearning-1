@@ -26,9 +26,20 @@ export default function MockTest() {
               </h1>
               
               {/* Subtext */}
-              <p className="text-gray-600 text-lg mb-8 leading-relaxed">
+              <p className="text-gray-600 text-lg mb-4 leading-relaxed">
                 We're working hard to bring you full-length mock tests tailored for your goals. Stay tuned!
               </p>
+              
+              {/* Special Announcement */}
+              <div className="bg-gradient-to-r from-[#F26B1D]/10 to-[#D72638]/10 border border-[#F26B1D]/20 rounded-lg p-4 mb-8">
+                <p className="text-[#D72638] font-semibold text-lg mb-2">
+                  🏆 Live All Nepal Test Series
+                </p>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  Final month preparation with <span className="font-semibold text-[#F26B1D]">amazing cash prizes</span>! 
+                  Experience real exam conditions with students across Nepal. Stay tuned for registration!
+                </p>
+              </div>
 
               {/* Feature Preview */}
               <div className="space-y-4 text-left">
