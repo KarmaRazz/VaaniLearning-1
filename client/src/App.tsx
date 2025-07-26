@@ -20,7 +20,7 @@ import StudentDashboardPage from "@/pages/student-dashboard";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import ResetPasswordPage from "@/pages/reset-password";
 import CEEPage from "@/pages/explore/cee";
-import IOMPage from "@/pages/explore/iom";
+import IOEPage from "@/pages/explore/ioe";
 import LokSewaPage from "@/pages/explore/loksewa";
 import ACCAPage from "@/pages/explore/acca";
 import OthersPage from "@/pages/explore/others";
@@ -42,7 +42,7 @@ function Router() {
       <Route path="/forgot-password" component={ForgotPasswordPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/explore/cee" component={CEEPage} />
-      <Route path="/explore/iom" component={IOMPage} />
+      <Route path="/explore/ioe" component={IOEPage} />
       <Route path="/explore/loksewa" component={LokSewaPage} />
       <Route path="/explore/acca" component={ACCAPage} />
       <Route path="/explore/others" component={OthersPage} />

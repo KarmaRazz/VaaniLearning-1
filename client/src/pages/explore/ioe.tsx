@@ -1,16 +1,16 @@
 import Navbar from "@/components/navbar";
 import { CourseCard } from "@/components/CourseCard";
 
-const iomCourses = [
-  { title: "IOM Engineering Entrance - Mathematics" },
-  { title: "IOM Engineering Entrance - Physics" },
-  { title: "IOM Engineering Entrance - Chemistry" },
+const ioeCourses = [
+  { title: "IOE Engineering Entrance - Mathematics" },
+  { title: "IOE Engineering Entrance - Physics" },
+  { title: "IOE Engineering Entrance - Chemistry" },
   { title: "Complete Mock Test Series" },
   { title: "Previous Year Question Bank" },
   { title: "Formula Sheets & Quick Revision" },
 ];
 
-export default function IOMPage() {
+export default function IOEPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <Navbar />
@@ -20,10 +20,10 @@ export default function IOMPage() {
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              IOM
+              IOE
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Institute of Medicine (IOM) entrance preparation for engineering and technical programs. Master Mathematics, Physics, and Chemistry with our structured learning approach designed for IOM aspirants.
+              Institute of Engineering (IOE) entrance preparation for engineering and technical programs. Master Mathematics, Physics, and Chemistry with our structured learning approach designed for IOE aspirants.
             </p>
           </div>
 
@@ -33,7 +33,7 @@ export default function IOMPage() {
               Available Courses
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {iomCourses.map((course, index) => (
+              {ioeCourses.map((course, index) => (
                 <CourseCard 
                   key={index}
                   title={course.title}
@@ -46,18 +46,18 @@ export default function IOMPage() {
           {/* Detailed Description Section */}
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              About IOM Entrance Preparation
+              About IOE Entrance Preparation
             </h2>
             <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
               <p className="mb-6">
-                The Institute of Medicine (IOM) conducts entrance examinations for various engineering and technical programs. Our comprehensive preparation program covers all essential subjects with a focus on problem-solving techniques and conceptual understanding.
+                The Institute of Engineering (IOE) conducts entrance examinations for various engineering and technical programs. Our comprehensive preparation program covers all essential subjects with a focus on problem-solving techniques and conceptual understanding.
               </p>
               
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Exam Structure & Syllabus
               </h3>
               <p className="mb-6">
-                The IOM entrance exam typically includes Mathematics, Physics, and Chemistry based on the +2 level curriculum. The exam format consists of multiple-choice questions with a time limit of 3 hours. Strong foundation in these core subjects is essential for success.
+                The IOE entrance exam typically includes Mathematics, Physics, and Chemistry based on the +2 level curriculum. The exam format consists of multiple-choice questions with a time limit of 3 hours. Strong foundation in these core subjects is essential for success.
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -65,7 +65,7 @@ export default function IOMPage() {
               </h3>
               <ul className="list-disc pl-6 mb-6 space-y-2">
                 <li>Subject-wise comprehensive study materials and video lectures</li>
-                <li>Regular practice sessions with IOM-pattern questions</li>
+                <li>Regular practice sessions with IOE-pattern questions</li>
                 <li>Weekly mock tests to track progress and improve time management</li>
                 <li>Detailed analysis of previous year papers and trends</li>
                 <li>Expert guidance from experienced faculty members</li>
@@ -73,7 +73,7 @@ export default function IOMPage() {
               </ul>
 
               <p>
-                Join our proven IOM preparation program and increase your chances of securing admission to your desired engineering or technical program at the Institute of Medicine.
+                Join our proven IOE preparation program and increase your chances of securing admission to your desired engineering or technical program at the Institute of Engineering.
               </p>
             </div>
           </div>
