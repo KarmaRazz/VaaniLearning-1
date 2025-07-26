@@ -7,7 +7,15 @@ import FeaturedCourses from "@/components/featured-courses";
 import FeatureCards from "@/components/feature-cards";
 import StatsSection from "@/components/stats-section";
 import { Button } from "@/components/ui/button";
-import { Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  Phone,
+  Mail,
+  MapPin,
+} from "lucide-react";
 
 export default function Home() {
   return (
@@ -20,7 +28,7 @@ export default function Home() {
       <FeaturedCourses />
       <StatsSection />
       <FeatureCards />
-      
+
       {/* Call to Action Section */}
       <section className="py-16 bg-[#FDF7F3]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -28,7 +36,8 @@ export default function Home() {
             Ready to Start Your Success Journey?
           </h2>
           <p className="text-xl text-[#444444] mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of students who have achieved their dreams with Vaani. Start your preparation today!
+            Join thousands of students who have achieved their dreams with
+            Vaani. Start your preparation today!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-[#F26B1D] text-white px-8 py-4 text-lg font-bold hover:bg-[#D72638] transition-colors duration-200 shadow-md hover:shadow-lg">
@@ -55,16 +64,28 @@ export default function Home() {
                 Nepal's most trusted platform for Lok Sewa and CEE preparation.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                <a
+                  href="#"
+                  className="text-[#333333] hover:text-[#F26B1D] transition-colors"
+                >
                   <Facebook className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                <a
+                  href="#"
+                  className="text-[#333333] hover:text-[#F26B1D] transition-colors"
+                >
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                <a
+                  href="#"
+                  className="text-[#333333] hover:text-[#F26B1D] transition-colors"
+                >
                   <Instagram className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-[#333333] hover:text-[#F26B1D] transition-colors">
+                <a
+                  href="#"
+                  className="text-[#333333] hover:text-[#F26B1D] transition-colors"
+                >
                   <Youtube className="h-5 w-5" />
                 </a>
               </div>
@@ -72,45 +93,112 @@ export default function Home() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Quick Links</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">
+                Quick Links
+              </h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">About Us</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Courses</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Pricing</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Contact</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Courses
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Support</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">
+                Support
+              </h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Help Center</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Terms of Service</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Privacy Policy</a></li>
-                <li><a href="#" className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium">Refund Policy</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-[#333333] hover:text-[#D72638] transition text-sm font-medium"
+                  >
+                    Refund Policy
+                  </a>
+                </li>
               </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">Contact</h4>
+              <h4 className="text-base font-semibold text-[#F26B1D] mb-4">
+                Contact
+              </h4>
               <div className="space-y-3">
                 <p className="flex items-center text-[#333333] text-sm">
-                  <Phone className="h-4 w-4 mr-3 text-[#F26B1D]" /> +977 98XXXXXXXX
+                  <Phone className="h-4 w-4 mr-3 text-[#F26B1D]" /> +977
+                  9704514014
                 </p>
                 <p className="flex items-center text-[#333333] text-sm">
-                  <Mail className="h-4 w-4 mr-3 text-[#F26B1D]" /> support@vaani.np
+                  <Mail className="h-4 w-4 mr-3 text-[#F26B1D]" />{" "}
+                  support@e-vaani.com
                 </p>
                 <p className="flex items-center text-[#333333] text-sm">
-                  <MapPin className="h-4 w-4 mr-3 text-[#F26B1D]" /> Kathmandu, Nepal
+                  <MapPin className="h-4 w-4 mr-3 text-[#F26B1D]" /> Kathmandu,
+                  Nepal
                 </p>
               </div>
             </div>
           </div>
 
           <div className="border-t border-[#333333]/20 mt-10 pt-8 text-center">
-            <p className="text-[#333333] text-sm">&copy; 2024 Vaani. All rights reserved.</p>
+            <p className="text-[#333333] text-sm">
+              &copy; 2024 Vaani. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

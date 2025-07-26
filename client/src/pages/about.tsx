@@ -2,8 +2,10 @@ import Navbar from "@/components/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, Award, Target, CheckCircle, Star, ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function About() {
+  const [, setLocation] = useLocation();
   const features = [
     {
       icon: BookOpen,
@@ -60,6 +62,7 @@ export default function About() {
             <div className="flex flex-wrap justify-center gap-4">
               <Button 
                 size="lg" 
+                onClick={() => setLocation('/signup')}
                 className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
               >
                 Start Learning <ArrowRight className="ml-2 h-5 w-5" />
@@ -206,6 +209,7 @@ export default function About() {
           <div className="flex flex-wrap justify-center gap-4">
             <Button 
               size="lg" 
+              onClick={() => setLocation('/signup')}
               className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
             >
               Sign Up Now <ArrowRight className="ml-2 h-5 w-5" />

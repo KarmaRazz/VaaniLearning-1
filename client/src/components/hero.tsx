@@ -2,6 +2,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
+  const scrollToGoals = () => {
+    const goalsSection = document.getElementById('goals-section');
+    if (goalsSection) {
+      goalsSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start' 
+      });
+    }
+  };
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-[#F26B1D] to-[#D72638] min-h-[80vh]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
@@ -20,7 +29,10 @@ export default function Hero() {
 
             {/* CTA Button */}
             <div className="flex justify-center md:justify-start">
-              <Button className="bg-[#D72638] hover:bg-[#F26B1D] text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+              <Button 
+                onClick={scrollToGoals}
+                className="bg-[#D72638] hover:bg-[#F26B1D] text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              >
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
