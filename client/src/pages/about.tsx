@@ -2,10 +2,9 @@ import Navbar from "@/components/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Users, Award, Target, CheckCircle, Star, ArrowRight } from "lucide-react";
-import { useLocation } from "wouter";
+import { Link } from "wouter";
 
 export default function About() {
-  const [, setLocation] = useLocation();
   const features = [
     {
       icon: BookOpen,
@@ -60,13 +59,14 @@ export default function About() {
               Nepal's trusted and affordable learning platform empowering students to excel in competitive examinations
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
-                onClick={() => setLocation('/signup')}
-                className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
-              >
-                Start Learning <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link href="/signup">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
+                >
+                  Start Learning <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -207,13 +207,14 @@ export default function About() {
             Your success story starts here.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button 
-              size="lg" 
-              onClick={() => setLocation('/signup')}
-              className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
-            >
-              Sign Up Now <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href="/signup">
+              <Button 
+                size="lg" 
+                className="bg-white text-[#F26B1D] hover:bg-gray-100 font-semibold"
+              >
+                Sign Up Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
             <Button 
               size="lg" 
               variant="outline" 
