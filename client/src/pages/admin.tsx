@@ -1485,7 +1485,7 @@ const NotesContent = () => {
   const [availableSubjectsForGoal, setAvailableSubjectsForGoal] = useState<string[]>([]);
 
   // Fetch goals and subjects from API
-  const { data: goals = [] } = useQuery({
+  const { data: goalsData = [] } = useQuery({
     queryKey: ['/api/goals'],
     queryFn: async () => {
       const response = await fetch('/api/goals');
@@ -1493,6 +1493,13 @@ const NotesContent = () => {
       return response.json();
     },
   });
+
+  // Sort goals with CEE first, then alphabetical
+  const goals = goalsData ? [...goalsData].sort((a, b) => {
+    if (a.name === "CEE") return -1;
+    if (b.name === "CEE") return 1;
+    return a.name.localeCompare(b.name);
+  }) : [];
 
   const { data: allSubjects = [] } = useQuery({
     queryKey: ['/api/subjects'],

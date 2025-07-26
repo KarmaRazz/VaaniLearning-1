@@ -17,7 +17,13 @@ const useGoals = () => useQuery({
   queryFn: async () => {
     const response = await fetch('/api/goals');
     if (!response.ok) throw new Error('Failed to fetch goals');
-    return response.json();
+    const data = await response.json();
+    // Sort goals with CEE first, then alphabetical
+    return [...data].sort((a, b) => {
+      if (a.name === "CEE") return -1;
+      if (b.name === "CEE") return 1;
+      return a.name.localeCompare(b.name);
+    });
   },
 });
 
