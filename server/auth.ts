@@ -227,7 +227,7 @@ export async function getCurrentUser(req: AuthenticatedRequest, res: Response) {
 }
 
 // Configure multer for profile picture uploads
-const uploadsDir = path.join(process.cwd(), 'uploads', 'profile-pics');
+const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'profile-pics');
 
 // Ensure uploads directory exists
 if (!fs.existsSync(uploadsDir)) {
@@ -281,7 +281,7 @@ export async function handleProfilePicUpload(req: AuthenticatedRequest, res: Res
 
     // Delete old profile picture if it exists
     if (user.profilePic) {
-      const oldPicPath = path.join(process.cwd(), user.profilePic);
+      const oldPicPath = path.join(process.cwd(), 'public', user.profilePic);
       if (fs.existsSync(oldPicPath)) {
         fs.unlinkSync(oldPicPath);
       }
@@ -330,7 +330,7 @@ export async function handleProfilePicDelete(req: AuthenticatedRequest, res: Res
     }
 
     // Delete the physical file
-    const oldPicPath = path.join(process.cwd(), user.profilePic);
+    const oldPicPath = path.join(process.cwd(), 'public', user.profilePic);
     if (fs.existsSync(oldPicPath)) {
       fs.unlinkSync(oldPicPath);
     }
