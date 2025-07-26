@@ -4,7 +4,7 @@ import { Link } from "wouter";
 
 export default function ExamCategories() {
   // Fetch goals from database
-  const { data: goals, isLoading } = useQuery({
+  const { data: goalsData, isLoading } = useQuery({
     queryKey: ["/api/goals"],
     queryFn: async () => {
       const response = await fetch("/api/goals");
@@ -12,6 +12,13 @@ export default function ExamCategories() {
       return response.json();
     },
   });
+
+  // Sort goals with CEE first, then alphabetical
+  const goals = goalsData ? [...goalsData].sort((a, b) => {
+    if (a.name === "CEE") return -1;
+    if (b.name === "CEE") return 1;
+    return a.name.localeCompare(b.name);
+  }) : [];
 
   const formatGoalUrl = (goalName: string) => {
     return `/explore/${goalName.toLowerCase().replace(/\s+/g, "")}`;

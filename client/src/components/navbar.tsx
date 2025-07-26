@@ -19,7 +19,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
 
   // Fetch goals from database
-  const { data: goals } = useQuery({
+  const { data: goalsData } = useQuery({
     queryKey: ["/api/goals"],
     queryFn: async () => {
       const response = await fetch("/api/goals");
@@ -27,6 +27,13 @@ export default function Navbar() {
       return response.json();
     },
   });
+
+  // Sort goals with CEE first, then alphabetical
+  const goals = goalsData ? [...goalsData].sort((a, b) => {
+    if (a.name === "CEE") return -1;
+    if (b.name === "CEE") return 1;
+    return a.name.localeCompare(b.name);
+  }) : [];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
