@@ -68,24 +68,10 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              {navLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <span
-                    className={`px-3 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
-                      isActiveLink(link.href)
-                        ? "text-primary-orange"
-                        : "text-gray-600 hover:text-primary-orange"
-                    }`}
-                  >
-                    {link.label}
-                  </span>
-                </Link>
-              ))}
-              
-              {/* Courses Dropdown */}
+              {/* Courses Dropdown - Primary CTA */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <span className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-orange transition-colors duration-200 cursor-pointer flex items-center gap-1">
+                  <span className="px-4 py-2 text-sm font-semibold bg-[#F26B1D]/10 hover:bg-[#F26B1D]/20 text-[#F26B1D] rounded-md transition-all duration-200 cursor-pointer flex items-center gap-1">
                     Courses
                     <ChevronDown className="h-4 w-4" />
                   </span>
@@ -100,6 +86,20 @@ export default function Navbar() {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+              
+              {navLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  <span
+                    className={`px-3 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                      isActiveLink(link.href)
+                        ? "text-primary-orange"
+                        : "text-gray-600 hover:text-primary-orange"
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -171,6 +171,21 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+            {/* Mobile Courses Section - First */}
+            <div className="mb-2">
+              <div className="px-3 py-2 text-base font-semibold bg-[#F26B1D]/10 text-[#F26B1D] rounded-md mb-2">Courses</div>
+              {goals?.map((goal: any) => (
+                <Link key={goal.id} href={formatGoalUrl(goal.name)}>
+                  <span
+                    className="block px-6 py-2 text-sm text-gray-600 hover:text-primary-orange cursor-pointer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {goal.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span
@@ -185,21 +200,6 @@ export default function Navbar() {
                 </span>
               </Link>
             ))}
-            
-            {/* Mobile Courses Section */}
-            <div className="border-t border-gray-200 pt-2 mt-2">
-              <div className="px-3 py-2 text-base font-medium text-gray-900">Courses</div>
-              {goals?.map((goal: any) => (
-                <Link key={goal.id} href={formatGoalUrl(goal.name)}>
-                  <span
-                    className="block px-6 py-2 text-sm text-gray-600 hover:text-primary-orange cursor-pointer"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {goal.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
             <div className="pt-2 space-y-2 border-t border-gray-200 mt-2">
               {isAuthenticated && user ? (
                 <>
