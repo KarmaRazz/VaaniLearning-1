@@ -8,6 +8,31 @@ import { seedGoalsAndSubjects } from "./seed-goals-subjects";
 import { AdminAuth } from "./admin-auth";
 
 const app = express();
+
+// Trust proxy for HTTPS/SSL (important for deployment)
+app.set('trust proxy', 1);
+
+// Security headers and HTTPS enforcement for production
+if (process.env.NODE_ENV === 'production') {
+  // Force HTTPS redirect
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      return res.redirect(`https://${req.header('host')}${req.url}`);
+    }
+    next();
+  });
+
+  // Security headers for HTTPS
+  app.use((req, res, next) => {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+  });
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

@@ -174,11 +174,11 @@ export async function login(req: Request, res: Response) {
     // Generate JWT token
     const token = generateToken({ id: user.id, email: user.email, name: user.name, role: user.role });
 
-    // Set HTTP-only cookie
+    // Set HTTP-only cookie with proper security settings for HTTPS
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict', // More lenient for cross-origin HTTPS
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
